@@ -13,6 +13,7 @@ class Scenario:
         self.enable_ui = True
 
         self.solids = []
+        self.background_image = None
 
     def update(self):
         pass
@@ -31,7 +32,18 @@ class Scenario:
             self.draw_ui(screen)
 
     def draw_background(self, screen):
-        screen.fill((135, 206, 235))
+        if self.background_image:
+            screen_width, screen_height = screen.get_size()
+            bg_width, bg_height = self.background_image.get_size()
+
+            x = (screen_width - bg_width) // 2
+            y = (screen_height - bg_height) // 2
+
+            screen.blit(self.background_image, (x, y))
+        else:
+            screen.fill((135, 206, 235))
+
+
 
     def draw_ground(self, screen):
         ground_height = 150
@@ -45,3 +57,6 @@ class Scenario:
 
     def draw_ui(self, screen):
         pass
+
+    def load_background(self, image_path):
+        self.background_image = pygame.image.load(image_path).convert_alpha()

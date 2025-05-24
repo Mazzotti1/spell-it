@@ -2,7 +2,7 @@ from Attributes.attributes import Attributes
 import pygame
 
 class Entity:
-    def __init__(self, x, y, name: str, attributes: Attributes, width: int = 32, height: int = 32):
+    def __init__(self, x, y, name: str, attributes: Attributes, width: int = 128, height: int = 128):
         self.name = name
         self.attributes = attributes
 
@@ -68,3 +68,12 @@ class Entity:
             frame = image.subsurface((i * frame_width, 0, frame_width, frame_height))
             sprites.append(frame)
         return sprites
+    
+    def update_animation(self, dt):
+        self.animation_timer += dt
+        if self.animation_timer >= self.frame_duration and self.current_frames:
+            self.frame_index = (self.frame_index + 1) % len(self.current_frames)
+            self.animation_timer = 0
+
+        if self.current_frames:
+            self.current_frame = self.current_frames[self.frame_index]

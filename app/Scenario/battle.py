@@ -1,12 +1,15 @@
 import pygame
 from Scenario.scenario import Scenario
 
-class Screen(Scenario):
-    def __init__(self, manager):
+class Battle(Scenario):
+    def __init__(self, manager, biome):
         super().__init__()
         self.manager = manager
-        self.enable_ground = True
-        self.enable_solids = True
+        self.enable_ground = False
+        self.enable_solids = False
         self.enable_background = True
         self.enable_ui = False
         self.font = pygame.font.SysFont(None, 64)
+
+        self.load_background(biome)
+

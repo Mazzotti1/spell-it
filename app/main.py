@@ -2,9 +2,11 @@ import pygame
 import sys
 from Scenario.scenario_manager import ScenarioManager
 from Scenario.main_menu import MainMenu
+from Scenario.battle import Battle
 from Attributes.attributes import Attributes
 from Entity.Player.player import Player
-
+from Factory.enemyFactory import EnemyFactory
+from Factory.playerFactory import PlayerFactory
 class App:
     def __init__(self):
       
@@ -18,23 +20,59 @@ class App:
         self.manager = ScenarioManager()
         self.manager.change_scenario(MainMenu(self.manager))
 
-        player_attributes = Attributes(
-            dodge=0.1, 
-            attack_speed=1.0, 
-            strength=10, 
-            health=100, 
-            lucky=0.05, 
-            critical_chance=0.1
-        )
-
-        self.player = Player("Aurélio", player_attributes, 368, 268)
-        self.player.rect = pygame.Rect(368, 268, self.player.width, self.player.height)
-
-        self.player.current_frames = self.player.idle_frames
-        self.player.frame_index = 0
-        self.player.animation_timer = 0
-        self.player.current_frame = self.player.current_frames[0] if self.player.current_frames else None
         
+        self.player = PlayerFactory.create_player(520, 750)
+
+        anacaonda_attributes = Attributes(
+            dodge=0.0, 
+            attack_speed=0.0, 
+            strength=0, 
+            health=0, 
+            lucky=0.0, 
+            critical_chance=0.0
+        )
+        self.anaconda = EnemyFactory.create_enemy('Anaconda', anacaonda_attributes, 1200, 550, "../assets/enemys/Anaconda/enemy_anaconda_idle.png")
+
+        quero_quero_attributes = Attributes(
+            dodge=0.0, 
+            attack_speed=0.0, 
+            strength=0, 
+            health=0, 
+            lucky=0.0, 
+            critical_chance=0.0
+        )
+        self.quero_quero = EnemyFactory.create_enemy('Quero-Quero', quero_quero_attributes, 1100, 420, "../assets/enemys/QueroQuero/enemy_quero_quero_idle.png")
+
+        calango_attributes = Attributes(
+            dodge=0.0, 
+            attack_speed=0.0, 
+            strength=0, 
+            health=0, 
+            lucky=0.0, 
+            critical_chance=0.0
+        )
+        self.calango = EnemyFactory.create_enemy('Calango', calango_attributes, 1200, 620, "../assets/enemys/Calango/enemy_calango_idle.png")
+
+        jacare_attributes = Attributes(
+            dodge=0.0, 
+            attack_speed=0.0, 
+            strength=0, 
+            health=0, 
+            lucky=0.0, 
+            critical_chance=0.0
+        )
+        self.jacare = EnemyFactory.create_enemy('Jacaré', jacare_attributes, 1280, 520, "../assets/enemys/Jacare/enemy_jacare_idle.png")
+
+        mico_attributes = Attributes(
+            dodge=0.0, 
+            attack_speed=0.0, 
+            strength=0, 
+            health=0, 
+            lucky=0.0, 
+            critical_chance=0.0
+        )
+        self.mico = EnemyFactory.create_enemy('Mico', mico_attributes, 1000, 300, "../assets/enemys/Mico/enemy_mico_idle.png")
+
     def run(self):
         while self.running:
             dt = self.clock.tick(60) / 1000 
@@ -49,16 +87,13 @@ class App:
             self.manager.update()
             self.manager.draw(self.screen)
 
-            self.player.animation_timer += dt
-            if self.player.animation_timer >= self.player.frame_duration:
-                self.player.frame_index = (self.player.frame_index + 1) % len(self.player.current_frames)
-                self.player.animation_timer = 0
-
-            self.player.current_frame = self.player.current_frames[self.player.frame_index]
-
-            if self.player.current_frame:
+            if isinstance(self.manager.current_scenario, Battle):
+                self.player.update_animation(dt)
                 self.player.draw(self.screen)
-            
+
+                self.quero_quero.update_animation(dt)
+                self.quero_quero.draw(self.screen)
+
             pygame.display.flip()
 
         pygame.quit()

@@ -1,0 +1,25 @@
+import pygame
+from Attributes.attributes import Attributes
+from Entity.Player.player import Player
+
+class PlayerFactory:
+    @staticmethod
+    def create_player(x, y):
+        player_attributes = Attributes(
+            dodge=0.1, 
+            attack_speed=1.0, 
+            strength=10, 
+            health=100, 
+            lucky=0.05, 
+            critical_chance=0.1
+        )
+
+        player = Player("Aurélio", player_attributes, x, y)
+        player.rect = pygame.Rect(x, y, player.width, player.height)
+
+        player.current_frames = player.idle_frames
+        player.frame_index = 0
+        player.animation_timer = 0
+        player.current_frame = player.current_frames[0] if player.current_frames else None
+
+        return player
