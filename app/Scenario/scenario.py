@@ -32,6 +32,8 @@ class Scenario:
             self.draw_ui(screen)
 
     def draw_background(self, screen):
+        screen.fill((0,0,0)) 
+
         if self.background_image:
             screen_width, screen_height = screen.get_size()
             bg_width, bg_height = self.background_image.get_size()
@@ -40,8 +42,6 @@ class Scenario:
             y = (screen_height - bg_height) // 2
 
             screen.blit(self.background_image, (x, y))
-        else:
-            screen.fill((135, 206, 235))
 
 
 

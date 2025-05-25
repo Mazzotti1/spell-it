@@ -7,6 +7,7 @@ from Attributes.attributes import Attributes
 from Entity.Player.player import Player
 from Factory.enemyFactory import EnemyFactory
 from Factory.playerFactory import PlayerFactory
+from Scenario.map import Map
 class App:
     def __init__(self):
       
@@ -83,6 +84,13 @@ class App:
 
                 if hasattr(self.manager.current_scenario, "handle_buttons_event"):
                     self.manager.current_scenario.handle_buttons_event(event)
+
+                if isinstance(self.manager.current_scenario, Map):
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse_pos = event.pos
+                        for node in self.manager.current_scenario.nodes:
+                            if node['rect'].collidepoint(mouse_pos):
+                                self.manager.current_scenario.handle_node_click(node)
 
             self.manager.update()
             self.manager.draw(self.screen)

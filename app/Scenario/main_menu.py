@@ -43,5 +43,5 @@ class MainMenu(Scenario):
         pygame.event.post(pygame.event.Event(pygame.QUIT))
 
     def start_game(self):
-        self.manager.change_scenario(Map(self.manager, "../assets/scene/map/map_1.png"))
+        self.manager.change_scenario(Map(self.manager, "../assets/scene/map/hd_m/map_1.png"))
          
