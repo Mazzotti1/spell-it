@@ -6,9 +6,18 @@ class Entity:
         self.name = name
         self.attributes = attributes
 
-        self.speed = 200
         self.direction = 0
         self.attacking = False
+
+        self.x = x
+        self.y = y
+        self.rect = pygame.Rect(self.x, self.y, width, height)
+
+        self.moving = False
+        self.target_x = x
+        self.target_y = y
+        self.move_speed = 200 
+        self.move_direction = None
 
         self.width = width
         self.height = height

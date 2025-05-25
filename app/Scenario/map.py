@@ -11,17 +11,19 @@ class Map(Scenario):
         self.enable_solids = False
         self.enable_background = True
         self.enable_ui = True
+        self.in_battle = False
         self.font = pygame.font.SysFont(None, 64)
 
         self.load_background(background)
 
-        self.enemy_images = [
-            pygame.image.load('../assets/scene/map/enemy_anaconda_map.png'),
-            pygame.image.load('../assets/scene/map/enemy_calango_map.png'),
-            pygame.image.load('../assets/scene/map/enemy_jacare_map.png'),
-            pygame.image.load('../assets/scene/map/enemy_quero_quero_map.png'),
-            pygame.image.load('../assets/scene/map/enemy_mico_map.png')
+        self.enemies = [
+            {'image': pygame.image.load('../assets/scene/map/enemy_anaconda_map.png'), 'type': 'anaconda'},
+            {'image': pygame.image.load('../assets/scene/map/enemy_calango_map.png'), 'type': 'calango'},
+            {'image': pygame.image.load('../assets/scene/map/enemy_jacare_map.png'), 'type': 'jacare'},
+            {'image': pygame.image.load('../assets/scene/map/enemy_quero_quero_map.png'), 'type': 'quero_quero'},
+            {'image': pygame.image.load('../assets/scene/map/enemy_mico_map.png'), 'type': 'mico'}
         ]
+
 
         self.boss_image = pygame.image.load('../assets/scene/map/boss_map.png')
         self.bonus_image = pygame.image.load('../assets/scene/map/attributes_bonus_map.png')
@@ -84,13 +86,17 @@ class Map(Scenario):
 
             put_enemy_in_left = random.choice([True, False])
 
-            if self.enemy_images: 
-                enemy_image = self.enemy_images.pop(random.randrange(len(self.enemy_images)))
+            if self.enemies:
+                enemy = self.enemies.pop(random.randrange(len(self.enemies)))
+                enemy_image = enemy['image']
+                enemy_type = enemy['type']
 
                 if put_enemy_in_left:
                     left_branch['enemy_image'] = enemy_image
+                    left_branch['enemy_type'] = enemy_type
                 else:
                     right_branch['enemy_image'] = enemy_image
+                    right_branch['enemy_type'] = enemy_type
 
             self.nodes.append(left_branch)
             self.nodes.append(right_branch)
@@ -115,6 +121,9 @@ class Map(Scenario):
 
 
     def draw_branches(self, screen):
+        if self.in_battle:
+            return
+        
         for node in self.nodes:
             if node['parent']:
                 start = node['parent'].center
@@ -223,7 +232,6 @@ class Map(Scenario):
                 del n['entity']
                 break
 
-
     def update_movement(self):
         if self.moving_entity and self.move_target_node:
             target_pos = pygame.math.Vector2(self.move_target_node['rect'].center)
@@ -236,6 +244,12 @@ class Map(Scenario):
                 self.moving_entity = None
                 self.player.rect = self.move_target_node['rect']
                 self.move_target_node['entity'] = self.player
+
+                if 'enemy_image' in self.move_target_node:
+
+                    self.manager.map_scenario = self
+                    self.manager.start_battle(self, self.move_target_node['enemy_type'])
+
                 self.move_target_node = None
 
                 self.player.current_frames = self.player.idle_frames
