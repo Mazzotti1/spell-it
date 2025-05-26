@@ -86,3 +86,40 @@ class Entity:
 
         if self.current_frames:
             self.current_frame = self.current_frames[self.frame_index]
+
+    def set_health(self, health: int):
+        self.attributes.set_health(health)
+
+    def get_health(self) -> int:
+        return self.attributes.get_health()
+
+    def set_strength(self, strength: float):
+        self.attributes.set_strength(strength)
+
+    def get_strength(self) -> float:
+        return self.attributes.get_strength()
+
+    def set_attack_speed(self, attack_speed: float):
+        self.attributes.set_attack_speed(attack_speed)
+
+    def get_attack_speed(self) -> float:
+        return self.attributes.get_attack_speed()
+
+    def set_dodge(self, dodge: float):
+        self.attributes.set_dodge(dodge)
+
+    def get_dodge(self) -> float:
+        return self.attributes.get_dodge()
+
+    def set_lucky(self, lucky: float):
+        self.attributes.set_lucky(lucky)
+
+    def get_lucky(self) -> float:
+        return self.attributes.get_lucky()
+
+    def set_critical_chance(self, critical_chance: float):
+        self.attributes.set_critical_chance(critical_chance)
+
+    def get_critical_chance(self) -> float:
+        return self.attributes.get_critical_chance()
+    

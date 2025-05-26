@@ -5,9 +5,10 @@ from Utils.button import Button
 from Scenario.map import Map
 
 class MainMenu(Scenario):
-    def __init__(self, manager):
+    def __init__(self, manager, player):
         super().__init__()
         self.manager = manager
+        self.player = player
         self.enable_ground = False
         self.enable_solids = False
         self.font = pygame.font.SysFont(None, 64)
@@ -43,5 +44,5 @@ class MainMenu(Scenario):
         pygame.event.post(pygame.event.Event(pygame.QUIT))
 
     def start_game(self):
-        self.manager.change_scenario(Map(self.manager, "../assets/scene/map/hd_m/map_1.png"))
+        self.manager.change_scenario(Map(self.manager, "../assets/scene/map/hd_m/map_1.png", self.player))
          

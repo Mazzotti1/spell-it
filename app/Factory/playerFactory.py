@@ -4,18 +4,20 @@ from Entity.Player.player import Player
 
 class PlayerFactory:
     @staticmethod
-    def create_player(x, y):
-        player_attributes = Attributes(
-            dodge=0.1, 
-            attack_speed=1.0, 
-            strength=10, 
-            health=100, 
-            lucky=0.05, 
-            critical_chance=0.1
-        )
+    def create_player(x, y, attributes = None):
 
-        player = Player("Aurélio", player_attributes, x, y)
-        player.rect = pygame.Rect(x, y, player.width, player.height)
+        if attributes is None:
+            attributes = Attributes(
+                dodge=0.1, 
+                attack_speed=1.0, 
+                strength=10, 
+                health=100, 
+                lucky=0.05, 
+                critical_chance=0.1
+            )
+
+        player = Player("Aurélio", attributes, x, y)
+        player.rect = pygame.Rect(x, y, player.width, player.width)
 
         player.current_frames = player.idle_frames
         player.frame_index = 0

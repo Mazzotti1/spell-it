@@ -10,7 +10,7 @@ class Battle(Scenario):
         self.enable_ground = False
         self.enable_solids = False
         self.enable_background = True
-        self.enable_ui = False
+        self.enable_ui = True
         self.enable_enemies = True
 
         self.font = pygame.font.SysFont(None, 64)
@@ -18,7 +18,7 @@ class Battle(Scenario):
         self.load_background(biome)
 
         self.buttons = [
-            self.create_button("Encerrar", "red", (900, 410), (130, 50), manager.end_battle),
+            self.create_button("Encerrar", "red", (0, 0), (130, 50), manager.end_battle),
         ]
 
     def draw_ui(self, screen):

@@ -5,6 +5,7 @@ from Scenario.main_menu import MainMenu
 from Scenario.battle import Battle
 from Factory.playerFactory import PlayerFactory
 from Scenario.map import Map
+from Attributes.attributes import Attributes
 class App:
     def __init__(self):
       
@@ -15,10 +16,19 @@ class App:
         self.clock = pygame.time.Clock()
         self.running = True 
         
-        self.player = PlayerFactory.create_player(-100, 750)
+
+        attributes = Attributes(
+            dodge=1.0, 
+            attack_speed=1.0, 
+            strength=1.0, 
+            health=5, 
+            lucky=1.0, 
+            critical_chance=1.0
+        )
+        self.player = PlayerFactory.create_player(-100, 750, attributes)
 
         self.manager = ScenarioManager(self.player)
-        self.manager.change_scenario(MainMenu(self.manager))
+        self.manager.change_scenario(MainMenu(self.manager, self.player))
     def run(self):
         while self.running:
             dt = self.clock.tick(60) / 1000 
@@ -36,6 +46,8 @@ class App:
                         for node in self.manager.current_scenario.nodes:
                             if node['rect'].collidepoint(mouse_pos):
                                 self.manager.current_scenario.handle_node_click(node)
+                                
+                        self.manager.current_scenario.handle_perk_click(mouse_pos)
 
             self.manager.update()
             self.manager.draw(self.screen)
