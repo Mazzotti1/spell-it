@@ -31,7 +31,7 @@ class Scenario:
         self.time_accumulator = 0
 
         self.zoom_scale = 1.0
-        self.target_zoom = 1.6
+        self.target_zoom = 1.95
         self.zoom_speed = 0.015
 
     def update(self):
@@ -83,7 +83,6 @@ class Scenario:
 
             frame_image = self.map_animation_sheet.subsurface(frame_rect)
 
-            # Zoom suave
             scale_factor = self.zoom_scale if self.current_frame == self.num_frames - 1 else 1.0
             scaled_width = int(self.frame_width * scale_factor)
             scaled_height = int(self.frame_height * scale_factor)
@@ -93,8 +92,7 @@ class Scenario:
                 (scaled_width, scaled_height)
             )
 
-            # Subida conforme zoom: sobe até 50 pixels
-            max_lift = 50
+            max_lift = 120
             lift = int((scale_factor - 1.0) / (self.target_zoom - 1.0) * max_lift) if scale_factor > 1.0 else 0
 
             x = (screen.get_width() - scaled_width) // 2
@@ -109,10 +107,9 @@ class Scenario:
             x = (screen_width - bg_width) // 2
             y = (screen_height - bg_height) // 2
 
-            screen.blit(self.background_image, (x, y))
+            rounded_bg = self.rounded_image(self.background_image, radius=90)
 
-
-
+            screen.blit(rounded_bg, (x, y))
 
     def draw_ground(self, screen):
         ground_height = 150
@@ -129,3 +126,15 @@ class Scenario:
 
     def load_background(self, image_path):
         self.background_image = pygame.image.load(image_path).convert_alpha()
+
+    def rounded_image(self, surface, radius):
+        size = surface.get_size()
+        
+        rounded_surface = pygame.Surface(size, pygame.SRCALPHA)
+        
+        rect = pygame.Rect(0, 0, *size)
+        pygame.draw.rect(rounded_surface, (255, 255, 255, 255), rect, border_radius=radius)
+        
+        rounded_surface.blit(surface, (0, 0), None, pygame.BLEND_RGBA_MULT)
+        
+        return rounded_surface
