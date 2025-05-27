@@ -1,10 +1,10 @@
 import pygame
 import random
-import textwrap
 from Scenario.scenario import Scenario
 import random
 from Factory.playerFactory import PlayerFactory
 from Interface.interace import Interface
+from Utils.utils import Utils
 
 class Map(Scenario):
     def __init__(self, manager, background, player):
@@ -73,7 +73,22 @@ class Map(Scenario):
         self.move_target_node = None 
         self.move_speed = 300 
         
+        self.utils = Utils()
+
         self.is_start_map_animating = True
+        self.map_animation_sheet = pygame.image.load('../assets/scene/map/animation/open_map_animation.png').convert_alpha()
+
+        self.frame_book_map_width = 744    
+        self.frame_book_map_height = 636  
+        self.frame_book_map_cols = 5
+        self.num_book_map_frames = 19
+        self.current_book_map_frame = 0
+        self.animation_book_map_speed = 0.1
+        self.time_book_map_accumulator = 0
+
+        self.zoom_scale_book_map = 1.0
+        self.target_zoom_book_map = 1.95
+        self.zoom_speed_book_map = 0.015
 
     def generate_branches(self, steps=3):
         start_x = 930
@@ -175,7 +190,7 @@ class Map(Scenario):
                 new_height = int(node['rect'].height * scale_factor)
 
                 scaled_img = pygame.transform.scale(img, (new_width, new_height))
-                rounded_img = self.round_image(scaled_img, radius=min(new_width, new_height)//2) 
+                rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2) 
 
                 rect = rounded_img.get_rect(center=node['rect'].center)
                 screen.blit(rounded_img, rect)
@@ -187,7 +202,7 @@ class Map(Scenario):
                     new_height = int(node['rect'].height * scale_factor)
 
                     scaled_img = pygame.transform.scale(self.boss_image, (new_width, new_height))
-                    rounded_img = self.round_image(scaled_img, radius=min(new_width, new_height)//2)
+                    rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2)
                     rect = rounded_img.get_rect(center=node['rect'].center)
 
                     screen.blit(rounded_img, rect)
@@ -198,7 +213,7 @@ class Map(Scenario):
                 new_height = int(node['rect'].height * scale_factor)
 
                 scaled_img = pygame.transform.scale(self.bonus_image, (new_width, new_height))
-                rounded_img = self.round_image(scaled_img, radius=min(new_width, new_height)//2)
+                rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2)
                 rect = rounded_img.get_rect(center=node['rect'].center)
 
                 border_radius = max(new_width, new_height) // 2 
@@ -226,21 +241,6 @@ class Map(Scenario):
 
             if self.is_node_perk or self.is_first_node:
                 self.draw_perks(screen)
-
-    def round_image(self, surface, radius):
-        size = surface.get_size()
-
-        rounded_surface = pygame.Surface(size, pygame.SRCALPHA)
-        
-        rect = pygame.Rect(0, 0, *size)
-        shape_surf = pygame.Surface(size, pygame.SRCALPHA)
-        
-        pygame.draw.rect(shape_surf, (255, 255, 255, 255), rect, border_radius=radius)
-
-        rounded_surface.blit(surface, (0, 0))
-        rounded_surface.blit(shape_surf, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
-
-        return rounded_surface
 
     def handle_node_click(self, clicked_node):
         current_node = None
@@ -322,13 +322,6 @@ class Map(Scenario):
             self.selected_perks = random.sample(self.perks, 3)
             self.perk_cards = []
 
-        def render_multiline_text(text, font, color, max_width):
-            wrapped_lines = []
-            for paragraph in text.split('\n'):
-                wrapped = textwrap.wrap(paragraph, width=30)
-                wrapped_lines.extend(wrapped)
-            return [font.render(line, True, color) for line in wrapped_lines]
-
         card_width = 500
         card_height = 390
 
@@ -345,7 +338,7 @@ class Map(Scenario):
             padding_x = 15
             max_text_width = card_width - padding_x * 2
 
-            title_surfaces = render_multiline_text(perk['title'], self.font_title, (0, 0, 0), max_text_width)
+            title_surfaces = self.utils.render_multiline_text(perk['title'], self.font_title, (0, 0, 0), max_text_width)
 
             title_y_offset = card_y + 90  
             y_offset = title_y_offset
@@ -369,7 +362,7 @@ class Map(Scenario):
             screen.blit(icon_image, icon_rect)
             y_offset += icon_rect.height
 
-            description_surfaces = render_multiline_text(perk['description'], self.font_desc, (0, 0, 0), max_text_width)
+            description_surfaces = self.utils.render_multiline_text(perk['description'], self.font_desc, (0, 0, 0), max_text_width)
 
             max_desc_height = card_y + card_height - 20
         
@@ -397,3 +390,63 @@ class Map(Scenario):
                 self.perk_cards = []
                 break
 
+
+    def draw_background(self, screen):
+        screen.fill((0, 0, 0))
+
+        if self.is_start_map_animating or self.current_book_map_frame == self.num_book_map_frames - 1:
+            col = self.current_book_map_frame % self.frame_book_map_cols
+            row = self.current_book_map_frame // self.frame_book_map_cols
+
+            frame_rect = pygame.Rect(
+                col * self.frame_book_map_width,
+                row * self.frame_book_map_height,
+                self.frame_book_map_width,
+                self.frame_book_map_height
+            )
+
+            frame_image = self.map_animation_sheet.subsurface(frame_rect)
+
+            scale_factor = self.zoom_scale_book_map if self.current_book_map_frame == self.num_book_map_frames - 1 else 1.0
+            scaled_width = int(self.frame_book_map_width * scale_factor)
+            scaled_height = int(self.frame_book_map_height * scale_factor)
+
+            frame_image = pygame.transform.scale(
+                frame_image,
+                (scaled_width, scaled_height)
+            )
+
+            max_lift = 120
+            lift = int((scale_factor - 1.0) / (self.target_zoom_book_map - 1.0) * max_lift) if scale_factor > 1.0 else 0
+
+            x = (screen.get_width() - scaled_width) // 2
+            y = (screen.get_height() - scaled_height) // 2 - lift
+
+            screen.blit(frame_image, (x, y))
+
+        if self.background_image and not self.is_start_map_animating:
+            screen_width, screen_height = screen.get_size()
+            bg_width, bg_height = self.background_image.get_size()
+
+            x = (screen_width - bg_width) // 2
+            y = (screen_height - bg_height) // 2
+
+            rounded_bg = self.utils.round_image(surface=self.background_image, radius=90)
+
+            screen.blit(rounded_bg, (x, y))
+
+    def update(self):
+        if self.is_start_map_animating:
+            self.time_book_map_accumulator += self.dt
+
+            if self.time_book_map_accumulator >= self.animation_book_map_speed:
+                self.time_book_map_accumulator = 0
+                if self.current_book_map_frame < self.num_book_map_frames - 1:
+                    self.current_book_map_frame += 1
+                   
+        if self.current_book_map_frame == self.num_book_map_frames - 1:
+            if self.zoom_scale_book_map < self.target_zoom_book_map:
+                self.zoom_scale_book_map += self.zoom_speed_book_map
+                if self.zoom_scale_book_map > self.target_zoom_book_map:
+                    self.zoom_scale_book_map = self.target_zoom_book_map
+                    self.is_start_map_animating = False
