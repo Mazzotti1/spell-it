@@ -4,6 +4,7 @@ import textwrap
 from Scenario.scenario import Scenario
 import random
 from Factory.playerFactory import PlayerFactory
+from Interface.interace import Interface
 
 class Map(Scenario):
     def __init__(self, manager, background, player):
@@ -16,8 +17,8 @@ class Map(Scenario):
         self.enable_ui = True
         self.in_battle = False
         self.is_choosing_perk = False
-        self.font_title = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 24)
-        self.font_desc = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 20)
+        self.font_title = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 22)
+        self.font_desc = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 18)
 
         self.load_background(background)
 
@@ -72,6 +73,8 @@ class Map(Scenario):
         self.move_target_node = None 
         self.move_speed = 300 
         
+        self.is_start_map_animating = True
+
     def generate_branches(self, steps=3):
         start_x = 930
         start_y = 830
@@ -214,12 +217,15 @@ class Map(Scenario):
                 entity.draw(screen)
 
     def draw_ui(self, screen):
-        self.update_movement()
-        self.draw_branches(screen)
-        self.draw_attributes(screen)
-        if self.is_node_perk or self.is_first_node:
-            self.draw_perks(screen)
+        interface = Interface(self.player)
 
+        if not self.is_start_map_animating:
+            self.update_movement()
+            self.draw_branches(screen)
+            interface.draw_health_bar(screen)
+
+            if self.is_node_perk or self.is_first_node:
+                self.draw_perks(screen)
 
     def round_image(self, surface, radius):
         size = surface.get_size()
@@ -390,29 +396,4 @@ class Map(Scenario):
                 self.selected_perks = [] 
                 self.perk_cards = []
                 break
-
-    def draw_attributes(self, screen):
-        if self.in_battle:
-            return
-
-        font = pygame.font.Font(None, 24) 
-        color = (255, 255, 255)  
-
-        x = 10
-        y = 10
-        spacing = 25 
-
-        attributes = [
-            f"Vida: {self.player.get_health()}",
-            f"Força: {self.player.get_strength()}",
-            f"Esquiva: {self.player.get_dodge()}",
-            f"Sorte: {self.player.get_lucky()}",
-            f"Velocidade de Ataque: {self.player.get_attack_speed()}",
-            f"Chance de crítico: {self.player.get_critical_chance()}",
-        ]
-
-        for attr in attributes:
-            text_surface = font.render(attr, True, color)
-            screen.blit(text_surface, (x, y))
-            y += spacing
 

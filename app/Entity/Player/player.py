@@ -1,4 +1,5 @@
 import pygame
+import random
 from Entity.entity import Entity
 from Skills.skill import Skill 
 
@@ -61,76 +62,52 @@ class Player(Entity):
 
         self.rect.topleft = (self.x, self.y)
 
+    def calculate_attributes(self, attribute, lucky):
+        if lucky <= 0:
+            return
+
+        getter = getattr(self.attributes, f"get_{attribute}")
+        setter = getattr(self.attributes, f"set_{attribute}")
+        current_value = getter()
+
+        if attribute in ['health']:
+            setter(current_value + 1)
+            return
+
+        bonus = random.uniform(0, lucky * 0.5)
+        setter(current_value + bonus) 
+
     def trade_health_for_attribute(self, attribute):
         if self.get_health() <= 1:
             return
              
         self.set_health(self.get_health() - 1) 
-        
-        match attribute:
-            case "strength":
-                self.set_strength(self.get_strength() + 1)
-            case "dodge":
-                self.set_dodge(self.get_dodge() + 1)
-            case "lucky":
-                self.set_lucky(self.get_lucky() + 1)
-            case "attack_speed":
-                self.set_attack_speed(self.get_attack_speed() + 1)
-            case "critical_chance":
-                self.set_critical_chance(self.get_critical_chance() + 0.01)
+        self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_lucky_for_attribute(self, attribute):
-        if self.get_lucky() <= 1:
+        if self.get_lucky() <= 0.5:
             return
              
-        self.set_lucky(self.get_lucky() - 1) 
-
-        match attribute:
-            case "strength":
-                self.set_strength(self.get_strength() + 1)
-            case "health":
-                self.set_health(self.get_health() + 1)
+        self.set_lucky(self.get_lucky() - 0.5) 
+        self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_dodge_for_attribute(self, attribute):
-        if self.get_dodge() <= 1:
+        if self.get_dodge() <= 0.5:
             return
              
-        self.set_dodge(self.get_dodge() - 1) 
-
-        match attribute:
-            case "strength":
-                self.set_strength(self.get_strength() + 1)
-            case "health":
-                self.set_health(self.get_health() + 1)
-            case "lucky":
-                self.set_lucky(self.get_lucky() + 1)
+        self.set_dodge(self.get_dodge() - 0.5) 
+        self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_critical_chance_for_attribute(self, attribute):
-        if self.get_critical_chance() <= 1:
+        if self.get_critical_chance() <= 0.5:
             return
              
-        self.set_critical_chance(self.get_critical_chance() - 1) 
-
-        match attribute:
-            case "strength":
-                self.set_strength(self.get_strength() + 1)
-            case "health":
-                self.set_health(self.get_health() + 1)
-            case "dodge":
-                self.set_dodge(self.get_dodge() + 1)
+        self.set_critical_chance(self.get_critical_chance() - 0.5) 
+        self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_strength_for_attribute(self, attribute):
-        if self.get_strength() <= 1:
+        if self.get_strength() <= 0.5:
             return
-             
-        self.set_strength(self.get_strength() - 1) 
 
-        match attribute:
-            case "lucky":
-                self.set_lucky(self.get_lucky() + 1)
-            case "critical_chance":
-                self.set_critical_chance(self.get_critical_chance() + 1)
-            case "dodge":
-                self.set_dodge(self.get_dodge() + 1)
-
-
+        self.set_strength(self.get_strength() - 0.5) 
+        self.calculate_attributes(attribute, self.get_lucky())
