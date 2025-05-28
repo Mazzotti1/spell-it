@@ -1,5 +1,5 @@
 import pygame
-
+from Utils.utils import Utils
 class Scenario:
     def __init__(self):
         self.name = None
@@ -14,6 +14,8 @@ class Scenario:
 
         self.solids = []
         self.background_image = None
+        self.is_start_map_animating = False
+        self.utils = Utils()
 
     def update(self):
         pass

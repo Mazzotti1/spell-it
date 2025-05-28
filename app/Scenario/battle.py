@@ -24,7 +24,7 @@ class Battle(Scenario):
     def draw_ui(self, screen):
         for btn in self.buttons:
             btn.draw(screen)
-    
+
     def create_button(self, text, color, position, size, on_click, text_color="white"):
         return Button(
             color=color,
@@ -34,7 +34,7 @@ class Battle(Scenario):
             on_click=on_click,
             text_color=text_color
         )
-    
+
     def handle_buttons_event(self, event):
         for btn in self.buttons:
             btn.handle_event(event)
@@ -44,3 +44,17 @@ class Battle(Scenario):
         self.enemy.update_animation(self.manager.dt)
         self.enemy.draw(screen)
 
+
+    def draw_background(self, screen):
+        screen.fill((0, 0, 0))
+
+        if self.background_image and not self.is_start_map_animating:
+            screen_width, screen_height = screen.get_size()
+            bg_width, bg_height = self.background_image.get_size()
+
+            x = (screen_width - bg_width) // 2
+            y = (screen_height - bg_height) // 2
+
+            rounded_bg = self.utils.round_image(surface=self.background_image, radius=0)
+
+            screen.blit(rounded_bg, (x, y))

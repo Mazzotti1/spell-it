@@ -56,30 +56,46 @@ class Map(Scenario):
         ]
 
         self.selected_perks = []
-        self.perk_cards = [] 
+        self.perk_cards = []
         self.is_node_perk = False
         self.is_first_node = True
-        self.card_image = pygame.image.load('../assets/objects/skill_scroll.png').convert_alpha()
+
+        self.is_animating_perk = True
+        self.perk_image_sheet = pygame.image.load('../assets/objects/perks_cards.png').convert_alpha()
+        self.frame_perk_width = 510
+        self.frame_perk_height = 899
+        self.num_perk_cols = 5
+        self.num_perk_rows = 3
+        self.perk_frames = self.load_perk_frames()
+        self.current_perk_frame = 0
+        self.num_perk_frames = len(self.perk_frames)
+        self.time_perk_accumulator = 0
+        self.perk_animation_speed = 0.4
+
+        self.time_passed = 0
+
+        self.frame_player_index = 0
+
         self.boss_image = pygame.image.load('../assets/scene/map/boss_map.png')
         self.bonus_image = pygame.image.load('../assets/scene/map/attributes_bonus_map.png')
 
-        self.nodes = [] 
+        self.nodes = []
         self.player = PlayerFactory.create_player(0, 0, self.player.attributes)
         self.generate_branches()
         self.clock = pygame.time.Clock()
-        self.dt = self.clock.tick(60) / 1150 
+        self.dt = self.clock.tick(60) / 1200
 
-        self.moving_entity = None  
-        self.move_target_node = None 
-        self.move_speed = 300 
-        
+        self.moving_entity = None
+        self.move_target_node = None
+        self.move_speed = 300
+
         self.utils = Utils()
 
         self.is_start_map_animating = True
         self.map_animation_sheet = pygame.image.load('../assets/scene/map/animation/open_map_animation.png').convert_alpha()
 
-        self.frame_book_map_width = 744    
-        self.frame_book_map_height = 636  
+        self.frame_book_map_width = 744
+        self.frame_book_map_height = 636
         self.frame_book_map_cols = 5
         self.num_book_map_frames = 19
         self.current_book_map_frame = 0
@@ -111,7 +127,7 @@ class Map(Scenario):
 
         self.player.rect = first['rect']
         self.player.current_frames = self.player.idle_frames
-        self.player.frame_index = 0
+        self.player.frame_player_index = 0
         self.player.animation_timer = 0
         self.player.current_frame = self.player.current_frames[0]
 
@@ -175,7 +191,7 @@ class Map(Scenario):
     def draw_branches(self, screen):
         if self.in_battle:
             return
-        
+
         for node in self.nodes:
             if node['parent']:
                 start = node['parent'].center
@@ -190,7 +206,7 @@ class Map(Scenario):
                 new_height = int(node['rect'].height * scale_factor)
 
                 scaled_img = pygame.transform.scale(img, (new_width, new_height))
-                rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2) 
+                rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2)
 
                 rect = rounded_img.get_rect(center=node['rect'].center)
                 screen.blit(rounded_img, rect)
@@ -216,8 +232,8 @@ class Map(Scenario):
                 rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2)
                 rect = rounded_img.get_rect(center=node['rect'].center)
 
-                border_radius = max(new_width, new_height) // 2 
-                pygame.draw.circle(screen, 'black', rect.center, border_radius + 2) 
+                border_radius = max(new_width, new_height) // 2
+                pygame.draw.circle(screen, 'black', rect.center, border_radius + 2)
 
                 screen.blit(rounded_img, rect)
 
@@ -228,7 +244,7 @@ class Map(Scenario):
         for node in self.nodes:
             if 'entity' in node and node['entity'] == self.player:
                 entity = node['entity']
-                entity.update_animation(self.dt) 
+                entity.update_animation(self.dt)
                 entity.draw(screen)
 
     def draw_ui(self, screen):
@@ -250,14 +266,14 @@ class Map(Scenario):
                 break
 
         if not current_node:
-            return  
+            return
 
         if clicked_node['rect'] == current_node.get('parent'):
             pass
         else:
             if self.is_choosing_perk:
-                return 
-            
+                return
+
             for node in self.nodes:
                 if node.get('parent') == current_node['rect'] and node['rect'] == clicked_node['rect']:
                     self.move_player_to_node(clicked_node)
@@ -268,7 +284,7 @@ class Map(Scenario):
         self.move_target_node = node
 
         self.moving_entity.current_frames = self.moving_entity.walking_top_frames
-        self.moving_entity.frame_index = 0
+        self.moving_entity.frame_player_index = 0
         self.moving_entity.animation_timer = 0
         self.moving_entity.current_frame = self.moving_entity.current_frames[0]
 
@@ -281,11 +297,11 @@ class Map(Scenario):
         if self.moving_entity and self.move_target_node:
             target_pos = pygame.math.Vector2(self.move_target_node['rect'].center)
             current_pos = pygame.math.Vector2(self.moving_entity.rect.center)
-            
+
             direction = (target_pos - current_pos)
             distance = direction.length()
 
-            if distance < 5: 
+            if distance < 5:
                 self.moving_entity = None
                 self.player.rect = self.move_target_node['rect']
                 self.move_target_node['entity'] = self.player
@@ -300,7 +316,7 @@ class Map(Scenario):
                 self.move_target_node = None
 
                 self.player.current_frames = self.player.idle_frames
-                self.player.frame_index = 0
+                self.player.frame_player_index = 0
                 self.player.animation_timer = 0
                 self.player.current_frame = self.player.current_frames[0]
 
@@ -322,58 +338,53 @@ class Map(Scenario):
             self.selected_perks = random.sample(self.perks, 3)
             self.perk_cards = []
 
-        card_width = 500
-        card_height = 390
+            self.current_perk_frame = 0
+            self.time_perk_accumulator = 0
+            self.is_animating_perk = True
+
+        card_width = 400
+        card_height = 500
+        spacing = 30
+        total_width = (card_width * 3) + (spacing * 2)
+        start_x = (screen.get_width() - total_width) // 2
+        y = (screen.get_height() - card_height) // 2
 
         for i, perk in enumerate(self.selected_perks):
-            card_x = 200 + i * (card_width + 20)
-            card_y = 560 - card_height // 2
+            x = start_x + i * (card_width + spacing)
 
-            card_rect = pygame.Rect(card_x, card_y, card_width, card_height)
-            self.perk_cards.append((card_rect, perk))
+            if self.perk_frames:
+                frame = self.perk_frames[self.current_perk_frame]
+                frame_scaled = pygame.transform.smoothscale(frame, (card_width, card_height))
+                screen.blit(frame_scaled, (x, y))
 
-            card_img_scaled = pygame.transform.smoothscale(self.card_image, (card_width, card_height))
-            screen.blit(card_img_scaled, (card_x, card_y))
+            if not self.is_animating_perk:
+                center_x = x + card_width // 2
+                title_y = y + 160
 
-            padding_x = 15
-            max_text_width = card_width - padding_x * 2
+                title_surfs = self.utils.render_multiline_text(perk["title"], self.font_title, (0,0,0))
+                for surf in title_surfs:
+                    rect = surf.get_rect(centerx=center_x, top=title_y)
+                    screen.blit(surf, rect)
+                    title_y += surf.get_height()
 
-            title_surfaces = self.utils.render_multiline_text(perk['title'], self.font_title, (0, 0, 0), max_text_width)
+                try:
+                    icon = pygame.image.load(perk["icon"]).convert_alpha()
+                    icon = pygame.transform.scale(icon, (64, 64))
+                    icon_rect = icon.get_rect(centerx=center_x, top=title_y + 10)
+                    screen.blit(icon, icon_rect)
+                    icon_bottom = icon_rect.bottom
+                except:
+                    icon_bottom = title_y + 64 + 10
 
-            title_y_offset = card_y + 90  
-            y_offset = title_y_offset
+                desc_y = icon_bottom + 10
+                desc_surfs = self.utils.render_multiline_text(perk["description"], self.font_desc, (0,0,0))
+                for surf in desc_surfs:
+                    rect = surf.get_rect(centerx=center_x, top=desc_y)
+                    screen.blit(surf, rect)
+                    desc_y += surf.get_height() + 3
 
-            area_center_x = card_x + padding_x + (max_text_width // 2)
+            self.perk_cards.append((pygame.Rect(x, y, card_width, card_height), perk))
 
-            for surf in title_surfaces:
-                title_rect = surf.get_rect()
-                title_rect.centerx = area_center_x
-                title_rect.top = y_offset
-                screen.blit(surf, title_rect)
-                y_offset += surf.get_height()
-
-            space_between_title_and_icon = 30  
-            y_offset += space_between_title_and_icon
-
-            icon_image = pygame.image.load(perk['icon']).convert_alpha()
-            icon_rect = icon_image.get_rect()
-            icon_rect.centerx = card_x + card_width // 2
-            icon_rect.top = y_offset
-            screen.blit(icon_image, icon_rect)
-            y_offset += icon_rect.height
-
-            description_surfaces = self.utils.render_multiline_text(perk['description'], self.font_desc, (0, 0, 0), max_text_width)
-
-            max_desc_height = card_y + card_height - 20
-        
-            for surf in description_surfaces:
-                if y_offset + surf.get_height() > max_desc_height:
-                    break
-                desc_rect = surf.get_rect()
-                desc_rect.centerx = area_center_x
-                desc_rect.top = y_offset
-                screen.blit(surf, desc_rect)
-                y_offset += surf.get_height() + 3
 
     def handle_perk_click(self, mouse_pos):
         if not self.is_choosing_perk:
@@ -384,9 +395,9 @@ class Map(Scenario):
                 print(f"Perk escolhido: {perk['title']}")
                 perk['effect'](self.player)
                 self.is_choosing_perk = False
-                self.is_node_perk = False 
+                self.is_node_perk = False
                 self.is_first_node = False
-                self.selected_perks = [] 
+                self.selected_perks = []
                 self.perk_cards = []
                 break
 
@@ -443,10 +454,33 @@ class Map(Scenario):
                 self.time_book_map_accumulator = 0
                 if self.current_book_map_frame < self.num_book_map_frames - 1:
                     self.current_book_map_frame += 1
-                   
+
         if self.current_book_map_frame == self.num_book_map_frames - 1:
             if self.zoom_scale_book_map < self.target_zoom_book_map:
                 self.zoom_scale_book_map += self.zoom_speed_book_map
                 if self.zoom_scale_book_map > self.target_zoom_book_map:
                     self.zoom_scale_book_map = self.target_zoom_book_map
                     self.is_start_map_animating = False
+
+        if (self.is_choosing_perk or self.is_first_node) and not self.is_start_map_animating:
+            self.time_perk_accumulator += self.dt * 1000
+
+            if self.time_perk_accumulator >= self.perk_animation_speed:
+                self.time_perk_accumulator = 0
+                if self.current_perk_frame < self.num_perk_frames - 1:
+                    self.current_perk_frame += 1
+                else:
+                    self.is_animating_perk = False
+
+
+    def load_perk_frames(self):
+        perk_frames = []
+        for row in range(self.num_perk_rows):
+            for col in range(self.num_perk_cols):
+                x = col * self.frame_perk_width
+                y = row * self.frame_perk_height
+                frame = self.perk_image_sheet.subsurface(
+                    pygame.Rect(x, y, self.frame_perk_width, self.frame_perk_height)
+                )
+                perk_frames.append(frame)
+        return perk_frames
