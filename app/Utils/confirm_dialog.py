@@ -14,13 +14,15 @@ class ConfirmDialog:
         font=None,
         font_size=28,
         position=(780, 300),
-        size=(400, 200),
+        size=(400, 220),
         radius=15,
         bg_color=(50, 50, 50),
         border_color=(200, 200, 200),
         text_color=(255, 255, 255),
         button_size=(100, 50),
-        button_spacing=20
+        button_spacing=20,
+        multiLineWidth = 50,
+        multi_line_width_cancel_button = 50
     ):
         self.title = title
         self.message = message
@@ -35,6 +37,8 @@ class ConfirmDialog:
         self.text_color = text_color
         self.utils = Utils()
         self.font_message = pygame.font.SysFont('Arial', 16)
+        self.multiLineWidth = multiLineWidth
+        self.multi_line_width_cancel_button = multi_line_width_cancel_button  
 
         confirm_pos = (
             position[0] + size[0] // 4 - button_size[0] // 2,
@@ -55,7 +59,8 @@ class ConfirmDialog:
             text=cancel_text,
             position=cancel_pos,
             size=button_size,
-            on_click=self.cancel
+            on_click=self.cancel,
+            multiLineWidth=self.multi_line_width_cancel_button
         )
 
     def confirm(self):
@@ -76,19 +81,24 @@ class ConfirmDialog:
         inner_rect = self.rect.inflate(-10, -10)
         pygame.draw.rect(screen, self.bg_color, inner_rect, border_radius=self.radius - 2)
 
-        title_surface = self.font.render(self.title, True, self.text_color)
-        title_rect = title_surface.get_rect(center=(self.rect.centerx, self.rect.top + 40))
-        screen.blit(title_surface, title_rect)
+        y_inner_offset = inner_rect.top + 20
 
-        message_surfaces = self.utils.render_multiline_text(self.message, self.font_message, self.text_color, 50)
+        title_surfaces = self.utils.render_multiline_text(self.title, self.font, self.text_color, 20)
+        
+        for surface in title_surfaces:
+            title_rect = surface.get_rect(center=(self.rect.centerx, y_inner_offset + surface.get_height() // 2))
+            screen.blit(surface, title_rect)
+            y_inner_offset += surface.get_height() + 5 
 
-        y_offset = title_rect.bottom + 30
+        y_message_offset = y_inner_offset + 20  
+
+        message_surfaces = self.utils.render_multiline_text(self.message, self.font_message, self.text_color, self.multiLineWidth)
 
         for surface in message_surfaces:
-            message_rect = surface.get_rect(center=(self.rect.centerx, y_offset))
+            message_rect = surface.get_rect(center=(self.rect.centerx, y_message_offset + surface.get_height() // 2))
             screen.blit(surface, message_rect)
-            y_offset += surface.get_height() + 5 
-        
+            y_message_offset += surface.get_height() + 5 
+            
         self.confirm_button.draw(screen)
         self.cancel_button.draw(screen)
 

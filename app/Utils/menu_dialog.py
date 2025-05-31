@@ -1,9 +1,10 @@
 import pygame
 from Utils.menu_button import MenuButton
 from Utils.confirm_dialog import ConfirmDialog
+from Utils.settings_dialog import SettingsDialog
 
 class MenuDialog:
-    def __init__(self, manager, color, position, size, text, text_size=36, font=None, radius=15):
+    def __init__(self, manager, color, position, size, text, text_size=36, font=None, radius=15, settings_dialog=None):
         self.color = color
         self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
         self.text = text
@@ -27,6 +28,8 @@ class MenuDialog:
             confirm_text="Sim",
             cancel_text="Não"
         )
+
+        self.settings_dialog = settings_dialog
 
     def draw(self, screen):
         border_color = (192, 192, 192)
@@ -58,10 +61,12 @@ class MenuDialog:
 
         for btn in self.menu_buttons:
             btn.draw(screen)
-
-        self.confirm_dialog.draw(screen)
+        
         pygame.draw.line(screen, self.text_color, start_left, end_left, 2)
         pygame.draw.line(screen, self.text_color, start_right, end_right, 2)
+
+        self.confirm_dialog.draw(screen)
+        self.settings_dialog.draw(screen)
 
     def create_menu_button(self, icon, position, size, on_click):
         return MenuButton(
@@ -72,6 +77,14 @@ class MenuDialog:
         )
     
     def handle_menu_buttons_event(self, event):
+        if self.confirm_dialog.visible:
+            self.confirm_dialog.handle_event(event)
+            return  
+
+        if self.settings_dialog.visible:
+            self.settings_dialog.handle_event(event)
+            return
+    
         for btn in self.menu_buttons:
             btn.handle_event(event)
 
@@ -86,6 +99,6 @@ class MenuDialog:
         self.confirm_dialog.visible = False
 
     def open_options(self):
-        print("Options action triggered")
+        self.settings_dialog.visible = True
 
     

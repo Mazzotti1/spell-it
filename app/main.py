@@ -43,6 +43,12 @@ class App:
                         self.manager.current_scenario.confirm_dialog.handle_event(event)
                         continue 
 
+                if hasattr(self.manager.current_scenario, 'settings_dialog'):
+                    if self.manager.current_scenario.settings_dialog.visible:
+                        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                            self.manager.current_scenario.settings_dialog.cancel()
+                            continue 
+
                 if getattr(self.manager.current_scenario, 'is_menu_open', False):
                         if getattr(self.manager.current_scenario, 'allow_pause_menu', True):
                             menu = self.manager.current_scenario.menu
@@ -58,10 +64,10 @@ class App:
                             continue 
                 
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        if getattr(self.manager.current_scenario, 'allow_pause_menu', True):
-                            self.manager.current_scenario.open_menu()
-                        continue
+                        if event.key == pygame.K_ESCAPE:
+                            if getattr(self.manager.current_scenario, 'allow_pause_menu', True):
+                                self.manager.current_scenario.open_menu()
+                            continue
 
                 if hasattr(self.manager.current_scenario, "handle_buttons_event"):
                     self.manager.current_scenario.handle_buttons_event(event)
@@ -74,6 +80,17 @@ class App:
                                 self.manager.current_scenario.handle_node_click(node)
 
                         self.manager.current_scenario.handle_perk_click(mouse_pos)
+
+                if hasattr(self.manager.current_scenario, 'settings_dialog'):
+                    settings_dialog = self.manager.current_scenario.settings_dialog
+                    if settings_dialog.visible:
+                        settings_dialog.handle_event(event)
+                        
+                        if settings_dialog.unsaved_changes_dialog.visible:
+                            settings_dialog.unsaved_changes_dialog.handle_event(event)
+                        elif settings_dialog.save_confirm_dialog.visible:
+                            settings_dialog.save_confirm_dialog.handle_event(event)
+                        continue
                     
             self.manager.update()
             self.manager.draw(self.screen)

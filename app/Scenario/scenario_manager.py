@@ -113,7 +113,6 @@ class ScenarioManager:
 
     def back_to_main(self):
         self.in_battle = False
-        self.current_scenario = self.map_scenario
 
         if hasattr(self.player, "battle_initial_movement_done"):
             self.player.battle_initial_movement_done = False 

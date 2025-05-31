@@ -1,6 +1,8 @@
 import pygame
 from Utils.utils import Utils
 from Utils.menu_dialog import MenuDialog
+from Utils.settings_dialog import SettingsDialog
+
 class Scenario:
     def __init__(self, manager=None):
         self.name = None
@@ -21,6 +23,17 @@ class Scenario:
         self.manager = manager
         
         self.is_menu_open = False
+
+        self.settings_dialog = SettingsDialog(
+            color='gray',
+            position=(650, 120),
+            size=(600, 800),
+            text="Configurações",
+            text_size=36,
+            font=None,
+            radius=10
+        )
+
         self.menu = MenuDialog(
             self.manager,
             color='gray',
@@ -29,7 +42,8 @@ class Scenario:
             text="Opções",
             text_size=36,
             font=None,
-            radius=10
+            radius=10,
+            settings_dialog=self.settings_dialog,
         )
 
     def update(self):
@@ -78,3 +92,4 @@ class Scenario:
 
             screen.blit(overlay, (0, 0))
             self.menu.draw(screen)
+        
