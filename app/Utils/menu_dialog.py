@@ -12,9 +12,9 @@ class MenuDialog:
         self.position = position
         self.size = size
 
-        self.buttons = [
-            self.create_button("Logout", "red", (0, 0), (130, 50), ),
-        ]
+        # self.buttons = [
+        #     self.create_button("Logout", "red", (0, 0), (130, 50), ),
+        # ]
 
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect, border_radius=self.radius)
