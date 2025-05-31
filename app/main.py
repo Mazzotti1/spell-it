@@ -38,22 +38,30 @@ class App:
                     self.running = False
                     continue
 
-                if self.manager.current_scenario.is_menu_open:
+                if hasattr(self.manager.current_scenario, 'confirm_dialog'):
+                    if self.manager.current_scenario.confirm_dialog.visible:
+                        self.manager.current_scenario.confirm_dialog.handle_event(event)
+                        continue 
 
-                    menu = self.manager.current_scenario.menu
-
-                    if menu.confirm_dialog.visible:
-                        menu.confirm_dialog.handle_event(event)
-                    else:
-                        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                            self.manager.current_scenario.open_menu()
+                if getattr(self.manager.current_scenario, 'is_menu_open', False):
+                        if getattr(self.manager.current_scenario, 'allow_pause_menu', True):
+                            menu = self.manager.current_scenario.menu
+                            if menu.confirm_dialog.visible:
+                                menu.confirm_dialog.handle_event(event)
+                            else:
+                                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                                    self.manager.current_scenario.open_menu()
+                                else:
+                                    menu.handle_menu_buttons_event(event)
+                            continue 
                         else:
-                            menu.handle_menu_buttons_event(event)
-                    continue
+                            continue 
                 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        self.manager.current_scenario.open_menu()
+                        if getattr(self.manager.current_scenario, 'allow_pause_menu', True):
+                            self.manager.current_scenario.open_menu()
+                        continue
 
                 if hasattr(self.manager.current_scenario, "handle_buttons_event"):
                     self.manager.current_scenario.handle_buttons_event(event)

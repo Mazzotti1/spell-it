@@ -4,7 +4,7 @@ from Utils.button import Button
 
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy):
-        super().__init__()
+        super().__init__(manager)
         self.manager = manager
         self.enemy = enemy
         self.enable_ground = False

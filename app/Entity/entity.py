@@ -79,13 +79,17 @@ class Entity:
         return sprites
     
     def update_animation(self, dt):
+        if not self.current_frames or len(self.current_frames) == 0:
+            return
+
         self.animation_timer += dt
-        if self.animation_timer >= self.frame_duration and self.current_frames:
+        if self.animation_timer >= self.frame_duration:
             self.frame_index = (self.frame_index + 1) % len(self.current_frames)
             self.animation_timer = 0
 
-        if self.current_frames:
+        if 0 <= self.frame_index < len(self.current_frames):
             self.current_frame = self.current_frames[self.frame_index]
+
 
     def set_health(self, health: int):
         self.attributes.set_health(health)

@@ -3,6 +3,7 @@ from Scenario.scenario import Scenario
 from Scenario.battle import Battle
 from Utils.button import Button
 from Scenario.map import Map
+from Utils.confirm_dialog import ConfirmDialog
 
 class MainMenu(Scenario):
     def __init__(self, manager, player):
@@ -20,6 +21,15 @@ class MainMenu(Scenario):
             self.create_button("Sair", "red", (900, 610), (130, 50), self.exit_game, text_color="white"),
         ]
 
+        self.confirm_dialog = ConfirmDialog(
+            title="Deseja Fechar o jogo?",
+            message="Ao confirmar o jogo será fechado.",
+            on_confirm=self.confirm_exit,
+            on_cancel=self.cancel_exit,
+            confirm_text="Fechar",
+            cancel_text="Cancelar"
+        )
+
     def create_button(self, text, color, position, size, on_click, text_color="black"):
         return Button(
             color=color,
@@ -31,19 +41,28 @@ class MainMenu(Scenario):
         )
 
     def draw_background(self, screen):
-        screen.fill((200, 200, 200))
+        screen.fill((15, 15, 15))
 
     def draw_ui(self, screen):
         for btn in self.menu_buttons:
             btn.draw(screen)
+        self.confirm_dialog.draw(screen)
 
     def handle_buttons_event(self, event):
         for btn in self.menu_buttons:
             btn.handle_event(event)
 
     def exit_game(self):
+        self.confirm_dialog.visible = True
+
+    def confirm_exit(self):
+        self.confirm_dialog.visible = False
         pygame.event.post(pygame.event.Event(pygame.QUIT))
 
+    def cancel_exit(self):
+        self.confirm_dialog.visible = False
+
     def start_game(self):
-        self.manager.change_scenario(Map(self.manager, "../assets/scene/map/hd_m/map_1.png", self.player))
+        if not self.confirm_dialog.visible:
+            self.manager.change_scenario(Map(self.manager, "../assets/scene/map/hd_m/map_1.png", self.player))
          

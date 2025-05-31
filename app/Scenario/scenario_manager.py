@@ -112,7 +112,19 @@ class ScenarioManager:
                 return mico, "../assets/scene/battle/mata_atlantica_scenario.png"
 
     def back_to_main(self):
-        attributes = Attributes(
+        self.in_battle = False
+        self.current_scenario = self.map_scenario
+
+        if hasattr(self.player, "battle_initial_movement_done"):
+            self.player.battle_initial_movement_done = False 
+
+        self.player.x = 420
+        self.player.y = 750
+        self.player.rect.topleft = (self.player.x, self.player.y)
+        self.player.moving = False
+        self.player.current_frames = self.player.idle_frames
+
+        new_attributes = Attributes(
             dodge=1.0, 
             attack_speed=1.0, 
             strength=1.0, 
@@ -120,5 +132,6 @@ class ScenarioManager:
             lucky=1.0, 
             critical_chance=1.0
         )
-        self.player = PlayerFactory.create_player(-100, 750, attributes)
+        self.player.set_attributes(new_attributes)
+
         self.change_scenario(MainMenu(self, self.player))
