@@ -30,11 +30,12 @@ class MainMenu(Scenario):
         )
 
     def draw_background(self, screen):
-        screen.fill((0, 0, 0))
+        screen.fill((200, 200, 200))
 
     def draw_ui(self, screen):
         for btn in self.menu_buttons:
             btn.draw(screen)
+        self.draw_menu(screen)
 
     def handle_buttons_event(self, event):
         for btn in self.menu_buttons:

@@ -36,6 +36,9 @@ class App:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.manager.current_scenario.open_menu()
 
                 if hasattr(self.manager.current_scenario, "handle_buttons_event"):
                     self.manager.current_scenario.handle_buttons_event(event)
@@ -48,7 +51,7 @@ class App:
                                 self.manager.current_scenario.handle_node_click(node)
                                 
                         self.manager.current_scenario.handle_perk_click(mouse_pos)
-
+                    
             self.manager.update()
             self.manager.draw(self.screen)
 

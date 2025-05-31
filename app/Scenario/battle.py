@@ -24,6 +24,7 @@ class Battle(Scenario):
     def draw_ui(self, screen):
         for btn in self.buttons:
             btn.draw(screen)
+        self.draw_menu(screen)
 
     def create_button(self, text, color, position, size, on_click, text_color="white"):
         return Button(

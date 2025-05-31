@@ -1,5 +1,6 @@
 import pygame
 from Utils.utils import Utils
+from Utils.menu_dialog import MenuDialog
 class Scenario:
     def __init__(self):
         self.name = None
@@ -16,6 +17,17 @@ class Scenario:
         self.background_image = None
         self.is_start_map_animating = False
         self.utils = Utils()
+
+        self.is_menu_open = False
+        self.menu = MenuDialog(
+            color='gray',
+            position=(780, 300),
+            size=(400, 200),
+            text="Opções",
+            text_size=36,
+            font=None,
+            radius=10
+        )
 
     def update(self):
         pass
@@ -51,3 +63,14 @@ class Scenario:
 
     def load_background(self, image_path):
         self.background_image = pygame.image.load(image_path).convert_alpha()
+
+    def open_menu(self):
+        self.is_menu_open = not self.is_menu_open  
+
+    def draw_menu(self, screen):
+        if self.is_menu_open:
+            overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)  
+            overlay.fill((38, 35, 35, 255)) 
+
+            screen.blit(overlay, (0, 0))
+            self.menu.draw(screen)

@@ -257,6 +257,7 @@ class Map(Scenario):
 
             if self.is_node_perk or self.is_first_node:
                 self.draw_perks(screen)
+        self.draw_menu(screen)
 
     def handle_node_click(self, clicked_node):
         current_node = None

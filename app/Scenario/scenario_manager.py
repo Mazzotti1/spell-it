@@ -2,7 +2,6 @@ import pygame
 from Scenario.battle import Battle
 from Attributes.attributes import Attributes
 from Factory.enemyFactory import EnemyFactory
-
 class ScenarioManager:
     def __init__(self, player):
         self.current_scenario = None
@@ -11,7 +10,6 @@ class ScenarioManager:
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick(60) / 1000 
         self.player = player
-
     def change_scenario(self, new_scenario):
         self.current_scenario = new_scenario
 
@@ -47,7 +45,7 @@ class ScenarioManager:
     def draw(self, screen):
         if self.current_scenario:
             self.current_scenario.draw_scene(screen)
-
+        
     def getBattleScene(self, enemy):
         match enemy:
             case "anaconda":
