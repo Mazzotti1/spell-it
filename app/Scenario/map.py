@@ -17,7 +17,7 @@ class Map(Scenario):
         self.enable_ui = True
         self.in_battle = False
         self.is_choosing_perk = False
-        self.font_title = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 22)
+        self.font_title = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 24)
         self.font_desc = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 18)
 
         self.load_background(background)
@@ -350,17 +350,30 @@ class Map(Scenario):
         start_x = (screen.get_width() - total_width) // 2
         y = (screen.get_height() - card_height) // 2
 
+        mouse_pos = pygame.mouse.get_pos()
+
         for i, perk in enumerate(self.selected_perks):
             x = start_x + i * (card_width + spacing)
+            is_hovered = False
+
+            card_rect = pygame.Rect(x, y, card_width, card_height)
+            if card_rect.collidepoint(mouse_pos):
+                is_hovered = True
+
+            draw_width = card_width + 35 if is_hovered else card_width
+            draw_height = card_height + 35 if is_hovered else card_height
+            draw_x = x - 10 if is_hovered else x
+            draw_y = y - 10 if is_hovered else y
 
             if self.perk_frames:
                 frame = self.perk_frames[self.current_perk_frame]
-                frame_scaled = pygame.transform.smoothscale(frame, (card_width, card_height))
-                screen.blit(frame_scaled, (x, y))
+                frame_scaled = pygame.transform.smoothscale(frame, (draw_width, draw_height))
+                rounded_frame = self.utils.round_image(frame_scaled, 20)
+                screen.blit(rounded_frame, (draw_x, draw_y))
 
             if not self.is_animating_perk:
-                center_x = x + card_width // 2
-                title_y = y + 160
+                center_x = draw_x + draw_width // 2
+                title_y = draw_y + 160
 
                 title_surfs = self.utils.render_multiline_text(perk["title"], self.font_title, (0,0,0))
                 for surf in title_surfs:
@@ -384,7 +397,7 @@ class Map(Scenario):
                     screen.blit(surf, rect)
                     desc_y += surf.get_height() + 3
 
-            self.perk_cards.append((pygame.Rect(x, y, card_width, card_height), perk))
+            self.perk_cards.append((pygame.Rect(draw_x, draw_y, draw_width, draw_height), perk))
 
 
     def handle_perk_click(self, mouse_pos):
