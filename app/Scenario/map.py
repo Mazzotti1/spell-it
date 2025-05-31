@@ -8,7 +8,7 @@ from Utils.utils import Utils
 
 class Map(Scenario):
     def __init__(self, manager, background, player):
-        super().__init__()
+        super().__init__(manager)
         self.manager = manager
         self.player = player
         self.enable_ground = False
@@ -357,7 +357,7 @@ class Map(Scenario):
             is_hovered = False
 
             card_rect = pygame.Rect(x, y, card_width, card_height)
-            if card_rect.collidepoint(mouse_pos):
+            if card_rect.collidepoint(mouse_pos) and not self.is_menu_open:
                 is_hovered = True
 
             draw_width = card_width + 35 if is_hovered else card_width

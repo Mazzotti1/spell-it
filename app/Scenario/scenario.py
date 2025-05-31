@@ -2,7 +2,7 @@ import pygame
 from Utils.utils import Utils
 from Utils.menu_dialog import MenuDialog
 class Scenario:
-    def __init__(self):
+    def __init__(self, manager=None):
         self.name = None
         self.objects = []
         self.music = None
@@ -17,9 +17,12 @@ class Scenario:
         self.background_image = None
         self.is_start_map_animating = False
         self.utils = Utils()
-
+        self.allow_menu = True
+        self.manager = manager
+        
         self.is_menu_open = False
         self.menu = MenuDialog(
+            self.manager,
             color='gray',
             position=(780, 300),
             size=(400, 200),
@@ -65,12 +68,13 @@ class Scenario:
         self.background_image = pygame.image.load(image_path).convert_alpha()
 
     def open_menu(self):
-        self.is_menu_open = not self.is_menu_open  
+        if self.allow_menu:
+            self.is_menu_open = not self.is_menu_open  
 
     def draw_menu(self, screen):
         if self.is_menu_open:
             overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)  
-            overlay.fill((38, 35, 35, 255)) 
+            overlay.fill((38, 35, 35, 225)) 
 
             screen.blit(overlay, (0, 0))
             self.menu.draw(screen)

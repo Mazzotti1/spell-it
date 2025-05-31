@@ -8,6 +8,7 @@ class MainMenu(Scenario):
     def __init__(self, manager, player):
         super().__init__()
         self.manager = manager
+        self.allow_menu = False
         self.player = player
         self.enable_ground = False
         self.enable_solids = False
@@ -35,7 +36,6 @@ class MainMenu(Scenario):
     def draw_ui(self, screen):
         for btn in self.menu_buttons:
             btn.draw(screen)
-        self.draw_menu(screen)
 
     def handle_buttons_event(self, event):
         for btn in self.menu_buttons:

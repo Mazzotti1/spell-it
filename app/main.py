@@ -15,7 +15,6 @@ class App:
         self.screen = pygame.display.set_mode((1920, 1080))
         self.clock = pygame.time.Clock()
         self.running = True 
-        
 
         attributes = Attributes(
             dodge=1.0, 
@@ -29,6 +28,7 @@ class App:
 
         self.manager = ScenarioManager(self.player)
         self.manager.change_scenario(MainMenu(self.manager, self.player))
+        
     def run(self):
         while self.running:
             dt = self.clock.tick(60) / 1000 
@@ -36,6 +36,21 @@ class App:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                    continue
+
+                if self.manager.current_scenario.is_menu_open:
+
+                    menu = self.manager.current_scenario.menu
+
+                    if menu.confirm_dialog.visible:
+                        menu.confirm_dialog.handle_event(event)
+                    else:
+                        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                            self.manager.current_scenario.open_menu()
+                        else:
+                            menu.handle_menu_buttons_event(event)
+                    continue
+                
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.manager.current_scenario.open_menu()
@@ -49,7 +64,7 @@ class App:
                         for node in self.manager.current_scenario.nodes:
                             if node['rect'].collidepoint(mouse_pos):
                                 self.manager.current_scenario.handle_node_click(node)
-                                
+
                         self.manager.current_scenario.handle_perk_click(mouse_pos)
                     
             self.manager.update()

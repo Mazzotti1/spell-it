@@ -22,9 +22,9 @@ class Utils:
         return rounded_surface
 
     @staticmethod
-    def render_multiline_text(text, font, color):
+    def render_multiline_text(text, font, color, width = 20):
         wrapped_lines = []
         for paragraph in text.split('\n'):
-            wrapped = textwrap.wrap(paragraph, width=20)
+            wrapped = textwrap.wrap(paragraph, width)
             wrapped_lines.extend(wrapped)
         return [font.render(line, True, color) for line in wrapped_lines]

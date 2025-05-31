@@ -2,6 +2,8 @@ import pygame
 from Scenario.battle import Battle
 from Attributes.attributes import Attributes
 from Factory.enemyFactory import EnemyFactory
+from Factory.playerFactory import PlayerFactory
+from Scenario.main_menu import MainMenu
 class ScenarioManager:
     def __init__(self, player):
         self.current_scenario = None
@@ -108,3 +110,15 @@ class ScenarioManager:
                 )
                 mico = EnemyFactory.create_enemy('Mico', mico_attributes, 1000, 300, "../assets/enemys/Mico/enemy_mico_idle.png")
                 return mico, "../assets/scene/battle/mata_atlantica_scenario.png"
+
+    def back_to_main(self):
+        attributes = Attributes(
+            dodge=1.0, 
+            attack_speed=1.0, 
+            strength=1.0, 
+            health=5, 
+            lucky=1.0, 
+            critical_chance=1.0
+        )
+        self.player = PlayerFactory.create_player(-100, 750, attributes)
+        self.change_scenario(MainMenu(self, self.player))

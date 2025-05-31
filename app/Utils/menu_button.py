@@ -1,23 +1,37 @@
 import pygame
 
-class menu_button:
-    def __init__(self, color, position, size, text, on_click=None,
-                 text_color="black", text_size=36, font=None, radius=15):
-        self.color = color
-        self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
-        self.text = text
-        self.text_color = text_color
-        self.font = pygame.font.Font(font, text_size)
-        self.radius = radius
-        self.on_click = on_click
+class MenuButton:
+    def __init__(self, icon, position, size, on_click=None):
+        self.icon = pygame.image.load(icon).convert_alpha()
+        self.icon = pygame.transform.scale(self.icon, size)
+
         self.position = position
         self.size = size
+        self.on_click = on_click
+        self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
+
+        self.color = (50, 50, 50)
+        self.radius = 10  
 
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect, border_radius=self.radius)
-        surface_text = self.font.render(self.text, True, self.text_color)
-        rect_text = surface_text.get_rect(center=(self.position[0] + self.size[0] // 2, self.position[1] + self.size[1] // 2))
-        screen.blit(surface_text, rect_text)
+        border_color = (192, 192, 192)
+        border_thickness = 3
+
+        is_hovered = self.rect.collidepoint(pygame.mouse.get_pos())
+
+        if is_hovered:
+            draw_rect = self.rect.inflate(15, 15) 
+            border_color = (255, 215, 0) 
+        else:
+            draw_rect = self.rect
+
+        pygame.draw.rect(screen, border_color, draw_rect, border_radius=self.radius)
+
+        inner_rect = draw_rect.inflate(-2 * border_thickness, -2 * border_thickness)
+        pygame.draw.rect(screen, self.color, inner_rect, border_radius=self.radius - 2)
+
+        icon_rect = self.icon.get_rect(center=inner_rect.center)
+        screen.blit(self.icon, icon_rect)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
