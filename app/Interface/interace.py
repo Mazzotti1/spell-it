@@ -1,12 +1,20 @@
 import pygame
 from Factory.playerFactory import PlayerFactory
+from Utils.time_bar import TimerBar
 
 class Interface:
-    def __init__(self, player):
+    def __init__(self, player, pre_combat_time = 30, turn_time=15):
         self.player = player
         self.player = PlayerFactory.create_player(0, 0, player.attributes)
         self.health_image = pygame.image.load("../assets/player/estatico/front.png").convert_alpha()
         self.health_image = pygame.transform.scale(self.health_image, (32, 32))
+
+        self.pre_combat_timer = TimerBar(pre_combat_time, title="Pré-combate")
+        self.turn_timer = TimerBar(turn_time, title="Turno")
+
+        self.input_active = True
+        self.input_text = ""
+        self.input_font = pygame.font.SysFont(None, 48)
 
     def draw_health_bar(self, screen):
 
@@ -36,3 +44,37 @@ class Interface:
             y = container_y + 5
             screen.blit(self.health_image, (x, y))
         
+    def draw_battle_timers(self, screen, type):
+        if type == "pre_combat":
+            self.pre_combat_timer.draw(screen, x=850, y=100, width=200, height=20)
+        elif type == "turn":
+            self.turn_timer.draw(screen, x=850, y=140, width=200, height=20)
+        else:
+            self.pre_combat_timer.draw(screen, x=850, y=100, width=200, height=20)
+
+    def reset_timers(self):
+        self.pre_combat_timer.reset()
+        self.turn_timer.reset()
+
+    def draw_input_box(self, screen):
+        box_width, box_height = 400, 60
+        x, y = (screen.get_width() - box_width) // 2, screen.get_height() - 135
+
+        input_rect = pygame.Rect(x, y, box_width, box_height)
+        pygame.draw.rect(screen, (255, 255, 255), input_rect, border_radius=10)
+        pygame.draw.rect(screen, (0, 0, 0), input_rect, 3, border_radius=10)
+
+        text_surface = self.input_font.render(self.input_text, True, (0, 0, 0))
+        screen.blit(text_surface, (x + 10, y + (box_height - text_surface.get_height()) // 2))
+
+    def handle_input_event(self, event):
+        if event.type == pygame.KEYDOWN and self.input_active:
+            if event.key == pygame.K_BACKSPACE:
+                self.input_text = self.input_text[:-1]
+            elif event.key == pygame.K_RETURN:
+                return self.input_text.strip()
+            else:
+                self.input_text += event.unicode
+
+    def is_pre_combat_over(self):
+        return self.pre_combat_timer.is_time_up()

@@ -12,12 +12,15 @@ class ScenarioManager:
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick(60) / 1000 
         self.player = player
+        self.player_final_x = 420
+        self.player_final_y = 750
+
     def change_scenario(self, new_scenario):
         self.current_scenario = new_scenario
 
     def start_battle(self, map_scenario, enemy):
         scene_enemy, biome_path = self.getBattleScene(enemy)
-        self.battle_scenario = Battle(self, biome_path, scene_enemy)
+        self.battle_scenario = Battle(self, biome_path, scene_enemy, self.player_final_x, self.player_final_y)
 
         self.player.x = -100
         self.player.y = 750
@@ -34,8 +37,8 @@ class ScenarioManager:
         if hasattr(self.player, "battle_initial_movement_done"):
             self.player.battle_initial_movement_done = False 
 
-        self.player.x = 420
-        self.player.y = 750
+        self.player.x = self.player_final_x
+        self.player.y = self.player_final_y
         self.player.rect.topleft = (self.player.x, self.player.y)
         self.player.moving = False
         self.player.current_frames = self.player.idle_frames
@@ -46,7 +49,7 @@ class ScenarioManager:
 
     def draw(self, screen):
         if self.current_scenario:
-            self.current_scenario.draw_scene(screen)
+            self.current_scenario.draw_scene(screen , self.player)
         
     def getBattleScene(self, enemy):
         match enemy:

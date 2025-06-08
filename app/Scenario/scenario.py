@@ -49,7 +49,7 @@ class Scenario:
     def update(self):
         pass
 
-    def draw_scene(self, screen):
+    def draw_scene(self, screen, player=None):
         if self.enable_background:
             self.draw_background(screen)
 
