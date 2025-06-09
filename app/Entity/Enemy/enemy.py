@@ -5,7 +5,7 @@ class Enemy(Entity):
         super().__init__(x, y, type, attributes, width=384, height=384)
     
         self.load_animations({
-            "idle": idle_sprite
+            "idle": (idle_sprite, 0.15),
         })
 
     def setType(self, type):
@@ -13,3 +13,6 @@ class Enemy(Entity):
 
     def getType(self):
         return self.type
+
+    def get_position(self):
+        return (self.x, self.y)

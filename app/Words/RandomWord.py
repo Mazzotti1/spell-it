@@ -23,6 +23,11 @@ class RandomWord:
             self.font = pygame.font.SysFont(None, 32)
             self.use_outline = True
             self.use_shadow = False
+        elif self.style == 'PUNIR':
+            self.color = (255, 0, 0)
+            self.font = pygame.font.SysFont(None, 48)
+            self.use_outline = True
+            self.use_shadow = True
         else:  
             self.color = (180, 180, 180)
             self.font = pygame.font.SysFont(None, 24)

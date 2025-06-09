@@ -73,6 +73,15 @@ class RandomWordManager:
             if word_obj.text.lower() == typed_word.lower():
                 print(f"Palavra correta: {typed_word}")
                 self.words.remove(word_obj)
-                return True
+                return word_obj
         print(f"Palavra incorreta: {typed_word}")
         return False
+
+    def generate_final_pre_combat_word(self, enemy):
+        enemy_x, enemy_y = enemy.get_position()
+
+        center_x = enemy_x + enemy.width // 2
+        center_y = enemy_y + enemy.height // 2
+
+        word = 'PUNIR'
+        self.words.append(RandomWord(self.screen_size, text=word, x=center_x, y=center_y, lifetime=self.lifetime, style='PUNIR'))

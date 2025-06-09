@@ -9,25 +9,16 @@ class Player(Entity):
 
         #pra carregar os outros sprites lembrar de botar em 128x128
         self.load_animations({
-            "idle": "../assets/player/idle_sprite.png",
-            # "idle_back": "../assets/player/player_idle_back.png",
-            # "walking_left": "../assets/player/player_walking_left.png",
-            "walking_right": "../assets/player/player_walking_right.png",
-            "walking_node_right": "../assets/player/player_diagonal_right.png",
-            # "walking_node_left": "../assets/player/player_diagonal_right.png",
-            "walking_top": "../assets/player/player_walking_top.png",
-            # "walking_bottom": "../assets/player/player_walking_bottom.png",
+            "idle": ("../assets/player/idle_sprite.png", 0.1),
+            "idle_back": ("../assets/player/player_idle_back.png", 0.15),
+            # "walking_left": ("../assets/player/player_walking_left.png", 0.1),
+            "walking_right": ("../assets/player/player_walking_right.png", 0.05),
+            "walking_node_right": ("../assets/player/player_diagonal_right.png", 0.05),
+            # "walking_node_left": ("../assets/player/player_diagonal_right.png", 0.12),
+            "walking_top": ("../assets/player/player_walking_top.png", 0.05),
+            # "walking_bottom": ("../assets/player/player_walking_bottom.png", 0.1),
+            "skill": ("../assets/skill/player_skill_sheet.png", 0.05),
         })
-
-        self.skills: list[Skill] = []
-
-
-    def add_skill(self, skill: Skill):
-        self.skills.append(skill)
-
-    def use_skill(self, skill_name: str, target: "Entity"):
-        skill = next((s for s in self.skills if s.name == skill_name), None)
-        skill.use(self, target)
 
     def start_moving_to(self, target_x, target_y, direction="walking_right"):
         self.target_x = target_x
@@ -111,3 +102,17 @@ class Player(Entity):
 
         self.set_strength(self.get_strength() - 0.5) 
         self.calculate_attributes(attribute, self.get_lucky())
+
+    def get_position(self):
+        return (self.x, self.y)
+
+    def play_skill_animation(self):
+        self.current_frames = self.skill_frames
+        self.current_animation = "skill"
+        self.frame_index = 0
+        self.animation_timer = 0
+        self.moving = False
+        self.animation_play_once = True
+
+        self.y -= 250 
+        self.rect.topleft = (self.x, self.y)

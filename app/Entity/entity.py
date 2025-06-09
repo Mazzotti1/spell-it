@@ -31,6 +31,9 @@ class Entity:
         self.animation_timer = 0
         self.frame_duration = 0.1
 
+        self.frame_durations = {}
+        self.animation_play_once = False
+
 
     def set_name(self, name: str):
         self.name = name
@@ -62,12 +65,15 @@ class Entity:
         frame = pygame.transform.scale(frame, (self.rect.width, self.rect.height))
         screen.blit(frame, self.rect.topleft)
 
-    def load_animations(self, animations: dict[str, str]):
-        for key, path in animations.items():
+    def load_animations(self, animations: dict[str, tuple[str, float]]):
+        for key, (path, duration) in animations.items():
             frames = Entity.load_spritesheet(path, self.width, self.height)
             setattr(self, f"{key}_frames", frames)
-            if not self.current_frames:  
+            self.frame_durations[key] = duration
+            if not self.current_frames:
                 self.current_frames = frames
+                self.current_animation = key
+                self.frame_duration = duration
 
     @staticmethod
     def load_spritesheet(path, frame_width, frame_height):
@@ -80,15 +86,39 @@ class Entity:
     
     def update_animation(self, dt):
         if not self.current_frames or len(self.current_frames) == 0:
-            return
+            return False
+
+        current_anim = getattr(self, "current_animation", None)
+        frame_duration = self.frame_durations.get(current_anim, self.frame_duration)
 
         self.animation_timer += dt
-        if self.animation_timer >= self.frame_duration:
-            self.frame_index = (self.frame_index + 1) % len(self.current_frames)
+        animation_finished = False
+
+        if self.animation_timer >= frame_duration:
+            if self.animation_play_once:
+                if self.frame_index < len(self.current_frames) - 1:
+                    self.frame_index += 1
+                else:
+                    animation_finished = True
+            else:
+                self.frame_index = (self.frame_index + 1) % len(self.current_frames)
+
             self.animation_timer = 0
 
         if 0 <= self.frame_index < len(self.current_frames):
             self.current_frame = self.current_frames[self.frame_index]
+
+        if animation_finished and self.animation_play_once:
+            self.current_frames = self.idle_frames
+            self.current_animation = "idle"
+            self.frame_index = 0
+            self.animation_timer = 0
+            self.animation_play_once = False
+
+            self.y += 250
+            self.rect.topleft = (self.x, self.y)
+
+        return animation_finished
 
 
     def set_health(self, health: int):

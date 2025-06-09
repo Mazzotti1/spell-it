@@ -5,23 +5,27 @@ class TimerBar:
     def __init__(self, total_time, title, color=(200, 50, 50)):
         self.total_time = total_time
         self.current_time = total_time
-        self.last_update = time.time()
+        self.last_update = None
         self.title = title
         self.color = color
 
-    def update(self):
-        now = time.time()
-        elapsed = now - self.last_update
-        self.last_update = now
-        self.current_time = max(0, self.current_time - elapsed)
+    def update(self, playerIsMoving=True):
+        if not playerIsMoving:
+            if self.last_update is None:
+                self.last_update = time.time()
+                return
+            now = time.time()
+            elapsed = now - self.last_update
+            self.current_time = max(0, self.current_time - elapsed)
+            self.last_update = now
 
     def reset(self):
         self.current_time = self.total_time
         self.last_update = time.time()
 
-    def draw(self, screen, x, y, width, height, show_time=True):
-        self.update()
-        
+    def draw(self, screen, x, y, width, height, show_time=True, playerIsMoving=True):
+        self.update(playerIsMoving)
+    
         pygame.draw.rect(screen, (80, 80, 80), (x, y, width, height), border_radius=5)
 
         percent = self.current_time / self.total_time if self.total_time > 0 else 0
@@ -42,3 +46,6 @@ class TimerBar:
 
     def is_time_up(self):
         return self.current_time == 0
+
+    def decrease_time(self, seconds):
+        self.current_time -= seconds
