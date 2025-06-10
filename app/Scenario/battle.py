@@ -49,6 +49,8 @@ class Battle(Scenario):
 
         self.explosion_animations = []
 
+        self.start_punishin_animation = False
+
     def draw_ui(self, screen):
         if not self.manager.player.moving:
             for btn in self.buttons:
@@ -84,8 +86,9 @@ class Battle(Scenario):
             self.interface.input_text = "" 
             
             if self.pre_combat_ended:
-                print('punido')
-                self.manager.player.play_skill_animation()  
+                self.manager.player.play_skill_animation()
+                self.start_punishin_animation = True
+                #tirar a vida do enimigo multiplicado pela sorte do jogador
                 return
 
             if word_obj and not self.pre_combat_ended:
@@ -136,6 +139,16 @@ class Battle(Scenario):
             else:
                 explosion.draw(screen)
 
+        if self.start_punishin_animation:
+            self.enemy.punish()
+            self.start_punishin_animation = False
+
+        for effect in self.enemy.punish_effects[:]:
+            if effect.is_finished():
+                self.enemy.punish_effects.remove(effect)
+            else:
+                effect.draw(screen)
+
 
     def draw_background(self, screen):
         screen.fill((0, 0, 0))
@@ -176,6 +189,9 @@ class Battle(Scenario):
                 if self.pre_combat_result == "success":
                     self.word_manager.generate_final_pre_combat_word(self.enemy)
                 # Ativar o combate real aqui
+
+        for effect in self.enemy.punish_effects:
+            effect.update(self.manager.dt)
 
 
     def draw_result_pre_combat_animation(self, screen):
