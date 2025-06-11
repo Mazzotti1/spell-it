@@ -21,7 +21,7 @@ class Battle(Scenario):
         self.quantity_pre_combat_words = 5
 
         self.pre_combat_ended = False
-        
+
         self.font = pygame.font.SysFont(None, 64)
 
         self.load_background(biome)
@@ -33,17 +33,17 @@ class Battle(Scenario):
 
         self.interface = Interface(manager.player, pre_combat_time=self.pre_combat_time)
 
-        screen_size = (1920, 1080) 
+        screen_size = (1920, 1080)
         self.word_manager = RandomWordManager(screen_size, self.pre_combat_time, biome, player_position=(self.player_final_x, self.player_final_y))
 
         self.alreadyGeneratedWords = False
         self.turn_started = False
         self.pre_combat_word_count = 0
 
-        self.pre_combat_result = None  
-        self.result_finalization_animation_progress = 0 
+        self.pre_combat_result = None
+        self.result_finalization_animation_progress = 0
         self.result_finalization_animation_active = False
-        self.result_finalization_animation_timer = 0 
+        self.result_finalization_animation_timer = 0
 
         self.book_animations = []
 
@@ -58,7 +58,7 @@ class Battle(Scenario):
             self.draw_menu(screen)
             self.interface.draw_input_box(screen)
             self.interface.draw_popup(screen)
-            
+
 
             if self.result_finalization_animation_active:
                 self.draw_result_pre_combat_animation(screen)
@@ -83,12 +83,17 @@ class Battle(Scenario):
         typed_word = self.interface.handle_input_event(event)
         if typed_word:
             word_obj = self.word_manager.check_word(typed_word)
-            self.interface.input_text = "" 
-            
+            self.interface.input_text = ""
+
             if self.pre_combat_ended:
                 self.manager.player.play_skill_animation()
                 self.start_punishin_animation = True
-                #tirar a vida do enimigo multiplicado pela sorte do jogador
+                damage, is_critical, enemy_alive = self.manager.player.attack(self.enemy)
+                print(f"Dano causado: {damage}")
+                if is_critical:
+                    print("⚡ Dano crítico!")
+                if not enemy_alive:
+                    print("☠️ Inimigo derrotado!")
                 return
 
             if word_obj and not self.pre_combat_ended:
@@ -96,7 +101,7 @@ class Battle(Scenario):
 
                 word_x, word_y = word_obj.x, word_obj.y
                 player_x, player_y = self.manager.player.get_position()
-                
+
                 animation = BookAnimation((player_x, player_y), (word_x, word_y))
                 self.book_animations.append(animation)
 
@@ -106,8 +111,8 @@ class Battle(Scenario):
             else:
                 self.interface.pre_combat_timer.decrease_time(3)
                 self.interface.show_popup("Palavra errada: -3 segundos", duration=1.5)
-            
-        
+
+
     def draw_scene(self, screen, player):
         super().draw_scene(screen)
         self.enemy.update_animation(self.manager.dt)
@@ -163,7 +168,7 @@ class Battle(Scenario):
             rounded_bg = self.utils.round_image(surface=self.background_image, radius=0)
 
             screen.blit(rounded_bg, (x, y))
-        
+
     def update(self):
         self.word_manager.update()
 

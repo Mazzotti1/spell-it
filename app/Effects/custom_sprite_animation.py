@@ -8,7 +8,9 @@ class CustomSpriteAnimation:
         num_frames=None,
         frame_duration=0.1,
         loop=False,
-        total_duration=None
+        total_duration=None,
+        frame_width=64,
+        frame_height=64
     ):
         self.sprite_sheet = pygame.image.load(sprite_sheet_path).convert_alpha()
         self.position = list(position)
@@ -16,6 +18,8 @@ class CustomSpriteAnimation:
         self.loop = loop
         self.total_duration = total_duration
         self.num_frames = num_frames
+        self.frame_width = frame_width
+        self.frame_height = frame_height
 
         self.frames = []
         self.current_frame_index = 0
@@ -28,13 +32,21 @@ class CustomSpriteAnimation:
     def _load_frames(self):
         sheet_width, sheet_height = self.sprite_sheet.get_size()
 
-        self.frame_width = sheet_width // self.num_frames
-        self.frame_height = sheet_height
+        columns = sheet_width // self.frame_width
+        rows = sheet_height // self.frame_height
 
-        for i in range(self.num_frames):
-            x = i * self.frame_width
-            frame = self.sprite_sheet.subsurface((x, 0, self.frame_width, self.frame_height))
-            self.frames.append(frame)
+        frame_count = 0
+        for row in range(rows):
+            for col in range(columns):
+                if self.num_frames is not None and frame_count >= self.num_frames:
+                    return
+
+                x = col * self.frame_width
+                y = row * self.frame_height
+                frame = self.sprite_sheet.subsurface((x, y, self.frame_width, self.frame_height))
+                self.frames.append(frame)
+                frame_count += 1
+
 
 
     def update(self, dt):

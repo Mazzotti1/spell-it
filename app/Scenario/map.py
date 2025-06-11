@@ -308,8 +308,11 @@ class Map(Scenario):
                 self.move_target_node['entity'] = self.player
 
                 if 'enemy_image' in self.move_target_node:
+                    enemy_nodes = [node for node in self.nodes if 'enemy_image' in node]
+                    enemy_index = enemy_nodes.index(self.move_target_node)
+
                     self.manager.map_scenario = self
-                    self.manager.start_battle(self, self.move_target_node['enemy_type'])
+                    self.manager.start_battle(self, self.move_target_node['enemy_type'], enemy_index)
                 elif self.move_target_node['type'] == 'perk':
                     self.is_node_perk = True
 

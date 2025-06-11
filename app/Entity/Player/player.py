@@ -1,7 +1,7 @@
 import pygame
 import random
 from Entity.entity import Entity
-from Skills.skill import Skill 
+from Skills.skill import Skill
 
 class Player(Entity):
     def __init__(self, name, attributes, x=0, y=0):
@@ -42,8 +42,8 @@ class Player(Entity):
             self.x = self.target_x
             self.y = self.target_y
             self.moving = False
-            self.current_frames = self.idle_frames  
-            self.frame_index = 0 
+            self.current_frames = self.idle_frames
+            self.frame_index = 0
         else:
             direction_x = dx / distance
             direction_y = dy / distance
@@ -66,41 +66,43 @@ class Player(Entity):
             return
 
         bonus = random.uniform(0, lucky * 0.5)
-        setter(current_value + bonus) 
+        bonus_int = max(1, int(bonus))
+
+        setter(current_value + bonus_int)
 
     def trade_health_for_attribute(self, attribute):
         if self.get_health() <= 1:
             return
-             
-        self.set_health(self.get_health() - 1) 
+
+        self.set_health(self.get_health() - 1)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_lucky_for_attribute(self, attribute):
         if self.get_lucky() <= 0.5:
             return
-             
-        self.set_lucky(self.get_lucky() - 0.5) 
+
+        self.set_lucky(self.get_lucky() - 0.5)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_dodge_for_attribute(self, attribute):
         if self.get_dodge() <= 0.5:
             return
-             
-        self.set_dodge(self.get_dodge() - 0.5) 
+
+        self.set_dodge(self.get_dodge() - 0.5)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_critical_chance_for_attribute(self, attribute):
         if self.get_critical_chance() <= 0.5:
             return
-             
-        self.set_critical_chance(self.get_critical_chance() - 0.5) 
+
+        self.set_critical_chance(self.get_critical_chance() - 0.5)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_strength_for_attribute(self, attribute):
         if self.get_strength() <= 0.5:
             return
 
-        self.set_strength(self.get_strength() - 0.5) 
+        self.set_strength(self.get_strength() - 0.5)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def get_position(self):
@@ -114,5 +116,5 @@ class Player(Entity):
         self.moving = False
         self.animation_play_once = True
 
-        self.y -= 250 
+        self.y -= 250
         self.rect.topleft = (self.x, self.y)

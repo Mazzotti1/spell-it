@@ -1,3 +1,4 @@
+import random
 from Attributes.attributes import Attributes
 import pygame
 
@@ -16,7 +17,7 @@ class Entity:
         self.moving = False
         self.target_x = x
         self.target_y = y
-        self.move_speed = 200 
+        self.move_speed = 200
         self.move_direction = None
 
         self.width = width
@@ -26,7 +27,7 @@ class Entity:
         self.walk_frames = []
         self.throw_book_frames = []
         self.current_frames = []
-        
+
         self.frame_index = 0
         self.animation_timer = 0
         self.frame_duration = 0.1
@@ -48,12 +49,18 @@ class Entity:
         return self.attributes
 
     def attack(self, target: "Entity"):
-        damage = self.attributes.get_strength()
-        target.take_damage(damage)
+        final_crit_chance = min(1.0, self.get_critical_chance() * self.get_lucky())
+        is_critical = random.random() < final_crit_chance
 
-    def take_damage(self, damage_value: int):
-        new_health = self.attributes.get_health() - damage_value
-        self.attributes.set_health(max(new_health, 0))
+        damage = self.get_strength()
+
+        if is_critical:
+            damage *= 2
+
+        target.set_health(max(0, target.get_health() - damage))
+        target_alive = target.is_alive()
+
+        return damage, is_critical, target_alive
 
     def is_alive(self):
         return self.attributes.get_health() > 0
@@ -83,7 +90,7 @@ class Entity:
             frame = image.subsurface((i * frame_width, 0, frame_width, frame_height))
             sprites.append(frame)
         return sprites
-    
+
     def update_animation(self, dt):
         if not self.current_frames or len(self.current_frames) == 0:
             return False
@@ -156,4 +163,3 @@ class Entity:
 
     def get_critical_chance(self) -> float:
         return self.attributes.get_critical_chance()
-    
