@@ -71,11 +71,13 @@ class RandomWordManager:
     def check_word(self, typed_word):
         for word_obj in self.words:
             if word_obj.text.lower() == typed_word.lower():
-                print(f"Palavra correta: {typed_word}")
                 self.words.remove(word_obj)
                 return word_obj
-        print(f"Palavra incorreta: {typed_word}")
         return False
+
+    def check_punishment_word(self, typed_word):
+        if 'punir' == typed_word.lower():
+            return True
 
     def generate_final_pre_combat_word(self, enemy):
         enemy_x, enemy_y = enemy.get_position()
@@ -84,4 +86,4 @@ class RandomWordManager:
         center_y = enemy_y + enemy.height // 2
 
         word = 'PUNIR'
-        self.words.append(RandomWord(self.screen_size, text=word, x=center_x, y=center_y, lifetime=self.lifetime, style='PUNIR'))
+        self.words.append(RandomWord(self.screen_size, text=word, x=center_x, y=center_y, lifetime=10, style='PUNIR'))

@@ -1,3 +1,4 @@
+import random
 from Entity.entity import Entity
 from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
@@ -11,6 +12,7 @@ class Enemy(Entity):
         })
 
         self.punish_effects = []
+        self.visible = True
 
     def setType(self, type):
         self.type = type
@@ -20,6 +22,30 @@ class Enemy(Entity):
 
     def get_position(self):
         return (self.x, self.y)
+
+    def attack(self, target: "Entity"):
+        final_crit_chance = min(1.0, self.get_critical_chance() * self.get_lucky())
+        is_critical = random.random() < final_crit_chance
+
+        damage = self.get_strength()
+
+        if is_critical:
+            damage *= 2
+
+        dodge_chance = min(1.0, self.get_lucky() * target.get_dodge())
+        did_dodge = random.random() < dodge_chance
+
+        if not did_dodge:
+            target.set_health(max(0, target.get_health() - damage))
+
+        target_alive = target.is_alive()
+
+        return {
+            "damage": 0 if did_dodge else damage,
+            "is_critical": is_critical,
+            "did_dodge": did_dodge,
+            "target_alive": target_alive
+        }
 
     def punish(self):
         self.punish_effects.clear()

@@ -408,7 +408,6 @@ class Map(Scenario):
 
         for rect, perk in self.perk_cards:
             if rect.collidepoint(mouse_pos):
-                print(f"Perk escolhido: {perk['title']}")
                 perk['effect'](self.player)
                 self.is_choosing_perk = False
                 self.is_node_perk = False

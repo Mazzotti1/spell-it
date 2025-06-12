@@ -21,13 +21,16 @@ class Battle(Scenario):
         self.quantity_pre_combat_words = 5
 
         self.pre_combat_ended = False
+        self.punishment_ended = False
+        self.player_turn_ended = False
+        self.enemy_turn_ended = False
 
         self.font = pygame.font.SysFont(None, 64)
 
         self.load_background(biome)
 
         self.buttons = [
-            self.create_button("Encerrar", "red", (0, 0), (130, 50), manager.end_battle),
+            self.create_button("Encerrar", "red", (1440, 0), (130, 50), manager.end_battle),
         ]
         self.pre_combat_time = 15
 
@@ -37,7 +40,7 @@ class Battle(Scenario):
         self.word_manager = RandomWordManager(screen_size, self.pre_combat_time, biome, player_position=(self.player_final_x, self.player_final_y))
 
         self.alreadyGeneratedWords = False
-        self.turn_started = False
+
         self.pre_combat_word_count = 0
 
         self.pre_combat_result = None
@@ -50,7 +53,9 @@ class Battle(Scenario):
         self.explosion_animations = []
 
         self.start_punishin_animation = False
-
+        self.enemy_alive = True
+        self.is_enemy_turn = False
+        self.player_turn = False
     def draw_ui(self, screen):
         if not self.manager.player.moving:
             for btn in self.buttons:
@@ -58,13 +63,15 @@ class Battle(Scenario):
             self.draw_menu(screen)
             self.interface.draw_input_box(screen)
             self.interface.draw_popup(screen)
-
+            self.interface.draw_health_bar(screen)
 
             if self.result_finalization_animation_active:
                 self.draw_result_pre_combat_animation(screen)
             else:
                 if not self.pre_combat_ended:
                     self.interface.draw_battle_timers(screen, "pre_combat", self.manager.player.moving)
+                elif not self.punishment_ended and self.pre_combat_ended:
+                    self.interface.draw_battle_timers(screen, "punishment", self.manager.player.moving)
 
 
     def create_button(self, text, color, position, size, on_click, text_color="white"):
@@ -85,16 +92,19 @@ class Battle(Scenario):
             word_obj = self.word_manager.check_word(typed_word)
             self.interface.input_text = ""
 
-            if self.pre_combat_ended:
-                self.manager.player.play_skill_animation()
-                self.start_punishin_animation = True
-                damage, is_critical, enemy_alive = self.manager.player.attack(self.enemy)
-                print(f"Dano causado: {damage}")
-                if is_critical:
-                    print("⚡ Dano crítico!")
-                if not enemy_alive:
-                    print("☠️ Inimigo derrotado!")
-                return
+            if self.pre_combat_ended and not self.punishment_ended:
+                punishment_word = self.word_manager.check_punishment_word(typed_word)
+                if punishment_word:
+                    self.manager.player.play_skill_animation()
+                    self.start_punishin_animation = True
+                    damage, is_critical, enemy_alive, did_hit = self.manager.player.attack(self.enemy)
+
+                    if not enemy_alive:
+                        self.enemy_alive = enemy_alive
+                        #animaçao do inimigo sendo derrotado
+                    self.interface.input_active = False
+                    #criar animaçao de erro de ataque, critico e do proprio ataque
+                    return
 
             if word_obj and not self.pre_combat_ended:
                 self.pre_combat_word_count += 1
@@ -110,6 +120,7 @@ class Battle(Scenario):
                     self.start_result_animation("success")
             else:
                 self.interface.pre_combat_timer.decrease_time(3)
+                self.interface.punishment_timer.decrease_time(3)
                 self.interface.show_popup("Palavra errada: -3 segundos", duration=1.5)
 
 
@@ -151,9 +162,14 @@ class Battle(Scenario):
         for effect in self.enemy.punish_effects[:]:
             if effect.is_finished():
                 self.enemy.punish_effects.remove(effect)
+
+                if not self.enemy_alive:
+                    self.start_result_animation("victory")
+                    self.enemy.visible = False
+                    self.interface.input_active = False
+                    #Iniciar estado de vitoria (mostrar animaçao das cartas subindo pra escolher etc)
             else:
                 effect.draw(screen)
-
 
     def draw_background(self, screen):
         screen.fill((0, 0, 0))
@@ -177,6 +193,13 @@ class Battle(Scenario):
             self.word_manager.words.clear()
             self.start_result_animation("failure")
             self.interface.input_active = False
+            self.is_enemy_turn = True
+
+        if self.interface.is_punishment_over() and not self.punishment_ended and self.enemy_alive and self.pre_combat_ended:
+            self.punishment_ended = True
+            self.word_manager.words.clear()
+            self.start_result_animation("player_turn_started")
+
 
         if self.interface.popup_time_remaining > 0:
             self.interface.popup_time_remaining -= self.manager.dt
@@ -193,7 +216,20 @@ class Battle(Scenario):
                 self.result_finalization_animation_active = False
                 if self.pre_combat_result == "success":
                     self.word_manager.generate_final_pre_combat_word(self.enemy)
-                # Ativar o combate real aqui
+
+        if self.is_enemy_turn:
+            result = self.enemy.attack(self.manager.player)
+            #criar animaçao de dodge, critico e do proprio ataque
+            if result["did_dodge"]:
+                print("O alvo esquivou do ataque!")
+            else:
+                print(f"{'Crítico! ' if result['is_critical'] else ''}Dano causado: {result['damage']}")
+
+            if not result["target_alive"]:
+                #animaçao do player sendo derrotado
+                print("O alvo foi derrotado!")
+            self.interface.input_active = False
+            self.is_enemy_turn = False
 
         for effect in self.enemy.punish_effects:
             effect.update(self.manager.dt)
@@ -220,8 +256,21 @@ class Battle(Scenario):
         text_duration = 0.3
         text_progress = min(self.result_finalization_animation_timer / text_duration, 0.5)
 
-        result_text = "Pré combate bem sucedido!" if self.pre_combat_result == "success" else "Pré combate foi um fracasso!"
-        color = (0, 200, 0) if self.pre_combat_result == "success" else (200, 0, 0)
+        if self.pre_combat_result == "success":
+            result_text = "Pré combate bem sucedido!"
+            color = (0, 200, 0)
+        elif self.pre_combat_result == "failure":
+            result_text = "Pré combate foi um fracasso! Turno do inimigo iniciado!"
+            color = (200, 0, 0)
+        elif self.pre_combat_result == "victory":
+            result_text = "Você venceu!"
+            color = (0, 200, 0)
+        elif self.pre_combat_result == "player_turn_started":
+            result_text = "Seu turno começou!"
+            color = (50, 168, 123)
+        else:
+            result_text = "Resultado desconhecido."
+            color = (200, 0, 0)
 
         text_surface = self.font.render(result_text, True, color)
         text_x = (width - text_surface.get_width()) // 2

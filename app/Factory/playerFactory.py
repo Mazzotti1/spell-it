@@ -8,12 +8,12 @@ class PlayerFactory:
 
         if attributes is None:
             attributes = Attributes(
-                dodge=0.1, 
-                attack_speed=1.0, 
-                strength=10, 
-                health=100, 
-                lucky=0.05, 
-                critical_chance=0.1
+                dodge=1,
+                attack_speed=1.0,
+                strength=10,
+                health=50,
+                lucky=1,
+                critical_chance=1
             )
 
         player = Player("Aurélio", attributes, x, y)

@@ -8,30 +8,30 @@ from Scenario.map import Map
 from Attributes.attributes import Attributes
 class App:
     def __init__(self):
-      
+
         pygame.init()
         pygame.display.set_caption("Menu")
 
         self.screen = pygame.display.set_mode((1920, 1080))
         self.clock = pygame.time.Clock()
-        self.running = True 
+        self.running = True
 
         attributes = Attributes(
-            dodge=1.0, 
-            attack_speed=1.0, 
-            strength=1.0, 
-            health=5, 
-            lucky=1.0, 
+            dodge=1.0,
+            attack_speed=1.0,
+            strength=1.0,
+            health=50,
+            lucky=1.0,
             critical_chance=1.0
         )
         self.player = PlayerFactory.create_player(-100, 750, attributes)
 
         self.manager = ScenarioManager(self.player)
         self.manager.change_scenario(MainMenu(self.manager, self.player))
-        
+
     def run(self):
         while self.running:
-            dt = self.clock.tick(60) / 1000 
+            dt = self.clock.tick(60) / 1000
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -41,13 +41,13 @@ class App:
                 if hasattr(self.manager.current_scenario, 'confirm_dialog'):
                     if self.manager.current_scenario.confirm_dialog.visible:
                         self.manager.current_scenario.confirm_dialog.handle_event(event)
-                        continue 
+                        continue
 
                 if hasattr(self.manager.current_scenario, 'settings_dialog'):
                     if self.manager.current_scenario.settings_dialog.visible:
                         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                             self.manager.current_scenario.settings_dialog.cancel()
-                            continue 
+                            continue
 
                 if getattr(self.manager.current_scenario, 'is_menu_open', False):
                         if getattr(self.manager.current_scenario, 'allow_pause_menu', True):
@@ -59,10 +59,10 @@ class App:
                                     self.manager.current_scenario.open_menu()
                                 else:
                                     menu.handle_menu_buttons_event(event)
-                            continue 
+                            continue
                         else:
-                            continue 
-                
+                            continue
+
                 if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_ESCAPE:
                             if getattr(self.manager.current_scenario, 'allow_pause_menu', True):
@@ -85,13 +85,13 @@ class App:
                     settings_dialog = self.manager.current_scenario.settings_dialog
                     if settings_dialog.visible:
                         settings_dialog.handle_event(event)
-                        
+
                         if settings_dialog.unsaved_changes_dialog.visible:
                             settings_dialog.unsaved_changes_dialog.handle_event(event)
                         elif settings_dialog.save_confirm_dialog.visible:
                             settings_dialog.save_confirm_dialog.handle_event(event)
                         continue
-                    
+
             self.manager.update()
             self.manager.draw(self.screen)
 
@@ -100,7 +100,7 @@ class App:
                 self.player.update_animation(dt)
                 self.player.draw(self.screen)
                 if not hasattr(self.player, "battle_initial_movement_done") or not self.player.battle_initial_movement_done:
-                    self.player.start_moving_to(420, 750, direction="walking_right") 
+                    self.player.start_moving_to(420, 750, direction="walking_right")
                     self.player.battle_initial_movement_done = True
 
             pygame.display.flip()

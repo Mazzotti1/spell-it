@@ -49,6 +49,13 @@ class Entity:
         return self.attributes
 
     def attack(self, target: "Entity"):
+
+        hit_chance = min(1.0, max(0.0, self.get_attack_speed()))
+        did_hit = random.random() < hit_chance
+
+        if not did_hit:
+            return 0, False, target.is_alive(), False
+
         final_crit_chance = min(1.0, self.get_critical_chance() * self.get_lucky())
         is_critical = random.random() < final_crit_chance
 
@@ -60,12 +67,15 @@ class Entity:
         target.set_health(max(0, target.get_health() - damage))
         target_alive = target.is_alive()
 
-        return damage, is_critical, target_alive
+        return damage, is_critical, target_alive, True
 
     def is_alive(self):
         return self.attributes.get_health() > 0
 
     def draw(self, screen):
+        if hasattr(self, "visible") and not self.visible:
+            return
+
         frame = self.current_frame
         if self.direction == -1:
             frame = pygame.transform.flip(frame, True, False)

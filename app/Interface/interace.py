@@ -1,16 +1,17 @@
 import pygame
 from Factory.playerFactory import PlayerFactory
 from Utils.time_bar import TimerBar
+import math
 
 class Interface:
-    def __init__(self, player, pre_combat_time = 30, turn_time=15):
+    def __init__(self, player, pre_combat_time = 30, turn_time=15, punishment_time=10):
         self.player = player
         self.player = PlayerFactory.create_player(0, 0, player.attributes)
         self.health_image = pygame.image.load("../assets/player/estatico/front.png").convert_alpha()
         self.health_image = pygame.transform.scale(self.health_image, (32, 32))
 
         self.pre_combat_timer = TimerBar(pre_combat_time, title="Pré-combate")
-
+        self.punishment_timer = TimerBar(punishment_time, title="Punição")
         self.turn_timer = TimerBar(turn_time, title="Turno")
 
         self.input_active = True
@@ -22,20 +23,20 @@ class Interface:
         self.popup_font = pygame.font.SysFont(None, 36)
 
     def draw_health_bar(self, screen):
+        health_quantity = self.player.get_health() // 10
 
-        health_quantity = self.player.get_health()
         icon_size = 32
         spacing = 2
         total_width = health_quantity * (icon_size + spacing) - spacing
         container_padding = 10
-        container_height = icon_size + 10 
+        container_height = icon_size + 10
         container_width = total_width + container_padding * 2
 
         container_x = 40
         container_y = 40
 
         container_rect = pygame.Rect(container_x, container_y, container_width, container_height)
-        pygame.draw.rect(screen, (212, 213, 214), container_rect, border_radius=5) 
+        pygame.draw.rect(screen, (212, 213, 214), container_rect, border_radius=5)
         pygame.draw.rect(screen, (255, 255, 255), container_rect, 2, border_radius=5)
 
         font = pygame.font.SysFont(None, 24)
@@ -48,17 +49,21 @@ class Interface:
             x = container_x + container_padding + i * (icon_size + spacing)
             y = container_y + 5
             screen.blit(self.health_image, (x, y))
-        
+
+
     def draw_battle_timers(self, screen, type, playerIsMoving=True):
         if type == "pre_combat":
             self.pre_combat_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
         elif type == "turn":
-            self.turn_timer.draw(screen, x=850, y=140, width=100, height=20, playerIsMoving=playerIsMoving)
+            self.turn_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
+        elif type == "punishment":
+            self.punishment_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
         else:
             self.pre_combat_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
 
     def reset_timers(self):
         self.pre_combat_timer.reset()
+        self.punishment_timer.reset()
         self.turn_timer.reset()
 
     def draw_input_box(self, screen):
@@ -70,11 +75,13 @@ class Interface:
         pygame.draw.rect(screen, (0, 0, 0), input_rect, 3, border_radius=10)
 
         if self.input_text:
+            if not self.input_active:
+                self.input_text = ""
             text_surface = self.input_font.render(self.input_text, True, (0, 0, 0))
         else:
-            placeholder = "Tempo encerrado" if not self.input_active else "Apenas digite..."
-            text_surface = self.input_font.render(placeholder, True, (150, 150, 150))  
-    
+            placeholder = "Bloqueado" if not self.input_active else "Apenas digite..."
+            text_surface = self.input_font.render(placeholder, True, (150, 150, 150))
+
         screen.blit(text_surface, (x + 10, y + (box_height - text_surface.get_height()) // 2))
 
     def handle_input_event(self, event):
@@ -88,7 +95,10 @@ class Interface:
 
     def is_pre_combat_over(self):
         return self.pre_combat_timer.is_time_up()
-    
+
+    def is_punishment_over(self):
+        return self.punishment_timer.is_time_up()
+
     def show_popup(self, message, duration=1.5):
         self.popup_error_message = message
         self.popup_time_remaining = duration
