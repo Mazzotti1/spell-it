@@ -20,6 +20,9 @@ class Enemy(Entity):
     def getType(self):
         return self.type
 
+    def getName(self):
+        return self.name
+
     def get_position(self):
         return (self.x, self.y)
 

@@ -8,6 +8,7 @@ class TimerBar:
         self.last_update = None
         self.title = title
         self.color = color
+        self.is_visible = True
 
     def update(self, playerIsMoving=True):
         if not playerIsMoving:
@@ -24,6 +25,9 @@ class TimerBar:
         self.last_update = time.time()
 
     def draw(self, screen, x, y, width, height, show_time=True, playerIsMoving=True):
+        if not self.is_visible:
+            return 
+           
         self.update(playerIsMoving)
     
         pygame.draw.rect(screen, (80, 80, 80), (x, y, width, height), border_radius=5)

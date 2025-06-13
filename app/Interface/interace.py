@@ -58,6 +58,8 @@ class Interface:
             self.turn_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
         elif type == "punishment":
             self.punishment_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
+        elif type == "enemy_turn":
+            self.punishment_timer.is_visible = False
         else:
             self.pre_combat_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
 

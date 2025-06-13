@@ -9,7 +9,7 @@ class PuffAnimation:
 
         self.total_frames = 4
         self.sprite_sheet = pygame.image.load("../assets/effects/Puff.png").convert_alpha()
-        self.frame_width = self.sprite_sheet.get_width() // self.total_frames
+        self.frame_width = self.sprite_sheet.get_width() // self.total_frames + 6
         self.frame_height = self.sprite_sheet.get_height()
 
     def is_finished(self):

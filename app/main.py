@@ -17,7 +17,7 @@ class App:
         self.running = True
 
         attributes = Attributes(
-            dodge=1.0,
+            dodge=100.0,
             attack_speed=1.0,
             strength=1.0,
             health=50,
