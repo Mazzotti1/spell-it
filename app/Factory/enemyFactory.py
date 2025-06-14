@@ -4,8 +4,8 @@ from Entity.Enemy.enemy import Enemy
 
 class EnemyFactory:
     @staticmethod
-    def create_enemy(type, attributes, x, y, idle_sprite):
-        enemy = Enemy(type, attributes, x, y, idle_sprite)
+    def create_enemy(type, attributes, x, y, idle_sprite, attacking_sprite):
+        enemy = Enemy(type, attributes, x, y, idle_sprite, attacking_sprite)
         enemy.rect = pygame.Rect(x, y, enemy.width, enemy.height)
 
         enemy.current_frames = enemy.idle_frames

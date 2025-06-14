@@ -17,7 +17,7 @@ class App:
         self.running = True
 
         attributes = Attributes(
-            dodge=100.0,
+            dodge=1.0,
             attack_speed=1.0,
             strength=1.0,
             health=50,
@@ -25,7 +25,8 @@ class App:
             critical_chance=1.0
         )
         self.player = PlayerFactory.create_player(-100, 750, attributes)
-
+        print(self.player.get_health())
+        
         self.manager = ScenarioManager(self.player)
         self.manager.change_scenario(MainMenu(self.manager, self.player))
 
@@ -98,7 +99,6 @@ class App:
             if isinstance(self.manager.current_scenario, Battle):
                 self.player.update_movement(dt)
                 self.player.update_animation(dt)
-                self.player.draw(self.screen)
                 if not hasattr(self.player, "battle_initial_movement_done") or not self.player.battle_initial_movement_done:
                     self.player.start_moving_to(420, 750, direction="walking_right")
                     self.player.battle_initial_movement_done = True

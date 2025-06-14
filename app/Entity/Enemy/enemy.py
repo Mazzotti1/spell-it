@@ -4,11 +4,14 @@ from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
 from Effects.falling_anvil_animation import FallingAnvilAnimation
 class Enemy(Entity):
-    def __init__(self, type, attributes, x=0, y=0, idle_sprite="../assets/enemys/anaconda/enemy_anaconda_idle_sprite.png"):
+    def __init__(self, type, attributes, x=0, y=0, 
+                 idle_sprite="../assets/enemys/Anaconda/enemy_anaconda_idle_sprite.png", 
+                 attacking_sprite="../assets/enemys/Anaconda/attacking/anaconda_attacking_sheet.png"):
         super().__init__(x, y, type, attributes, width=384, height=384)
 
         self.load_animations({
             "idle": (idle_sprite, 0.15),
+            "attacking":(attacking_sprite, 0.1)
         })
 
         self.punish_effects = []
@@ -131,3 +134,10 @@ class Enemy(Entity):
                 frame_width= 512
             )
             self.punish_effects.append(PunishAnimation(storm))
+
+    def set_animation(self, name: str, play_once: bool = False):
+        self.current_frames = getattr(self, f"{name}_frames")
+        self.current_animation = name
+        self.frame_index = 0
+        self.animation_timer = 0
+        self.animation_play_once = play_once

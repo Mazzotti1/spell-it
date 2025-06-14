@@ -9,6 +9,15 @@ from Effects.temporary_effects import TemporaryEffect
 from Effects.floating_text import FloatingText
 from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
+
+##Fazer sprite do inimigo tomando dano (piscando branco com vermelho)
+##Fazer sprite do player tomando dano (piscando branco com vermelho)
+##Fazer animação do inimigo morrendo
+##Fazer animação do player morrendo
+##Fazer animação de erro de ataque do player
+##Fazer animação de critico do player
+##Estado de vitória mostrar as possiveis habilidades pra escolher
+
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy, player_final_x, player_final_y):
         super().__init__(manager),
@@ -39,7 +48,7 @@ class Battle(Scenario):
             num_frames=3,
             loop=True,
             frame_duration=0.1,
-            total_duration=3.0,
+            total_duration=10.0,
             frame_height= 320,
             frame_width= 320
         )
@@ -50,7 +59,7 @@ class Battle(Scenario):
             num_frames=5,
             loop=True,
             frame_duration=0.1,
-            total_duration=3.0,
+            total_duration=10.0,
             frame_height= 320,
             frame_width= 320
         )
@@ -61,14 +70,14 @@ class Battle(Scenario):
             num_frames=5,
             loop=True,
             frame_duration=0.1,
-            total_duration=3.0,
+            total_duration=10.0,
             frame_height= 320,
             frame_width= 320
         )
 
         self.lion = CustomSpriteAnimation(
             "../assets/effects/enemys/leao_sheet.png",
-            (420, 470),
+            (420, 510),
             num_frames=11,
             loop=True,
             frame_duration=0.05,
@@ -79,22 +88,22 @@ class Battle(Scenario):
 
         self.bite = CustomSpriteAnimation(
             "../assets/effects/enemys/mordida_sheet.png",
-            (350, 550),
+            (350, 620),
             num_frames=5,
             loop=True,
             frame_duration=0.1,
-            total_duration=3.0,
+            total_duration=10.0,
             frame_height= 320,
             frame_width= 320
         )
 
         self.thunder = CustomSpriteAnimation(
             "../assets/effects/enemys/raio_sheet.png",
-            (379, 670),
+            (300, 560),
             num_frames=29,
             loop=True,
             frame_duration=0.1,
-            total_duration=3.0,
+            total_duration=10.0,
             frame_height= 320,
             frame_width= 320
         )
@@ -129,7 +138,7 @@ class Battle(Scenario):
         self.player_turn = False
 
         self.flash_timer = 0
-        self.flash_interval = 100 
+        self.flash_interval = 120
         self.flash_on = False
 
         self.temporary_effects = []
@@ -139,10 +148,12 @@ class Battle(Scenario):
         self.pending_enemy_attack = False
         self.enemy_attack_animation_active = False
         self.enemy_attack_animation_timer = 0
-        self.enemy_attack_animation_duration = 2.0
+        self.enemy_attack_animation_duration = 0.7
+        self.turn_transition_delay = 0 
         self.pending_damage_result = False
 
         self.enemy_attacks = []
+        self.enemy_animation_attacking_started = False
 
     def draw_ui(self, screen):
         if not self.manager.player.moving:
@@ -216,6 +227,8 @@ class Battle(Scenario):
         self.enemy.update_animation(self.manager.dt)
         self.enemy.draw(screen)
 
+        self.manager.player.draw(screen)
+
         if not player.moving and not self.alreadyGeneratedWords:
             self.word_manager.generate_pre_combat_words(quantity=self.quantity_pre_combat_words)
             self.alreadyGeneratedWords = True
@@ -258,22 +271,22 @@ class Battle(Scenario):
             else:
                 effect.draw(screen)
 
-        punishment_active = len(self.enemy.punish_effects) > 0
+        # flash_active = len(self.enemy.punish_effects) > 0 or len(self.enemy_attacks) > 2
 
-        if punishment_active:
-            self.flash_timer += self.manager.dt * 1000
-            if self.flash_timer >= self.flash_interval:
-                self.flash_timer = 0
-                self.flash_on = not self.flash_on
+        # if flash_active:
+        #     self.flash_timer += self.manager.dt * 1000
+        #     if self.flash_timer >= self.flash_interval:
+        #         self.flash_timer = 0
+        #         self.flash_on = not self.flash_on
 
-            flash_surface = pygame.Surface(screen.get_size())
-            flash_color = (255, 255, 255) if self.flash_on else (0, 0, 0)
-            flash_surface.fill(flash_color)
-            flash_surface.set_alpha(180)
-            screen.blit(flash_surface, (0, 0))
-        else:
-            self.flash_timer = 0
-            self.flash_on = False
+        #     flash_surface = pygame.Surface(screen.get_size())
+        #     flash_color = (255, 255, 255) if self.flash_on else (0, 0, 0)
+        #     flash_surface.fill(flash_color)
+        #     flash_surface.set_alpha(180)
+        #     screen.blit(flash_surface, (0, 0))
+        # else:
+        #     self.flash_timer = 0
+        #     self.flash_on = False
 
         for effect in self.temporary_effects:
             effect.draw(screen)
@@ -282,6 +295,10 @@ class Battle(Scenario):
             text.draw(screen)
 
         if self.enemy_attack_animation_active:
+            if not self.enemy_animation_attacking_started:
+                self.enemy.set_animation("attacking")
+                self.enemy_animation_attacking_started = True
+
             self.interface.draw_battle_timers(screen, "enemy_turn", self.manager.player.moving)
 
             match self.enemy.getName():
@@ -301,6 +318,8 @@ class Battle(Scenario):
         for enemy_attack_animation in self.enemy_attacks[:]:
             if enemy_attack_animation.is_finished():
                 self.enemy_attacks.remove(enemy_attack_animation)
+                self.enemy.set_animation("idle")
+                self.enemy_animation_started = False 
             else:
                 enemy_attack_animation.draw(screen)
 
@@ -322,6 +341,11 @@ class Battle(Scenario):
 
     def update(self):
         self.word_manager.update()
+
+        if self.turn_transition_delay > 0:
+            self.turn_transition_delay -= self.manager.dt
+            return
+
 
         if self.interface.is_pre_combat_over() and not self.pre_combat_ended:
             self.pre_combat_ended = True
@@ -393,16 +417,19 @@ class Battle(Scenario):
                 image = self.dodge_img
                 pos = (self.manager.player.x, self.manager.player.y - 100)
                 self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                self.turn_transition_delay = 0.8
             else:
                 damage = result["damage"]
-                pos = (self.manager.player.x, self.manager.player.y - 50)
+                pos = (self.manager.player.x + 100, self.manager.player.y - 80)
 
                 color = (255, 215, 0) if result["is_critical"] else (255, 0, 0)
                 self.floating_texts.append(FloatingText(str(damage), pos, color, self.font, duration=1.0))
 
                 if result["is_critical"]:
-                    effect_image = pygame.image.load(self.critical_img).convert_alpha()
-                    self.temporary_effects.append(TemporaryEffect(effect_image, pos, duration=0.5))
+                    image = self.critical_img
+                    self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+
+                self.turn_transition_delay = 0.8
 
             if not result["target_alive"]:
                 self.player_alive = result["target_alive"]
@@ -449,10 +476,19 @@ class Battle(Scenario):
             color = (200, 0, 0)
 
         text_surface = self.font.render(result_text, True, color)
+
+        stroke_color = (255, 255, 255)
+        stroke_surface = self.font.render(result_text, True, stroke_color)
+
         text_x = (width - text_surface.get_width()) // 2
         text_final_y = center_y - 100
         text_start_y = center_y
         text_y = text_start_y - int((text_start_y - text_final_y) * text_progress)
+
+        for dx in [-1, 0, 1]:
+            for dy in [-1, 0, 1]:
+                if dx != 0 or dy != 0:
+                    screen.blit(stroke_surface, (text_x + dx, text_y + dy))
 
         screen.blit(text_surface, (text_x, text_y))
 
