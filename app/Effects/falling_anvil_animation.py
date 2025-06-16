@@ -14,6 +14,6 @@ class FallingAnvilAnimation(CustomSpriteAnimation):
         super().update(dt)
 
         if self.fall_elapsed < self.fall_duration:
-            self.fall_elapsed += dt
+            self.fall_elapsed += dt 
             progress = min(1.0, self.fall_elapsed / self.fall_duration)
             self.position[1] = self.start_y + (self.end_y - self.start_y) * progress

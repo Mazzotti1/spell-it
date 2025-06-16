@@ -26,7 +26,7 @@ class App:
         )
         self.player = PlayerFactory.create_player(-100, 750, attributes)
         print(self.player.get_health())
-        
+
         self.manager = ScenarioManager(self.player)
         self.manager.change_scenario(MainMenu(self.manager, self.player))
 

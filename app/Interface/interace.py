@@ -4,7 +4,7 @@ from Utils.time_bar import TimerBar
 import math
 
 class Interface:
-    def __init__(self, player, pre_combat_time = 30, turn_time=15, punishment_time=10):
+    def __init__(self, player, pre_combat_time = 30, turn_time=15, punishment_time=5):
         self.player = player
         self.player = PlayerFactory.create_player(0, 0, player.attributes)
         self.health_image = pygame.image.load("../assets/player/estatico/front.png").convert_alpha()

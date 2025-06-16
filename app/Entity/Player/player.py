@@ -18,7 +18,11 @@ class Player(Entity):
             "walking_top": ("../assets/player/player_walking_top.png", 0.05),
             # "walking_bottom": ("../assets/player/player_walking_bottom.png", 0.1),
             "skill": ("../assets/skill/player_skill_sheet.png", 0.05),
+            "hited": ("../assets/player/player_hited_sheet.png", 0.1),
+            "dying": ("../assets/player/Dying/player_dying.png", 0.1),
         })
+
+        self.visible = True
 
     def start_moving_to(self, target_x, target_y, direction="walking_right"):
         self.target_x = target_x
@@ -118,3 +122,10 @@ class Player(Entity):
 
         self.y -= 250
         self.rect.topleft = (self.x, self.y)
+
+    def set_animation(self, name: str, play_once: bool = False):
+        self.current_frames = getattr(self, f"{name}_frames")
+        self.current_animation = name
+        self.frame_index = 0
+        self.animation_timer = 0
+        self.animation_play_once = play_once
