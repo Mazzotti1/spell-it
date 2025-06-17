@@ -199,7 +199,9 @@ class Enemy(Entity):
 
             self.punish_effects.append(PunishAnimation(stars_anim, delay = 0.6))
             self.punish_effects.append(PunishAnimation(self.anaconda_hited, delay = 0.7))
-            self.dying_animations.append(PunishAnimation(self.anaconda_dying, delay = 0.0))
+
+            if not self.is_alive():
+                self.dying_animations.append(PunishAnimation(self.anaconda_dying, delay = 0.0))
 
         elif self.name == "Calango":
             flame = CustomSpriteAnimation(
@@ -214,7 +216,9 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(flame))
             self.punish_effects.append(PunishAnimation(self.calango_hited, delay = 0.6))
-            self.dying_animations.append(PunishAnimation(self.calango_dying, delay = 0.0))
+
+            if not self.is_alive():
+                self.dying_animations.append(PunishAnimation(self.calango_dying, delay = 0.0))
 
         elif self.name == "Jacaré":
             firefly = CustomSpriteAnimation(
@@ -229,7 +233,9 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(firefly))
             self.punish_effects.append(PunishAnimation(self.jacare_hited, delay = 0.2))
-            self.dying_animations.append(PunishAnimation(self.jacare_dying, delay = 0.5))
+
+            if not self.is_alive():
+                self.dying_animations.append(PunishAnimation(self.jacare_dying, delay = 0.5))
 
 
         elif self.name == "Quero-Quero":
@@ -245,7 +251,9 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(tornado))
             self.punish_effects.append(PunishAnimation(self.quero_quero_hited, delay = 0.2))
-            self.dying_animations.append(PunishAnimation(self.quero_quero_dying, delay = 0.5))
+
+            if not self.is_alive():
+                self.dying_animations.append(PunishAnimation(self.quero_quero_dying, delay = 0.5))
 
         elif self.name == "Mico":
             storm = CustomSpriteAnimation(
@@ -260,7 +268,9 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(storm))
             self.punish_effects.append(PunishAnimation(self.mico_hited, delay = 0.2))
-            self.dying_animations.append(PunishAnimation(self.mico_dying, delay = 0.5))
+
+            if not self.is_alive():
+                self.dying_animations.append(PunishAnimation(self.mico_dying, delay = 0.5))
 
     def set_animation(self, name: str, play_once: bool = False):
         self.current_frames = getattr(self, f"{name}_frames")

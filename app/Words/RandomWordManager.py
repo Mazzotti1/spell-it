@@ -5,7 +5,10 @@ from Words.RandomWord import RandomWord
 class RandomWordManager:
     def __init__(self, screen_size, lifetime=5, biome=None, player_position=None):
         self.screen_size = screen_size
+
         self.words = []
+        self.enemy_words = []
+
         self.lifetime = lifetime
 
         self.biome = biome
@@ -40,6 +43,16 @@ class RandomWordManager:
         for word in selected_words:
             x, y = self.get_valid_position(min_distance=200)
             self.words.append(RandomWord(self.screen_size, text=word, x=x, y=y, lifetime=self.lifetime))
+
+    def generate_enemy_words(self, quantity=5):
+        if len(self.word_pool) < quantity:
+            quantity = len(self.word_pool)
+
+        selected_words = random.sample(self.word_pool, quantity)
+        self.words = []
+        for word in selected_words:
+            x, y = self.get_valid_position(min_distance=200)
+            self.enemy_words.append(RandomWord(self.screen_size, text=word, x=x, y=y, lifetime=self.lifetime))
 
     def update(self):
         self.words = [word for word in self.words if not word.is_expired()]

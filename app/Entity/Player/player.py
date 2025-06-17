@@ -23,6 +23,7 @@ class Player(Entity):
         })
 
         self.visible = True
+        self.skills = [] 
 
     def start_moving_to(self, target_x, target_y, direction="walking_right"):
         self.target_x = target_x
@@ -129,3 +130,9 @@ class Player(Entity):
         self.frame_index = 0
         self.animation_timer = 0
         self.animation_play_once = play_once
+
+    def add_skill(self, skill: Skill):
+        self.skills.append(skill)
+
+    def use_skill(self, skill_name: str):
+        pass

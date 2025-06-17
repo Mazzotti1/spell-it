@@ -9,8 +9,8 @@ from Effects.temporary_effects import TemporaryEffect
 from Effects.floating_text import FloatingText
 from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
+from Skills.SkillCardAnimation import SkillCardAnimation
 
-##Estado de vitória mostrar as possiveis habilidades pra escolher
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy, player_final_x, player_final_y):
         super().__init__(manager),
@@ -116,7 +116,8 @@ class Battle(Scenario):
         self.word_manager = RandomWordManager(screen_size, self.pre_combat_time, biome, player_position=(self.player_final_x, self.player_final_y))
 
         self.alreadyGeneratedWords = False
-
+        self.alreadyGeneratedEnemyWords = False
+        
         self.pre_combat_word_count = 0
 
         self.pre_combat_result = None
@@ -162,7 +163,13 @@ class Battle(Scenario):
         self.defeat_animation_started = False
 
         self.draw_restart_button = False
-    
+
+        self.victory_animation_started = False
+        self.victory_animation_timer = 0
+        
+        self.reward_cards = []
+        self.showing_reward_cards = False
+
     def draw_ui(self, screen):
         if not self.manager.player.moving:
             for btn in self.buttons:
@@ -250,7 +257,6 @@ class Battle(Scenario):
                 self.interface.punishment_timer.decrease_time(3)
                 self.interface.show_popup("Palavra errada: -3 segundos", duration=1.5)
 
-
     def draw_scene(self, screen, player):
         super().draw_scene(screen)
         self.enemy.update_animation(self.manager.dt)
@@ -261,6 +267,10 @@ class Battle(Scenario):
         if not player.moving and not self.alreadyGeneratedWords:
             self.word_manager.generate_pre_combat_words(quantity=self.quantity_pre_combat_words)
             self.alreadyGeneratedWords = True
+
+        if not player.moving and not self.alreadyGeneratedEnemyWords and self.enemy_attack_animation_active and len(self.enemy_attacks) > 0:
+            self.word_manager.generate_pre_combat_words(quantity=self.quantity_pre_combat_words)
+            self.alreadyGeneratedEnemyWords = True
 
         if not player.moving:
             self.word_manager.draw(screen)
@@ -413,6 +423,19 @@ class Battle(Scenario):
             self.manager.player.set_animation("dying", True)
             self.player_dying_animation_active = False
 
+        if self.victory_animation_started:
+            self.victory_animation_timer += self.manager.dt
+            total_duration = 3.0 
+            if self.victory_animation_timer >= total_duration:
+                self.victory_animation_started = False
+                self.victory_animation_timer = 0.0
+                self.start_reward_animation(screen)
+
+        if self.showing_reward_cards:
+            for card in self.reward_cards:
+                card.draw(screen)
+
+
     def draw_background(self, screen):
         screen.fill((0, 0, 0))
 
@@ -468,6 +491,7 @@ class Battle(Scenario):
         ):
             self.punishment_ended = True
             self.word_manager.words.clear()
+            self.alreadyGeneratedEnemyWords = False
             self.start_result_animation("player_turn_started")
 
         if (
@@ -484,6 +508,7 @@ class Battle(Scenario):
             self.word_manager.words.clear()
             self.start_result_animation("victory")
             self.enemy.visible = False
+            self.victory_animation_started = True
 
         if self.interface.popup_time_remaining > 0:
             self.interface.popup_time_remaining -= self.manager.dt
@@ -495,11 +520,12 @@ class Battle(Scenario):
             self.result_finalization_animation_timer += self.manager.dt
             total_duration = 3
             self.result_finalization_animation_progress = min(self.result_finalization_animation_timer / total_duration, 1)
-
+            self.interface.input_active = False
             if self.result_finalization_animation_progress >= 1:
                 self.result_finalization_animation_active = False
                 if self.pre_combat_result == "success":
                     self.word_manager.generate_final_pre_combat_word(self.enemy)
+                    self.interface.input_active = True
 
         for effect in self.enemy.punish_effects:
             effect.update(self.manager.dt)
@@ -568,6 +594,11 @@ class Battle(Scenario):
         for enemy_dying_animation in self.enemy_dying:
             enemy_dying_animation.update(self.manager.dt)
 
+        if self.showing_reward_cards:
+            mouse_pos = pygame.mouse.get_pos()
+            for card in self.reward_cards:
+                card.update(mouse_pos, self.manager.dt)
+
     def draw_result_pre_combat_animation(self, screen):
         if not self.result_finalization_animation_active:
             return
@@ -634,3 +665,16 @@ class Battle(Scenario):
     def restart(self):
         self.manager.player.visible = True
         self.manager.back_to_main()
+
+    def start_reward_animation(self, screen):
+        self.showing_reward_cards = True
+        self.reward_cards.clear()
+
+        screen_center_x = screen.get_width() // 2
+        screen_center_y = screen.get_height() // 2
+
+        start_pos = (screen_center_x, screen_center_y + 400)
+        target_pos = (screen_center_x, screen_center_y)
+
+        card = SkillCardAnimation(start_pos=start_pos, target_pos=target_pos, player= self.manager.player, manager=self.manager)
+        self.reward_cards.append(card)

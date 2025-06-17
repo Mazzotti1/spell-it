@@ -86,13 +86,13 @@ class ScenarioManager:
         new_attributes = Attributes(
             dodge=1.0,
             attack_speed=1.0,
-            strength=1.0,
+            strength=1000.0,
             health=50,
             lucky=1.0,
             critical_chance=1.0
         )
         self.player.set_attributes(new_attributes)
-
+        self.player.skills = []
         self.change_scenario(MainMenu(self, self.player))
 
     def scale_attributes(self, index: int) -> Attributes:
@@ -100,7 +100,7 @@ class ScenarioManager:
         return Attributes(
             dodge=min(0.1 + 0.02 * idx, 0.5),
             attack_speed=0.5 + 0.05 * idx,
-            strength=1000 + idx * 2,
+            strength=1 + idx * 2,
             health=5 + idx * 10,
             lucky=0.05 + 0.01 * idx,
             critical_chance=min(0.05 + 0.02 * idx, 0.5)

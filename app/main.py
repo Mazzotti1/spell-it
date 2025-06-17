@@ -19,7 +19,7 @@ class App:
         attributes = Attributes(
             dodge=1.0,
             attack_speed=1.0,
-            strength=1.0,
+            strength=1000.0,
             health=50,
             lucky=1.0,
             critical_chance=1.0
@@ -97,11 +97,15 @@ class App:
             self.manager.draw(self.screen)
 
             if isinstance(self.manager.current_scenario, Battle):
+                battle = self.manager.current_scenario
                 self.player.update_movement(dt)
                 self.player.update_animation(dt)
                 if not hasattr(self.player, "battle_initial_movement_done") or not self.player.battle_initial_movement_done:
                     self.player.start_moving_to(420, 750, direction="walking_right")
                     self.player.battle_initial_movement_done = True
+                
+                for card in battle.reward_cards:
+                    card.handle_event(event)
 
             pygame.display.flip()
 
