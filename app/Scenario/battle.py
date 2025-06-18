@@ -11,6 +11,14 @@ from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
 from Skills.SkillCardAnimation import SkillCardAnimation
 
+##Turno do player enche com muita palavra na tela
+##Barra de tempo, 15 segundos
+##Barra com 3 niveis de acerto, verde amarelo e vermelho
+##Acabou o tempo tentativa de ataque do player com o dano base sendo multiplicado pelo nivel de acerto da barra
+##Se acertar verificar o critico sobre o dano base + multiplcador por nivel de acerto
+
+##Se skill for usada timer reseta pra 15 segundos e armazena a açao dela pra verificar o que deve acontecer baseado nela
+
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy, player_final_x, player_final_y):
         super().__init__(manager),
@@ -117,7 +125,7 @@ class Battle(Scenario):
 
         self.alreadyGeneratedWords = False
         self.alreadyGeneratedEnemyWords = False
-        
+
         self.pre_combat_word_count = 0
 
         self.pre_combat_result = None
@@ -144,7 +152,7 @@ class Battle(Scenario):
         self.enemy_attack_animation_active = False
         self.enemy_attack_animation_timer = 0
         self.enemy_attack_animation_duration = 0.7
-        self.turn_transition_delay = 0 
+        self.turn_transition_delay = 0
         self.pending_damage_result = False
 
         self.enemy_attacks = []
@@ -166,7 +174,7 @@ class Battle(Scenario):
 
         self.victory_animation_started = False
         self.victory_animation_timer = 0
-        
+
         self.reward_cards = []
         self.showing_reward_cards = False
 
@@ -178,6 +186,9 @@ class Battle(Scenario):
             self.interface.draw_input_box(screen)
             self.interface.draw_popup(screen)
             self.interface.draw_health_bar(screen)
+
+            if len(self.manager.player.skills) > 0:
+                self.interface.draw_player_skills(screen, self.manager.player)
 
             if self.draw_restart_button:
                 self.restart_button.draw(screen)
@@ -411,7 +422,7 @@ class Battle(Scenario):
                     animation = self.enemy.mico_dying
 
             self.enemy_dying.append(PunishAnimation(animation, delay=0))
-        
+
         for enemy_dying_animation in self.enemy_dying[:]:
             if enemy_dying_animation.is_finished():
                 self.enemy_dying.remove(enemy_dying_animation)
@@ -425,7 +436,7 @@ class Battle(Scenario):
 
         if self.victory_animation_started:
             self.victory_animation_timer += self.manager.dt
-            total_duration = 3.0 
+            total_duration = 3.0
             if self.victory_animation_timer >= total_duration:
                 self.victory_animation_started = False
                 self.victory_animation_timer = 0.0
@@ -458,7 +469,7 @@ class Battle(Scenario):
             return
 
         if not self.manager.player.is_alive() and not self.defeat_animation_started:
-            self.manager.player.visible = False 
+            self.manager.player.visible = False
 
         if (
             not self.manager.player.is_alive()
@@ -529,7 +540,7 @@ class Battle(Scenario):
 
         for effect in self.enemy.punish_effects:
             effect.update(self.manager.dt)
-        
+
         for effect_dying in self.enemy.dying_animations:
             self.enemy.visible = False
             effect_dying.update(self.manager.dt)
@@ -559,7 +570,7 @@ class Battle(Scenario):
         if self.pending_damage_result:
             self.pending_damage_result = False
             result = self.enemy.attack(self.manager.player)
-            
+
             if result["did_dodge"]:
                 image = self.dodge_img
                 pos = (self.manager.player.x, self.manager.player.y - 100)

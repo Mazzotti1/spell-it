@@ -50,6 +50,68 @@ class Interface:
             y = container_y + 5
             screen.blit(self.health_image, (x, y))
 
+    def draw_player_skills(self, screen, player):
+        skills = player.skills
+
+        if not skills:
+            return
+
+        base_icon_size = 64
+        hover_icon_width = 320
+        hover_icon_height = 485
+        spacing = 10
+        container_padding = 10
+
+        total_width = len(skills) * (base_icon_size + spacing) - spacing
+        container_height = base_icon_size + 10
+        container_width = total_width + container_padding * 2
+
+        health_container_x = 40
+        health_total_width = (self.player.get_health() // 10) * (32 + 2) - 2
+        health_container_width = health_total_width + container_padding * 2
+
+        container_x = health_container_x + health_container_width + 20
+        container_y = 40
+
+        container_rect = pygame.Rect(container_x, container_y, container_width, container_height)
+        pygame.draw.rect(screen, (212, 213, 214), container_rect, border_radius=5)
+        pygame.draw.rect(screen, (255, 255, 255), container_rect, 2, border_radius=5)
+
+        font = pygame.font.SysFont(None, 24)
+        text_surface = font.render("Habilidades", True, (255, 255, 255))
+        text_x = container_x
+        text_y = container_y - 20
+        screen.blit(text_surface, (text_x, text_y))
+
+        mouse_pos = pygame.mouse.get_pos()
+        for i, skill in enumerate(skills):
+            x = container_x + container_padding + i * (base_icon_size + spacing)
+            y = container_y + 5
+
+            skill_rect = pygame.Rect(x, y, base_icon_size, base_icon_size)
+            is_hovered = skill_rect.collidepoint(mouse_pos)
+
+            if is_hovered:
+                overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+                overlay.fill((0, 0, 0, 180))
+                screen.blit(overlay, (0, 0))
+
+                center_x = screen.get_width() // 2 - hover_icon_width // 2
+                center_y = screen.get_height() // 2 - hover_icon_height // 2
+
+                skill_img = skill.get_image()
+                if skill_img:
+                    skill_img_scaled = pygame.transform.scale(skill_img, (hover_icon_width, hover_icon_height))
+                    screen.blit(skill_img_scaled, (center_x, center_y))
+                else:
+                    pygame.draw.rect(screen, (255, 0, 0), (center_x, center_y, hover_icon_width, hover_icon_height))
+            else:
+                skill_img = skill.get_image()
+                if skill_img:
+                    skill_img_scaled = pygame.transform.scale(skill_img, (base_icon_size, base_icon_size))
+                    screen.blit(skill_img_scaled, (x, y))
+                else:
+                    pygame.draw.rect(screen, (255, 0, 0), (x, y, base_icon_size, base_icon_size))
 
     def draw_battle_timers(self, screen, type, playerIsMoving=True):
         if type == "pre_combat":

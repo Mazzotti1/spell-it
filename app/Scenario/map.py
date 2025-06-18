@@ -255,8 +255,12 @@ class Map(Scenario):
             self.draw_branches(screen)
             interface.draw_health_bar(screen)
 
+            if len(self.manager.player.skills) > 0:
+                interface.draw_player_skills(screen, self.manager.player)
+
             if self.is_node_perk or self.is_first_node:
                 self.draw_perks(screen)
+
         self.draw_menu(screen)
 
     def handle_node_click(self, clicked_node):

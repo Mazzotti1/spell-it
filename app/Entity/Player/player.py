@@ -23,7 +23,7 @@ class Player(Entity):
         })
 
         self.visible = True
-        self.skills = [] 
+        self.skills = []
 
     def start_moving_to(self, target_x, target_y, direction="walking_right"):
         self.target_x = target_x

@@ -30,7 +30,7 @@ class SkillCardAnimation:
         }
 
         self.skill_name, self.front_image = self.get_unique_skill()
-        
+
         self.dice_animation = CustomSpriteAnimation(
                 "../assets/objects/dice_sheet.png",
                 (self.target_pos[0] - 70, self.target_pos[1] - 300),
@@ -47,7 +47,7 @@ class SkillCardAnimation:
 
         self.rect = self.back_image.get_rect(center=self.pos)
 
-        self.state = "back" 
+        self.state = "back"
         self.hovered = False
         self.clicked = False
 
@@ -55,7 +55,7 @@ class SkillCardAnimation:
         self.hover_scale = 1.1
         self.dice_playing = False
 
-        self.reveal_time = None  
+        self.reveal_time = None
         self.end_battle_called = False
 
     def update(self, mouse_pos, dt):
@@ -76,7 +76,7 @@ class SkillCardAnimation:
                 self.current_image = self.front_image
 
                 if not any(skill.get_name() == self.skill_name for skill in self.player.skills):
-                    new_skill = Skill(self.skill_name)
+                    new_skill = Skill(self.skill_name, self.front_images[self.skill_name])
                     self.player.add_skill(new_skill)
 
                 self.reveal_time = pygame.time.get_ticks()
