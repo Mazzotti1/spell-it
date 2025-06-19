@@ -48,7 +48,7 @@ class Entity:
     def get_attributes(self):
         return self.attributes
 
-    def attack(self, target: "Entity"):
+    def attack(self, target: "Entity", hit_bonus = 1):
 
         hit_chance = min(1.0, max(0.0, self.get_attack_speed()))
         did_hit = random.random() < hit_chance
@@ -59,7 +59,7 @@ class Entity:
         final_crit_chance = min(1.0, self.get_critical_chance() * self.get_lucky())
         is_critical = random.random() < final_crit_chance
 
-        damage = self.get_strength()
+        damage = self.get_strength() * hit_bonus
 
         if is_critical:
             damage *= 2

@@ -2,6 +2,7 @@ import pygame
 from Factory.playerFactory import PlayerFactory
 from Utils.time_bar import TimerBar
 import math
+from Utils.hit_bar import HitBar
 
 class Interface:
     def __init__(self, player, pre_combat_time = 30, turn_time=15, punishment_time=5):
@@ -13,6 +14,10 @@ class Interface:
         self.pre_combat_timer = TimerBar(pre_combat_time, title="Pré-combate")
         self.punishment_timer = TimerBar(punishment_time, title="Punição")
         self.turn_timer = TimerBar(turn_time, title="Turno")
+        self.player_turn_timer = TimerBar(turn_time, title="Turno do jogador")
+
+        self.hit_bar = HitBar(total_hits=15, title="Acertos")
+
 
         self.input_active = True
         self.input_text = ""
@@ -122,8 +127,13 @@ class Interface:
             self.punishment_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
         elif type == "enemy_turn":
             self.punishment_timer.is_visible = False
+        elif type == "player_turn":
+            self.player_turn_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
         else:
             self.pre_combat_timer.draw(screen, x=850, y=100, width=200, height=20, playerIsMoving=playerIsMoving)
+
+    def draw_hit_bar(self, screen):
+        self.hit_bar.draw(screen, x=850, y=40, width=200, height=20)
 
     def reset_timers(self):
         self.pre_combat_timer.reset()
@@ -162,6 +172,9 @@ class Interface:
 
     def is_punishment_over(self):
         return self.punishment_timer.is_time_up()
+    
+    def is_player_turn_over(self):
+        return self.player_turn_timer.is_time_up()
 
     def show_popup(self, message, duration=1.5):
         self.popup_error_message = message

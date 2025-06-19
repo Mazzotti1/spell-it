@@ -28,7 +28,7 @@ class Enemy(Entity):
             num_frames=5,
             loop=True,
             frame_duration=0.1,
-            total_duration=0.5,
+            total_duration=3.0,
             frame_height= 384,
             frame_width= 384
         )
@@ -39,7 +39,7 @@ class Enemy(Entity):
             num_frames=8,
             loop=True,
             frame_duration=0.07,
-            total_duration=0.5,
+            total_duration=3.0,
             frame_height= 384,
             frame_width= 384
         )
@@ -50,7 +50,7 @@ class Enemy(Entity):
             num_frames=5,
             loop=True,
             frame_duration=0.01,
-            total_duration=0.5,
+            total_duration=3.0,
             frame_height= 384,
             frame_width= 384
         )
@@ -61,7 +61,7 @@ class Enemy(Entity):
             num_frames=6,
             loop=True,
             frame_duration=0.01,
-            total_duration=0.5,
+            total_duration=3.0,
             frame_height= 384,
             frame_width= 384
         )
@@ -72,7 +72,7 @@ class Enemy(Entity):
             num_frames=5,
             loop=True,
             frame_duration=0.01,
-            total_duration=0.5,
+            total_duration=3.0,
             frame_height= 384,
             frame_width= 384
         )

@@ -53,3 +53,7 @@ class TimerBar:
 
     def decrease_time(self, seconds):
         self.current_time -= seconds
+
+    def clear(self):
+        self.current_time = 0
+        self.last_update = time.time()

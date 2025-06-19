@@ -11,11 +11,10 @@ from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
 from Skills.SkillCardAnimation import SkillCardAnimation
 
-##Turno do player enche com muita palavra na tela
-##Barra de tempo, 15 segundos
-##Barra com 3 niveis de acerto, verde amarelo e vermelho
-##Acabou o tempo tentativa de ataque do player com o dano base sendo multiplicado pelo nivel de acerto da barra
-##Se acertar verificar o critico sobre o dano base + multiplcador por nivel de acerto
+##Quando inimigo tomar o dano tem que voltar pro IDLE
+##Animação do player atacando
+##Animação do que ta atingindo o iniimigo
+## Sincronizar e melhorar as velocidades dos frames 
 
 ##Se skill for usada timer reseta pra 15 segundos e armazena a açao dela pra verificar o que deve acontecer baseado nela
 
@@ -33,6 +32,7 @@ class Battle(Scenario):
         self.player_final_y = player_final_y
 
         self.quantity_pre_combat_words = 5
+        self.quantity_player_turn_words = 15
 
         self.pre_combat_ended = False
         self.punishment_ended = False
@@ -127,6 +127,7 @@ class Battle(Scenario):
         self.alreadyGeneratedEnemyWords = False
 
         self.pre_combat_word_count = 0
+        self.player_turn_word_count = 0
 
         self.pre_combat_result = None
         self.result_finalization_animation_progress = 0
@@ -139,7 +140,6 @@ class Battle(Scenario):
 
         self.start_punishin_animation = False
         self.enemy_alive = True
-        self.player_turn = False
 
         self.flash_timer = 0
         self.flash_interval = 120
@@ -154,6 +154,13 @@ class Battle(Scenario):
         self.enemy_attack_animation_duration = 0.7
         self.turn_transition_delay = 0
         self.pending_damage_result = False
+
+        self.pending_player_attack = False
+        self.player_attack_animation_active = False
+        self.player_attack_animation_timer = 0
+        self.player_attack_animation_duration = 3.0
+        self.player_pending_damage_result = False
+
 
         self.enemy_attacks = []
         self.enemy_animation_attacking_started = False
@@ -178,6 +185,9 @@ class Battle(Scenario):
         self.reward_cards = []
         self.showing_reward_cards = False
 
+        self.alreadyGeneratedPlayerTurnWords = False
+        self.player_turn_started = False
+
     def draw_ui(self, screen):
         if not self.manager.player.moving:
             for btn in self.buttons:
@@ -196,6 +206,11 @@ class Battle(Scenario):
             if self.result_finalization_animation_active:
                 self.draw_result_pre_combat_animation(screen)
             else:
+
+                if self.player_turn_started:
+                    self.interface.draw_battle_timers(screen, "player_turn", self.manager.player.moving)
+                    self.interface.draw_hit_bar(screen)
+                
                 if not self.pre_combat_ended:
                     self.interface.draw_battle_timers(screen, "pre_combat", self.manager.player.moving)
                 elif not self.punishment_ended and self.pre_combat_ended:
@@ -251,7 +266,7 @@ class Battle(Scenario):
                     self.interface.input_active = False
                     return
 
-            if word_obj and not self.pre_combat_ended:
+            if word_obj and not self.pre_combat_ended and not self.player_turn_started:
                 self.pre_combat_word_count += 1
 
                 word_x, word_y = word_obj.x, word_obj.y
@@ -263,10 +278,53 @@ class Battle(Scenario):
                 if self.pre_combat_word_count >= self.quantity_pre_combat_words:
                     self.pre_combat_ended = True
                     self.start_result_animation("success")
-            else:
+            elif not word_obj and not self.player_turn_started:
                 self.interface.pre_combat_timer.decrease_time(3)
                 self.interface.punishment_timer.decrease_time(3)
                 self.interface.show_popup("Palavra errada: -3 segundos", duration=1.5)
+
+            if word_obj and self.player_turn_started:
+                self.player_turn_word_count += 1
+                self.interface.hit_bar.add_hit()
+                
+                word_x, word_y = word_obj.x, word_obj.y
+                player_x, player_y = self.manager.player.get_position()
+
+                animation = BookAnimation((player_x, player_y), (word_x, word_y))
+                self.book_animations.append(animation)
+
+                if self.player_turn_word_count >= self.quantity_player_turn_words:
+                    self.player_turn_started = False
+                    damage, is_critical, enemy_alive, did_hit = self.manager.player.attack(self.enemy, 3)
+                    
+                    if not did_hit:
+                        image = self.dodge_img
+                        pos = (self.enemy.x, self.enemy.y - 100)
+                        self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                        self.turn_transition_delay = 0.8
+                    else:
+                        damage = damage
+                        pos = (self.enemy.x + 100, self.enemy.y - 80)
+
+                        color = (255, 215, 0) if is_critical else (255, 0, 0)
+                        self.floating_texts.append(FloatingText(str(damage), pos, color, self.font, duration=1.0))
+
+                        if is_critical:
+                            image = self.critical_img
+                            self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+
+                        self.turn_transition_delay = 0.8
+
+                    if not enemy_alive:
+                        self.enemy_dying_animation_active = True
+                        self.enemy_hited_animation_active = False
+
+                    self.interface.input_active = False
+                    return
+
+            elif not word_obj and self.player_turn_started:
+                self.interface.player_turn_timer.decrease_time(1)
+                self.interface.show_popup("Palavra errada: -1 segundos", duration=1.5)
 
     def draw_scene(self, screen, player):
         super().draw_scene(screen)
@@ -283,6 +341,14 @@ class Battle(Scenario):
             self.word_manager.generate_pre_combat_words(quantity=self.quantity_pre_combat_words)
             self.alreadyGeneratedEnemyWords = True
 
+        if (
+            not self.alreadyGeneratedPlayerTurnWords
+            and self.player_turn_started
+            and not self.result_finalization_animation_active
+        ):
+            self.word_manager.generate_pre_combat_words(quantity=15)
+            self.alreadyGeneratedPlayerTurnWords = True
+        
         if not player.moving:
             self.word_manager.draw(screen)
             if not self.result_finalization_animation_active and not self.pre_combat_ended:
@@ -396,6 +462,7 @@ class Battle(Scenario):
                 case "Mico":
                     animation = self.enemy.mico_hited
 
+            # animation.finished = False
             self.enemy_hited.append(PunishAnimation(animation, delay = 0))
 
         for enemy_hited_animation in self.enemy_hited[:]:
@@ -471,6 +538,8 @@ class Battle(Scenario):
         if not self.manager.player.is_alive() and not self.defeat_animation_started:
             self.manager.player.visible = False
 
+
+        ##Quando sair do turno do player e voltar pro inimigo botar self.alreadyGeneratedPlayerTurnWords = False
         if (
             not self.manager.player.is_alive()
             and not self.enemy_attack_animation_active
@@ -490,12 +559,20 @@ class Battle(Scenario):
             self.interface.input_active = False
             self.pending_enemy_attack = True
 
+        if self.interface.is_player_turn_over():
+            self.player_turn_started = False
+            self.word_manager.words.clear()
+            self.interface.input_active = False
+            self.pending_player_attack = True
+            
         if (
-            self.interface.is_punishment_over()
-            and not self.punishment_ended
+            (
+                (self.interface.is_punishment_over() and not self.punishment_ended)
+                or
+                (self.interface.is_pre_combat_over() and not self.pre_combat_ended)
+            )
             and self.enemy.is_alive()
             and self.manager.player.is_alive()
-            and self.pre_combat_ended
             and not self.enemy_attack_animation_active
             and len(self.floating_texts) <= 0
             and len(self.temporary_effects) <= 0
@@ -503,6 +580,8 @@ class Battle(Scenario):
             self.punishment_ended = True
             self.word_manager.words.clear()
             self.alreadyGeneratedEnemyWords = False
+            self.player_turn_started = True
+            self.interface.input_active = True
             self.start_result_animation("player_turn_started")
 
         if (
@@ -531,7 +610,10 @@ class Battle(Scenario):
             self.result_finalization_animation_timer += self.manager.dt
             total_duration = 3
             self.result_finalization_animation_progress = min(self.result_finalization_animation_timer / total_duration, 1)
-            self.interface.input_active = False
+            
+            if not self.player_turn_started:
+                self.interface.input_active = False
+            
             if self.result_finalization_animation_progress >= 1:
                 self.result_finalization_animation_active = False
                 if self.pre_combat_result == "success":
@@ -561,11 +643,23 @@ class Battle(Scenario):
             self.enemy_attack_animation_timer = 0
             self.player_hited_animation_active = True
 
+        if not self.result_finalization_animation_active and self.pending_player_attack:
+            self.pending_player_attack = False
+            self.player_attack_animation_active = True
+            self.player_attack_animation_timer = 0
+            self.enemy_hited_animation_active = True
+
         if self.enemy_attack_animation_active:
             self.enemy_attack_animation_timer += self.manager.dt
             if self.enemy_attack_animation_timer >= self.enemy_attack_animation_duration:
                 self.enemy_attack_animation_active = False
                 self.pending_damage_result = True
+
+        if self.player_attack_animation_active:
+            self.player_attack_animation_timer += self.manager.dt
+            if self.player_attack_animation_timer >= self.player_attack_animation_duration:
+                self.player_attack_animation_active = False
+                self.player_pending_damage_result = True
 
         if self.pending_damage_result:
             self.pending_damage_result = False
@@ -592,6 +686,43 @@ class Battle(Scenario):
             if not result["target_alive"]:
                 self.player_dying_animation_active = True
                 self.player_hited_animation_active = False
+
+            self.interface.pre_combat_timer.clear()
+            self.interface.punishment_timer.clear()
+
+        if self.player_pending_damage_result:
+            self.player_pending_damage_result = False
+
+            if self.player_turn_word_count >= 9:
+                bonus = 2.0
+            elif self.player_turn_word_count >= 5:
+                bonus = 1.5
+            else:
+                bonus = 1.0
+
+            damage, is_critical, enemy_alive, did_hit = self.manager.player.attack(self.enemy, bonus)
+                    
+            if not did_hit:
+                image = self.dodge_img
+                pos = (self.enemy.x, self.enemy.y - 100)
+                self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                self.turn_transition_delay = 0.8
+            else:
+                damage = damage
+                pos = (self.enemy.x + 100, self.enemy.y - 80)
+
+                color = (255, 215, 0) if is_critical else (255, 0, 0)
+                self.floating_texts.append(FloatingText(str(damage), pos, color, self.font, duration=1.0))
+
+                if is_critical:
+                    image = self.critical_img
+                    self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+
+                self.turn_transition_delay = 0.8
+
+            if not enemy_alive:
+                self.enemy_dying_animation_active = True
+                self.enemy_hited_animation_active = False
 
         for enemy_attack_animation in self.enemy_attacks:
             enemy_attack_animation.update(self.manager.dt)
