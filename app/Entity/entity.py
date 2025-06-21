@@ -137,6 +137,11 @@ class Entity:
 
         return animation_finished
 
+    def draw_at_position(self, screen, pos):
+        rect = self.rect.copy()
+        rect.center = pos
+        screen.blit(self.current_frame, rect)
+
 
     def set_health(self, health: int):
         self.attributes.set_health(health)

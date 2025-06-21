@@ -1,3 +1,4 @@
+from Utils.button import Button
 import pygame
 import random
 from Scenario.scenario import Scenario
@@ -81,6 +82,10 @@ class Map(Scenario):
 
         self.nodes = []
         self.player = PlayerFactory.create_player(0, 0, self.player.attributes)
+
+        self.branch_scroll_offset_y = 0
+        self.branches_generated = 3
+
         self.generate_branches()
         self.clock = pygame.time.Clock()
         self.dt = self.clock.tick(60) / 1200
@@ -106,9 +111,7 @@ class Map(Scenario):
         self.target_zoom_book_map = 1.95
         self.zoom_speed_book_map = 0.015
 
-    def generate_branches(self, steps=3):
-        start_x = 930
-        start_y = 830
+    def generate_branches(self, steps=3, start_x=930, start_y=830):
         branch_width = 90
         branch_height = 90
         offset_x = 110
@@ -116,23 +119,26 @@ class Map(Scenario):
 
         current_x = start_x
         current_y = start_y
-
-        first = {
-            'rect': pygame.Rect(current_x, current_y, branch_width, branch_height),
-            'parent': None,
-            'type': 'start',
-            'entity': self.player
-        }
-        self.nodes.append(first)
-
-        self.player.rect = first['rect']
-        self.player.current_frames = self.player.idle_frames
-        self.player.frame_player_index = 0
-        self.player.animation_timer = 0
-        self.player.current_frame = self.player.current_frames[0]
+        
+        if not self.nodes:
+            first = {
+                'rect': pygame.Rect(current_x, current_y, branch_width, branch_height),
+                'parent': None,
+                'type': 'start',
+                'entity': self.player
+            }
+            self.nodes.append(first)
+            self.player.rect = first['rect']
+            self.player.current_frames = self.player.idle_frames
+            self.player.frame_player_index = 0
+            self.player.animation_timer = 0
+            self.player.current_frame = self.player.current_frames[0]
 
         for _ in range(steps):
-            middle_node = self.nodes[-1]
+            middle_node = self.get_last_middle_node()
+
+            if not middle_node:
+                    middle_node = self.nodes[0] 
 
             branch_x_left = current_x - offset_x
             branch_y_left = current_y - offset_y
@@ -193,48 +199,45 @@ class Map(Scenario):
             return
 
         for node in self.nodes:
+            shifted_rect = node['rect'].copy()
+            shifted_rect.y += self.branch_scroll_offset_y
+
             if node['parent']:
-                start = node['parent'].center
-                end = node['rect'].center
-                pygame.draw.line(screen, 'gray', start, end, 5)
+                parent_rect = node['parent'].copy()
+                parent_rect.y += self.branch_scroll_offset_y
+                pygame.draw.line(screen, 'gray', parent_rect.center, shifted_rect.center, 5)
 
         for node in self.nodes:
+            shifted_rect = node['rect'].copy()
+            shifted_rect.y += self.branch_scroll_offset_y
+
             if 'enemy_image' in node:
                 img = node['enemy_image']
-                scale_factor = 1
-                new_width = int(node['rect'].width * scale_factor)
-                new_height = int(node['rect'].height * scale_factor)
-
+                new_width = int(shifted_rect.width * 1)
+                new_height = int(shifted_rect.height * 1)
                 scaled_img = pygame.transform.scale(img, (new_width, new_height))
-                rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2)
-
-                rect = rounded_img.get_rect(center=node['rect'].center)
+                rounded_img = self.utils.round_image(scaled_img, radius=min(new_width, new_height)//2)
+                rect = rounded_img.get_rect(center=shifted_rect.center)
                 screen.blit(rounded_img, rect)
 
-            elif node['type'] == 'middle':
-                if node.get('entity') != self.player and 'enemy_image' not in node:
-                    scale_factor = 1.7
-                    new_width = int(node['rect'].width * scale_factor)
-                    new_height = int(node['rect'].height * scale_factor)
-
-                    scaled_img = pygame.transform.scale(self.boss_image, (new_width, new_height))
-                    rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2)
-                    rect = rounded_img.get_rect(center=node['rect'].center)
-
-                    screen.blit(rounded_img, rect)
+            elif node['type'] == 'middle' and node.get('entity') != self.player and 'enemy_image' not in node:
+                scale_factor = 1.7
+                new_width = int(shifted_rect.width * scale_factor)
+                new_height = int(shifted_rect.height * scale_factor)
+                scaled_img = pygame.transform.scale(self.boss_image, (new_width, new_height))
+                rounded_img = self.utils.round_image(scaled_img, radius=min(new_width, new_height)//2)
+                rect = rounded_img.get_rect(center=shifted_rect.center)
+                screen.blit(rounded_img, rect)
 
             elif 'entity' not in node:
                 scale_factor = 0.7
-                new_width = int(node['rect'].width * scale_factor)
-                new_height = int(node['rect'].height * scale_factor)
-
+                new_width = int(shifted_rect.width * scale_factor)
+                new_height = int(shifted_rect.height * scale_factor)
                 scaled_img = pygame.transform.scale(self.bonus_image, (new_width, new_height))
-                rounded_img = self.utils.round_image(surface=scaled_img, radius=min(new_width, new_height)//2)
-                rect = rounded_img.get_rect(center=node['rect'].center)
-
+                rounded_img = self.utils.round_image(scaled_img, radius=min(new_width, new_height)//2)
+                rect = rounded_img.get_rect(center=shifted_rect.center)
                 border_radius = max(new_width, new_height) // 2
                 pygame.draw.circle(screen, 'black', rect.center, border_radius + 2)
-
                 screen.blit(rounded_img, rect)
 
         if self.moving_entity:
@@ -245,7 +248,9 @@ class Map(Scenario):
             if 'entity' in node and node['entity'] == self.player:
                 entity = node['entity']
                 entity.update_animation(self.dt)
-                entity.draw(screen)
+                shifted_rect = node['rect'].copy()
+                shifted_rect.y += self.branch_scroll_offset_y 
+                entity.draw_at_position(screen, shifted_rect.center)
 
     def draw_ui(self, screen):
         interface = Interface(self.player)
@@ -273,19 +278,33 @@ class Map(Scenario):
         if not current_node:
             return
 
-        if clicked_node['rect'] == current_node.get('parent'):
+        def get_visual_rect(obj):
+            if isinstance(obj, pygame.Rect):
+                rect = obj.copy()
+            else:
+                rect = obj['rect'].copy()
+            rect.y += self.branch_scroll_offset_y
+            return rect
+
+        clicked_rect = clicked_node['rect']
+
+        parent_rect = get_visual_rect(current_node.get('parent')) if current_node.get('parent') else None
+        if parent_rect and clicked_rect == parent_rect:
             pass
         else:
             if self.is_choosing_perk:
                 return
 
             for node in self.nodes:
-                if node.get('parent') == current_node['rect'] and node['rect'] == clicked_node['rect']:
-                    self.move_player_to_node(clicked_node)
-                    break
+                if node.get('parent') == current_node['rect']:
+                    node_rect_visual = get_visual_rect(node)
+                    if node_rect_visual == clicked_rect:
+                        self.move_player_to_node(node)
+                        break
+
 
     def move_player_to_node(self, node):
-        self.moving_entity = PlayerFactory.create_player(self.player.rect.x, self.player.rect.y)
+        self.moving_entity = PlayerFactory.create_player(self.player.rect.x, self.player.rect.y + self.branch_scroll_offset_y)
         self.move_target_node = node
 
         self.moving_entity.current_frames = self.moving_entity.walking_top_frames
@@ -300,7 +319,11 @@ class Map(Scenario):
 
     def update_movement(self):
         if self.moving_entity and self.move_target_node:
-            target_pos = pygame.math.Vector2(self.move_target_node['rect'].center)
+            target_pos = pygame.math.Vector2(
+                self.move_target_node['rect'].centerx,
+                self.move_target_node['rect'].centery + self.branch_scroll_offset_y
+            )
+
             current_pos = pygame.math.Vector2(self.moving_entity.rect.center)
 
             direction = (target_pos - current_pos)
@@ -490,6 +513,10 @@ class Map(Scenario):
                     self.current_perk_frame += 1
                 else:
                     self.is_animating_perk = False
+        
+        if self.manager.need_to_expand_map:
+            self.expand_map()
+            self.manager.need_to_expand_map = False
 
 
     def load_perk_frames(self):
@@ -503,3 +530,41 @@ class Map(Scenario):
                 )
                 perk_frames.append(frame)
         return perk_frames
+
+    def create_button(self, text, color, position, size, on_click, text_color="white"):
+        return Button(
+            color=color,
+            position=position,
+            size=size,
+            text=text,
+            on_click=on_click,
+            text_color=text_color
+        )
+    
+    def get_last_middle_node_y(self):
+        middle_nodes = [n for n in self.nodes if n['type'] == 'middle']
+        if middle_nodes:
+            return middle_nodes[-1]['rect'].y
+        return 830 
+
+    def get_last_middle_node(self):
+        for node in reversed(self.nodes):
+            if node['type'] == 'middle':
+                return node
+        return None
+
+    def expand_map(self):
+        nodes_per_step = 2
+        steps_to_remove = 1
+        start_offset = 1
+        total_to_remove = start_offset + (nodes_per_step * steps_to_remove)
+        print(f"Total to remove: {total_to_remove}")
+
+        self.nodes = self.nodes[total_to_remove:]
+
+        print(f"Nodes after removal: {len(self.nodes)}")
+        self.branch_scroll_offset_y += 220  
+
+        last_y = self.get_last_middle_node_y()
+        self.generate_branches(steps=1, start_x=930, start_y=last_y)
+

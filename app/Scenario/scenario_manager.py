@@ -14,6 +14,7 @@ class ScenarioManager:
         self.player = player
         self.player_final_x = 420
         self.player_final_y = 750
+        self.need_to_expand_map = False
 
     def change_scenario(self, new_scenario):
         self.current_scenario = new_scenario
