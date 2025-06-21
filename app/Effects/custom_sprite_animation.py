@@ -77,3 +77,9 @@ class CustomSpriteAnimation:
 
     def is_finished(self):
         return self.finished
+
+    def reset(self):
+        self.current_frame_index = 0
+        self.elapsed_time = 0
+        self.total_elapsed = 0
+        self.finished = False

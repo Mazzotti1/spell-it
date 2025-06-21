@@ -140,6 +140,12 @@ class Interface:
         self.punishment_timer.reset()
         self.turn_timer.reset()
 
+    def reset_plauer_turn_timer(self):
+        self.player_turn_timer.reset()
+
+    def reset_hit_bar(self):
+        self.hit_bar.reset()
+
     def draw_input_box(self, screen):
         box_width, box_height = 400, 60
         x, y = (screen.get_width() - box_width) // 2, screen.get_height() - 133

@@ -56,19 +56,19 @@ class ScenarioManager:
 
         match enemy:
             case "anaconda":
-                anaconda = EnemyFactory.create_enemy('Anaconda', attributes, 1200, 550, "../assets/enemys/Anaconda/enemy_anaconda_idle.png", "../assets/enemys/Anaconda/attacking/anaconda_attacking_sheet.png" )
+                anaconda = EnemyFactory.create_enemy('Anaconda', attributes, 1200, 550)
                 return anaconda, "../assets/scene/battle/amazonic_scenario.png"
             case "calango":
-                calango = EnemyFactory.create_enemy('Calango', attributes, 1200, 620, "../assets/enemys/Calango/enemy_calango_idle.png", "../assets/enemys/Calango/attacking/calango_attacking_sheet.png")
+                calango = EnemyFactory.create_enemy('Calango', attributes, 1200, 620)
                 return calango, "../assets/scene/battle/caatinga_scenario.png"
             case "jacare":
-                jacare = EnemyFactory.create_enemy('Jacaré', attributes, 1280, 520, "../assets/enemys/Jacare/enemy_jacare_idle.png", "../assets/enemys/Jacare/attacking/jacare_attacking_sheet.png")
+                jacare = EnemyFactory.create_enemy('Jacare', attributes, 1280, 520)
                 return jacare,  "../assets/scene/battle/pantanal_scenario.png"
             case "quero_quero":
-                quero_quero = EnemyFactory.create_enemy('Quero-Quero', attributes, 1100, 420, "../assets/enemys/QueroQuero/enemy_quero_quero_idle.png", "../assets/enemys/QueroQuero/attacking/quero_quero_attacking_sheet.png")
+                quero_quero = EnemyFactory.create_enemy('Quero-Quero', attributes, 1100, 420)
                 return quero_quero, "../assets/scene/battle/pampa_scenario.png"
             case "mico":
-                mico = EnemyFactory.create_enemy('Mico', attributes, 1000, 300, "../assets/enemys/Mico/enemy_mico_idle.png", "../assets/enemys/Mico/attacking/mico_attacking_sheet.png")
+                mico = EnemyFactory.create_enemy('Mico', attributes, 1000, 300)
                 return mico, "../assets/scene/battle/mata_atlantica_scenario.png"
 
     def back_to_main(self):
