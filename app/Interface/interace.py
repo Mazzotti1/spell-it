@@ -26,6 +26,9 @@ class Interface:
         self.popup_error_message = None
         self.popup_time_remaining = 0
         self.popup_font = pygame.font.SysFont(None, 36)
+        self.popup_priority = 0
+
+        self.skill_rects = []
 
     def draw_health_bar(self, screen):
         health_quantity = self.player.get_health() // 10
@@ -89,11 +92,15 @@ class Interface:
         screen.blit(text_surface, (text_x, text_y))
 
         mouse_pos = pygame.mouse.get_pos()
+
+        self.skill_rects.clear() 
         for i, skill in enumerate(skills):
             x = container_x + container_padding + i * (base_icon_size + spacing)
             y = container_y + 5
 
             skill_rect = pygame.Rect(x, y, base_icon_size, base_icon_size)
+            self.skill_rects.append(skill_rect)
+
             is_hovered = skill_rect.collidepoint(mouse_pos)
 
             if is_hovered:
@@ -182,9 +189,14 @@ class Interface:
     def is_player_turn_over(self):
         return self.player_turn_timer.is_time_up()
 
-    def show_popup(self, message, duration=1.5):
-        self.popup_error_message = message
-        self.popup_time_remaining = duration
+    def show_popup(self, message, duration=1.5, x=None, y=None, priority=0):
+        if self.popup_error_message is None or priority >= self.popup_priority:
+            self.popup_error_message = message
+            self.popup_time_remaining = duration
+            self.popup_x = x
+            self.popup_y = y
+            self.popup_position = (x, y)
+            self.popup_priority = priority
 
     def draw_popup(self, screen):
         if self.popup_error_message:
@@ -196,8 +208,8 @@ class Interface:
             screen_width = screen.get_width()
             screen_height = screen.get_height()
 
-            x = ((screen_width - 800) - bg_width) // 2
-            y = 50
+            x = self.popup_x if self.popup_x is not None else ((screen_width - 800) - bg_width) // 2
+            y = self.popup_y if self.popup_y is not None else 50
 
             bg_rect = pygame.Rect(x, y, bg_width, bg_height)
             pygame.draw.rect(screen, (255, 255, 255), bg_rect, border_radius=15)

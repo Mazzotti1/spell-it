@@ -2,6 +2,7 @@ import pygame
 import random
 from Entity.entity import Entity
 from Skills.skill import Skill
+from Skills.skill_factory import create_skill
 
 class Player(Entity):
     def __init__(self, name, attributes, x=0, y=0):
@@ -23,7 +24,18 @@ class Player(Entity):
         })
 
         self.visible = True
+        
         self.skills = []
+
+        self.force_critical_hit = False
+        self.double_damage = False
+
+        self.is_mime_hit = False
+        self.mime_damage = None
+        self.recieve_lucky = 0
+
+        self.buff_atack_speed = 0
+        self.buff_atack_damage = 0
 
     def start_moving_to(self, target_x, target_y, direction="walking_right"):
         self.target_x = target_x
@@ -132,7 +144,69 @@ class Player(Entity):
         self.animation_play_once = play_once
 
     def add_skill(self, skill: Skill):
-        self.skills.append(skill)
+        self.skills.append(create_skill(skill._name, skill.get_image()))
+
+    def remove_skill(self, skill_name: str):
+        self.skills = [skill for skill in self.skills if skill.get_name() != skill_name]
+
 
     def use_skill(self, skill_name: str):
         pass
+
+    def attack(self, target: "Entity", hit_bonus = 1):
+
+        if self.recieve_lucky > 0:
+            lucky = self.get_lucky() * 4
+            self.recieve_lucky -= 1
+        else:
+            lucky = self.get_lucky()
+
+        if self.buff_atack_damage > 0:
+            print("bonus")
+            random_bonus = random.randint(1, 3) * lucky
+            strength = self.get_strength() + random_bonus
+            self.buff_atack_damage -= 1
+        else:
+            strength = self.get_strength()
+
+        if self.buff_atack_speed > 0:
+            print("bonus")
+            random_bonus = random.randint(1, 3) * lucky
+            atack_speed = self.get_attack_speed() + random_bonus
+            self.buff_atack_speed -= 1
+        else:
+            atack_speed = self.get_attack_speed()
+
+        hit_chance = min(1.0, max(0.0, atack_speed))
+        did_hit = random.random() < hit_chance
+
+        if not did_hit:
+            return 0, False, target.is_alive(), False
+
+        final_crit_chance = min(1.0, self.get_critical_chance() * lucky)
+
+        if self.force_critical_hit:
+            is_critical = True
+            self.force_critical_hit = False 
+        else:
+            is_critical = random.random() < final_crit_chance
+
+        if self.double_damage:
+            double_strength = strength * 2
+            damage = double_strength * hit_bonus
+            self.double_damage = False
+        elif self.is_mime_hit:
+            print("mimetismo")
+            damage = self.mime_damage * hit_bonus
+            self.is_mime_hit = False
+            self.mime_damage = None
+        else:
+            damage = strength * hit_bonus
+
+        if is_critical:
+            damage *= 2
+
+        target.set_health(max(0, target.get_health() - damage))
+        target_alive = target.is_alive()
+
+        return damage, is_critical, target_alive, True

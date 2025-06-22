@@ -12,6 +12,8 @@ class Enemy(Entity):
         self.punish_effects = []
         self.dying_animations = []
         self.visible = True
+        self.forced_miss_turns = 0
+        self.player_recieve_lucky = 0
 
     def load_enemy_assets(self):
         base_path = "../assets/enemys"
@@ -156,8 +158,19 @@ class Enemy(Entity):
         if is_critical:
             damage *= 2
 
-        dodge_chance = min(1.0, self.get_lucky() * target.get_dodge())
-        did_dodge = random.random() < dodge_chance
+        if self.player_recieve_lucky > 0:
+            dodge = target.get_dodge() * 4
+            self.player_recieve_lucky -= 1
+        else:
+            dodge = target.get_dodge()
+
+        dodge_chance = min(1.0, self.get_lucky() * dodge)
+        
+        if self.forced_miss_turns > 0:
+            did_dodge = True
+            self.forced_miss_turns -= 1
+        else:
+            did_dodge = random.random() < dodge_chance
 
         if not did_dodge:
             target.set_health(max(0, target.get_health() - damage))

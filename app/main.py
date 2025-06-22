@@ -19,7 +19,7 @@ class App:
         attributes = Attributes(
             dodge=1.0,
             attack_speed=1.0,
-            strength=1000.0,
+            strength=8.0,
             health=50,
             lucky=1.0,
             critical_chance=1.0

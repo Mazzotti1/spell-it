@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import pygame
-from Entity.entity import Entity
 
 class Skill(ABC):
     def __init__(self, name: str, image: pygame.Surface = None):
@@ -16,6 +15,21 @@ class Skill(ABC):
     def get_image(self):
         return self.image
 
-    def create_skill(name: str, front_images_dict):
-        image = front_images_dict.get(name)
-        return Skill(name, image)
+    def activate(self, context): pass
+
+    def on_word_typed(self, context, word: str, correct: bool): pass
+
+    def on_3_words_success(self, context): pass
+
+    def on_word_error(self, context, word: str)-> bool : return False
+
+    def on_repeat_last_word(self, context, word: str): pass
+
+    def on_repeat_enemy_word(self, context, word: str): pass
+
+    def on_enemy_attack(self, context, damage): return damage
+
+    def on_turn_start(self, context): pass
+
+    def on_turn_end(self, context): pass
+

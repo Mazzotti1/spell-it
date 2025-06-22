@@ -42,7 +42,7 @@ class RandomWordManager:
         self.words = []
         for word in selected_words:
             x, y = self.get_valid_position(min_distance=200)
-            self.words.append(RandomWord(self.screen_size, text=word, x=x, y=y, lifetime=self.lifetime))
+            self.words.append(RandomWord(self.screen_size, text=word, x=x, y=y, lifetime=300))
 
     def generate_enemy_words(self, quantity=5):
         if len(self.word_pool) < quantity:
@@ -52,13 +52,17 @@ class RandomWordManager:
         self.words = []
         for word in selected_words:
             x, y = self.get_valid_position(min_distance=200)
-            self.enemy_words.append(RandomWord(self.screen_size, text=word, x=x, y=y, lifetime=self.lifetime))
+            self.enemy_words.append(RandomWord(self.screen_size, text=word, x=x, y=y, lifetime=300))
 
     def update(self):
         self.words = [word for word in self.words if not word.is_expired()]
 
     def draw(self, screen):
         for word in self.words:
+            word.draw(screen)
+
+    def draw_enemy_words(self, screen):
+        for word in self.enemy_words:
             word.draw(screen)
 
     def get_valid_position(self, min_distance=200):

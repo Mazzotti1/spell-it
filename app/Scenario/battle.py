@@ -28,7 +28,7 @@ class Battle(Scenario):
         self.player_final_y = player_final_y
 
         self.quantity_pre_combat_words = 5
-        self.quantity_player_turn_words = 5
+        self.quantity_player_turn_words = 15
 
         self.pre_combat_ended = False
         self.punishment_ended = False
@@ -118,6 +118,10 @@ class Battle(Scenario):
         self.alreadyGeneratedPlayerTurnWords = False
         self.player_turn_started = False
 
+        self.active_skills = []
+
+        self.show_enemy_words = False
+
     def draw_ui(self, screen):
         if not self.manager.player.moving:
             for btn in self.buttons:
@@ -163,10 +167,25 @@ class Battle(Scenario):
         if self.draw_restart_button:
             self.restart_button.handle_event(event)
 
+        if self.player_turn_started and not self.interface.is_player_turn_over():
+             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for i, rect in enumerate(self.interface.skill_rects):
+                    if rect.collidepoint(pygame.mouse.get_pos()):
+                        skill = self.manager.player.skills[i]
+                        skill.activate(context=self) 
+                        break
+        elif not self.pre_combat_ended and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.interface.show_popup("Não é possível usar habilidades no pré-combate!", duration=2.0, y=150)
+            return
+
         typed_word = self.interface.handle_input_event(event)
         if typed_word:
             word_obj = self.word_manager.check_word(typed_word)
             self.interface.input_text = ""
+
+            for skill in self.active_skills:
+                skill.on_repeat_last_word(self, typed_word)
+                skill.on_repeat_enemy_word(self, typed_word)
 
             if self.pre_combat_ended and not self.punishment_ended:
                 punishment_word = self.word_manager.check_punishment_word(typed_word)
@@ -195,6 +214,7 @@ class Battle(Scenario):
 
                     self.interface.input_active = False
                     return
+                
 
             if word_obj and not self.pre_combat_ended and not self.player_turn_started:
                 self.pre_combat_word_count += 1
@@ -216,7 +236,11 @@ class Battle(Scenario):
             if word_obj and self.player_turn_started:
                 self.player_turn_word_count += 1
                 self.interface.hit_bar.add_hit()
-                
+
+                for skill in self.active_skills:
+                    skill.on_word_typed(self, typed_word, True)
+                    skill.on_3_words_success(self)
+
                 word_x, word_y = word_obj.x, word_obj.y
                 player_x, player_y = self.manager.player.get_position()
 
@@ -258,8 +282,15 @@ class Battle(Scenario):
                     return
 
             elif not word_obj and self.player_turn_started:
-                self.interface.player_turn_timer.decrease_time(1)
-                self.interface.show_popup("Palavra errada: -1 segundos", duration=1.5)
+                handled = False
+                for skill in self.active_skills:
+                    if skill.on_word_error(self, typed_word):
+                        handled = True
+                        break
+
+                if not handled:
+                    self.interface.player_turn_timer.decrease_time(1)
+                    self.interface.show_popup("Palavra errada: -1 segundos", duration=1.5)
 
     def draw_scene(self, screen, player):
         super().draw_scene(screen)
@@ -277,7 +308,7 @@ class Battle(Scenario):
             self.alreadyGeneratedWords = True
 
         if not player.moving and not self.alreadyGeneratedEnemyWords and self.enemy_attack_animation_active and len(self.enemy_attacks) > 0:
-            self.word_manager.generate_pre_combat_words(quantity=self.quantity_pre_combat_words)
+            self.word_manager.generate_enemy_words(quantity=self.quantity_pre_combat_words)
             self.alreadyGeneratedEnemyWords = True
 
         if (
@@ -290,6 +321,10 @@ class Battle(Scenario):
         
         if not player.moving:
             self.word_manager.draw(screen)
+
+            if self.show_enemy_words:
+                self.word_manager.draw_enemy_words(screen)
+            
             if not self.result_finalization_animation_active and not self.pre_combat_ended:
                 self.interface.draw_battle_timers(screen, "pre_combat",  self.manager.player.moving)
 
@@ -545,6 +580,7 @@ class Battle(Scenario):
             self.start_result_animation("failure")
             self.interface.input_active = False
             self.pending_enemy_attack = True
+            self.show_enemy_words = True
 
         if (
             self.interface.is_player_turn_over()
@@ -561,6 +597,7 @@ class Battle(Scenario):
             self.pending_enemy_attack = True
             self.alreadyGeneratedPlayerTurnWords = False
             self.player_turn_ended = True
+            self.show_enemy_words = True
 
         if self.interface.is_player_turn_over() and not self.player_turn_ended and self.player_turn_started:
             self.player_turn_ended = True
@@ -594,6 +631,7 @@ class Battle(Scenario):
             self.interface.input_active = True
             self.enemy_turn_ended = False
             self.start_result_animation("player_turn_started")
+            self.show_enemy_words = False
 
         if (
             self.interface.is_punishment_over()
