@@ -26,6 +26,7 @@ class Player(Entity):
         self.visible = True
         
         self.skills = []
+        self.all_acquired_skills = []
 
         self.force_critical_hit = False
         self.double_damage = False
@@ -145,6 +146,7 @@ class Player(Entity):
 
     def add_skill(self, skill: Skill):
         self.skills.append(create_skill(skill._name, skill.get_image()))
+        self.all_acquired_skills.append(create_skill(skill._name, skill.get_image()))
 
     def remove_skill(self, skill_name: str):
         self.skills = [skill for skill in self.skills if skill.get_name() != skill_name]
@@ -210,3 +212,18 @@ class Player(Entity):
         target_alive = target.is_alive()
 
         return damage, is_critical, target_alive, True
+    
+    def recieveBossReward(self):
+        bonus_health = random.randint(5, 10)
+        bonus_strength = round(random.uniform(0.2, 0.5), 2)
+        bonus_attack_speed = round(random.uniform(0.05, 0.1), 2)
+        bonus_dodge = round(random.uniform(0.01, 0.03), 2)
+        bonus_critical = round(random.uniform(0.01, 0.03), 2)
+        bonus_lucky = round(random.uniform(0.01, 0.03), 2)
+
+        self.set_health(self.get_health() + bonus_health)
+        self.attributes.strength += bonus_strength
+        self.attributes.attack_speed += bonus_attack_speed
+        self.attributes.dodge = min(self.attributes.dodge + bonus_dodge, 0.5)
+        self.attributes.critical_chance = min(self.attributes.critical_chance + bonus_critical, 0.5)
+        self.attributes.lucky += bonus_lucky

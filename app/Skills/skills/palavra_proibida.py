@@ -9,7 +9,7 @@ class PalavraProibida(Skill):
 
     def activate(self, context):
         context.interface.reset_plauer_turn_timer()
-        context.interface.show_popup("Palavra Proibida ativada!", duration=2.0)
+        context.interface.show_popup("Palavra Proibida ativada!", duration=2.0, y=880)
         context.manager.player.remove_skill(self.get_name())
         context.manager.player.recieve_lucky += 2
         context.enemy.player_recieve_lucky += 2

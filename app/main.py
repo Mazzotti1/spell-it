@@ -19,10 +19,11 @@ class App:
         attributes = Attributes(
             dodge=1.0,
             attack_speed=1.0,
-            strength=8.0,
+            strength=1000.0,
             health=50,
             lucky=1.0,
-            critical_chance=1.0
+            critical_chance=1.0,
+            max_health=50
         )
         self.player = PlayerFactory.create_player(-100, 750, attributes)
         print(self.player.get_health())

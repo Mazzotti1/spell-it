@@ -2,7 +2,6 @@ from Utils.button import Button
 import pygame
 import random
 from Scenario.scenario import Scenario
-import random
 from Factory.playerFactory import PlayerFactory
 from Interface.interace import Interface
 from Utils.utils import Utils
@@ -110,6 +109,9 @@ class Map(Scenario):
         self.zoom_scale_book_map = 1.0
         self.target_zoom_book_map = 1.95
         self.zoom_speed_book_map = 0.015
+
+        self.available_bosses = ["tupinaje", "vermaçu", "donJacarone", "drPestis", "froguelhao"]
+        self.expanded_once = False
 
     def generate_branches(self, steps=3, start_x=930, start_y=830):
         branch_width = 90
@@ -340,6 +342,22 @@ class Map(Scenario):
 
                     self.manager.map_scenario = self
                     self.manager.start_battle(self, self.move_target_node['enemy_type'], enemy_index)
+                elif self.move_target_node['type'] == 'middle':
+                    boss_nodes = [node for node in self.nodes if node['type'] == 'middle']
+                    boss_index = boss_nodes.index(self.move_target_node)
+
+                    chosen_boss = random.choice(self.available_bosses)
+                    self.available_bosses.remove(chosen_boss)
+                    self.manager.map_scenario = self
+                    self.manager.start_boss_battle(self, chosen_boss, index=boss_index)
+
+                    if boss_index == 3:
+                        self.expand_map()
+  
+                    if boss_index == 5 and not self.expanded_once:
+                        self.expand_map()
+                        self.expanded_once = True
+
                 elif self.move_target_node['type'] == 'perk':
                     self.is_node_perk = True
 
@@ -558,11 +576,9 @@ class Map(Scenario):
         steps_to_remove = 1
         start_offset = 1
         total_to_remove = start_offset + (nodes_per_step * steps_to_remove)
-        print(f"Total to remove: {total_to_remove}")
 
         self.nodes = self.nodes[total_to_remove:]
 
-        print(f"Nodes after removal: {len(self.nodes)}")
         self.branch_scroll_offset_y += 220  
 
         last_y = self.get_last_middle_node_y()

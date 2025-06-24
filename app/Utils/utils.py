@@ -1,6 +1,7 @@
 import pygame
 import textwrap
-
+import unicodedata
+import re
 class Utils:
     def __init__(self):
         pass
@@ -28,3 +29,8 @@ class Utils:
             wrapped = textwrap.wrap(paragraph, width)
             wrapped_lines.extend(wrapped)
         return [font.render(line, True, color) for line in wrapped_lines]
+    
+    def normalize_skill_name(name):
+        name = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
+        name = re.sub(r'\s+', '_', name.lower())
+        return name

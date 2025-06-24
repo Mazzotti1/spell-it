@@ -3,6 +3,7 @@ from Factory.playerFactory import PlayerFactory
 from Utils.time_bar import TimerBar
 import math
 from Utils.hit_bar import HitBar
+import time
 
 class Interface:
     def __init__(self, player, pre_combat_time = 30, turn_time=15, punishment_time=5):
@@ -29,6 +30,16 @@ class Interface:
         self.popup_priority = 0
 
         self.skill_rects = []
+
+        self.boss_bar_animation_time = 0.5 
+        self.boss_bar_start_time = None
+        self.boss_bar_height = 30
+        self.boss_bar_y_target = 90 
+        self.boss_bar_y_start = 170
+        self.boss_bar_current_width = 0
+        self.boss_bar_full_width = 600
+        self.boss_bar_font = pygame.font.SysFont("arial", 26, bold=True)
+        self.boss_displayed_health = None
 
     def draw_health_bar(self, screen):
         health_quantity = self.player.get_health() // 10
@@ -218,3 +229,42 @@ class Interface:
             text_x = x + (bg_width - text_surface.get_width()) // 2
             text_y = y + (bg_height - text_surface.get_height()) // 2
             screen.blit(text_surface, (text_x, text_y))
+
+    def start_boss_bar_animation(self):
+        self.boss_bar_start_time = time.time()
+
+    def draw_boss_health_bar(self, screen, enemy, dt):
+        if self.boss_bar_start_time is None:
+            self.start_boss_bar_animation()
+            self.boss_displayed_health = enemy.get_health()
+
+        elapsed = time.time() - self.boss_bar_start_time
+        progress = min(elapsed / self.boss_bar_animation_time, 1)
+
+        current_width = int(self.boss_bar_full_width * progress)
+        bar_x = 1250  
+        bar_y = self.boss_bar_y_start - int((self.boss_bar_y_start - self.boss_bar_y_target) * progress)
+
+        pygame.draw.rect(screen, (80, 0, 0), (bar_x, bar_y, current_width, self.boss_bar_height), border_radius=10)
+
+        if self.boss_displayed_health is None:
+            self.boss_displayed_health = enemy.get_health()
+
+        real_health = enemy.get_health()
+        max_health = max(enemy.get_max_health(), 1)
+
+        lerp_speed = 10
+        diff = real_health - self.boss_displayed_health
+        if abs(diff) > 0.1:
+            self.boss_displayed_health += diff * min(lerp_speed * dt, 1)
+        else:
+            self.boss_displayed_health = real_health
+
+        health_ratio = self.boss_displayed_health / max_health
+        current_health_width = int(current_width * health_ratio)
+
+        pygame.draw.rect(screen, (200, 0, 0), (bar_x, bar_y, current_health_width, self.boss_bar_height), border_radius=10)
+
+        name_surf = self.boss_bar_font.render(enemy.getName(), True, (255, 255, 255))
+        name_rect = name_surf.get_rect(center=(bar_x + self.boss_bar_full_width // 2, bar_y - 20))
+        screen.blit(name_surf, name_rect)

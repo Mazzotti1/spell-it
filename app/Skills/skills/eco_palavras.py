@@ -20,13 +20,13 @@ class EcoDePalavras(Skill):
 
     def activate(self, context):
         context.interface.reset_plauer_turn_timer()
-        context.interface.show_popup("Eco de palavras ativado!", duration=2.0)
+        context.interface.show_popup("Eco de palavras ativado!", duration=2.0, y=880)
         context.manager.player.remove_skill(self.get_name())
         context.active_skills.append(self) 
 
     def on_repeat_last_word(self, context, word: str):
         if self.last_correct_word == word and self.count_words >= 1:
-            context.interface.show_popup("Eco de palavras foi atingido!", duration=2.0, priority=1)
+            context.interface.show_popup("Eco de palavras foi atingido!", duration=2.0, priority=1, y=880)
             context.manager.player.double_damage = True
             self.last_correct_word = None
 

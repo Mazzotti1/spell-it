@@ -10,12 +10,13 @@ from Effects.floating_text import FloatingText
 from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
 from Skills.SkillCardAnimation import SkillCardAnimation
+import random
 
-
-##Se skill for usada timer reseta pra 15 segundos e armazena a açao dela pra verificar o que deve acontecer baseado nela
-
+##Arrumar a expansão de mapa
+##Testar o end game de vitória
+##Balancear tudo
 class Battle(Scenario):
-    def __init__(self, manager, biome, enemy, player_final_x, player_final_y):
+    def __init__(self, manager, biome, enemy, player_final_x, player_final_y, isBossBattle=False, isLastBattle=False):
         super().__init__(manager),
         self.manager = manager
         self.enemy = enemy
@@ -26,6 +27,8 @@ class Battle(Scenario):
         self.enable_enemies = True
         self.player_final_x = player_final_x
         self.player_final_y = player_final_y
+        self.isBossBattle = isBossBattle
+        self.isLastBattle = isLastBattle
 
         self.quantity_pre_combat_words = 5
         self.quantity_player_turn_words = 15
@@ -44,9 +47,9 @@ class Battle(Scenario):
         self.buttons = [
             self.create_button("Encerrar", "red", (1440, 0), (130, 50), manager.end_battle),
         ]
-        self.restart_button =   self.create_button("Recomeçar", "orange", (860, 540), (180, 50), self.restart)
+        self.restart_button =   self.create_button("Recomeçar", "orange", (1250, 540), (180, 50), self.restart)
 
-        self.pre_combat_time = 15
+        self.pre_combat_time = 10 if self.isBossBattle else 15
 
         self.interface = Interface(manager.player, pre_combat_time=self.pre_combat_time)
 
@@ -122,6 +125,13 @@ class Battle(Scenario):
 
         self.show_enemy_words = False
 
+        self.screen_flash_alpha = 0
+        self.flash_intensity = 100 
+        self.shake_offset = (0, 0)
+        self.shake_magnitude = 10
+        self.player_win_game = False
+        self.player_was_defeated = False
+        
     def draw_ui(self, screen):
         if not self.manager.player.moving:
             for btn in self.buttons:
@@ -130,12 +140,12 @@ class Battle(Scenario):
             self.interface.draw_input_box(screen)
             self.interface.draw_popup(screen)
             self.interface.draw_health_bar(screen)
+            
+            if self.isBossBattle:
+                self.interface.draw_boss_health_bar(screen, self.enemy, self.manager.dt)
 
             if len(self.manager.player.skills) > 0:
                 self.interface.draw_player_skills(screen, self.manager.player)
-
-            if self.draw_restart_button:
-                self.restart_button.draw(screen)
 
             if self.result_finalization_animation_active:
                 self.draw_result_pre_combat_animation(screen)
@@ -149,6 +159,18 @@ class Battle(Scenario):
                     self.interface.draw_battle_timers(screen, "pre_combat", self.manager.player.moving)
                 elif not self.punishment_ended and self.pre_combat_ended:
                     self.interface.draw_battle_timers(screen, "punishment", self.manager.player.moving)
+
+
+            if self.player_win_game:
+                self.end_game_animation(screen, self.manager.player, "Parabéns pela vitória!")
+                self.draw_restart_button = True
+            
+            if self.player_was_defeated:
+                self.end_game_animation(screen, self.manager.player, "Você foi derrotado!")
+                self.draw_restart_button = True
+
+            if self.draw_restart_button:
+                self.restart_button.draw(screen)
 
     def create_button(self, text, color, position, size, on_click, text_color="white"):
         return Button(
@@ -231,7 +253,7 @@ class Battle(Scenario):
             elif not word_obj and not self.player_turn_started:
                 self.interface.pre_combat_timer.decrease_time(3)
                 self.interface.punishment_timer.decrease_time(3)
-                self.interface.show_popup("Palavra errada: -3 segundos", duration=1.5)
+                self.interface.show_popup("Palavra errada: -3 segundos", duration=1.5, y=945)
 
             if word_obj and self.player_turn_started:
                 self.player_turn_word_count += 1
@@ -290,7 +312,7 @@ class Battle(Scenario):
 
                 if not handled:
                     self.interface.player_turn_timer.decrease_time(1)
-                    self.interface.show_popup("Palavra errada: -1 segundos", duration=1.5)
+                    self.interface.show_popup("Palavra errada: -1 segundos", duration=1.5, y=945),
 
     def draw_scene(self, screen, player):
         super().draw_scene(screen)
@@ -376,7 +398,7 @@ class Battle(Scenario):
 
             self.interface.draw_battle_timers(screen, "enemy_turn", self.manager.player.moving)
             match self.enemy.getName():
-                case "Anaconda":
+                case "Anaconda" | "Tupinajé":
                     animation = CustomSpriteAnimation(
                         "../assets/effects/enemys/raio_sheet.png",
                         (300, 560),
@@ -387,7 +409,7 @@ class Battle(Scenario):
                         frame_height= 320,
                         frame_width= 320
                     )
-                case "Calango":
+                case "Calango" | "Vermaçu":
                     animation = CustomSpriteAnimation(
                         "../assets/effects/enemys/mordida_sheet.png",
                         (350, 620),
@@ -398,7 +420,7 @@ class Battle(Scenario):
                         frame_height= 320,
                         frame_width= 320
                     )
-                case "Jacare":
+                case "Jacare" | "Don Jacarone":
                     animation = CustomSpriteAnimation(
                         "../assets/effects/enemys/garra_diagonal_sheet.png",
                         (350 - 50, 750 - 70),
@@ -410,7 +432,7 @@ class Battle(Scenario):
                         frame_width= 320
                     )
 
-                case "Quero-Quero":
+                case "Quero-Quero" | "Dr. Pestis":
                     animation= CustomSpriteAnimation(
                         "../assets/effects/enemys/furacao_sheet.png",
                         (350, 580),
@@ -422,7 +444,7 @@ class Battle(Scenario):
                         frame_width= 320
                     )
 
-                case "Mico":
+                case "Mico" | "Froguelhão":
                     animation = CustomSpriteAnimation(
                         "../assets/effects/enemys/leao_sheet.png",
                         (420, 510),
@@ -486,6 +508,16 @@ class Battle(Scenario):
                     animation = self.enemy.quero_quero_hited
                 case "Mico":
                     animation = self.enemy.mico_hited
+                case "Tupinajé":
+                    animation = self.enemy.tupinaje_hited
+                case "Vermaçu":
+                    animation = self.enemy.vermaçu_hited
+                case "Froguelhão":
+                    animation = self.enemy.froguelhao_hited   
+                case "Don Jacarone":
+                    animation = self.enemy.don_jacarone_hited
+                case "Dr. Pestis":
+                    animation = self.enemy.dr_pestis_hited    
 
             self.enemy_hited.append(PunishAnimation(animation, delay = 0))
 
@@ -511,6 +543,16 @@ class Battle(Scenario):
                     animation = self.enemy.quero_quero_dying
                 case "Mico":
                     animation = self.enemy.mico_dying
+                case "Tupinajé":
+                    animation = self.enemy.tupinaje_dying
+                case "Vermaçu":
+                    animation = self.enemy.vermaçu_dying
+                case "Froguelhão":
+                    animation = self.enemy.froguelhao_dying 
+                case "Don Jacarone":
+                    animation = self.enemy.don_jacarone_dying
+                case "Dr. Pestis":
+                    animation = self.enemy.dr_pestis_dying   
 
             self.enemy_dying.append(PunishAnimation(animation, delay=0))
 
@@ -531,12 +573,24 @@ class Battle(Scenario):
             if self.victory_animation_timer >= total_duration:
                 self.victory_animation_started = False
                 self.victory_animation_timer = 0.0
-                self.start_reward_animation(screen)
+
+                if self.isLastBattle:
+                    self.player_win_game = True
+                else:
+                    self.start_reward_animation(screen)
 
         if self.showing_reward_cards:
             for card in self.reward_cards:
                 card.draw(screen)
 
+        if self.isBossBattle:
+            if self.shake_offset != (0, 0):
+                screen.scroll(dx=self.shake_offset[0], dy=self.shake_offset[1])
+        
+            if self.screen_flash_alpha > 0:
+                flash_surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+                flash_surface.fill((255, 255, 255, self.screen_flash_alpha))
+                screen.blit(flash_surface, (0, 0))
 
     def draw_background(self, screen):
         screen.fill((0, 0, 0))
@@ -572,7 +626,7 @@ class Battle(Scenario):
             self.word_manager.words.clear()
             self.start_result_animation("defeat")
             self.defeat_animation_started = True
-            self.draw_restart_button = True
+            self.player_was_defeated = True
 
         if self.interface.is_pre_combat_over() and not self.pre_combat_ended:
             self.pre_combat_ended = True
@@ -653,6 +707,8 @@ class Battle(Scenario):
             self.start_result_animation("victory")
             self.enemy.visible = False
             self.victory_animation_started = True
+            if self.isBossBattle:
+                self.manager.player.recieveBossReward()
 
         if self.interface.popup_time_remaining > 0:
             self.interface.popup_time_remaining -= self.manager.dt
@@ -710,10 +766,24 @@ class Battle(Scenario):
             self.enemy_hited_animation_active = True
 
         if self.enemy_attack_animation_active:
+
+            if self.isBossBattle:
+                self.screen_flash_alpha = min(255, self.flash_intensity)
+
+                self.shake_offset = (
+                    random.randint(-self.shake_magnitude, self.shake_magnitude),
+                    random.randint(-self.shake_magnitude, self.shake_magnitude)
+                )
+
             self.enemy_attack_animation_timer += self.manager.dt
             if self.enemy_attack_animation_timer >= self.enemy_attack_animation_duration:
                 self.enemy_attack_animation_active = False
                 self.pending_damage_result = True
+
+                if self.isBossBattle:
+                    self.shake_offset = (0, 0)
+                    self.screen_flash_alpha = 0
+
 
         if self.player_attack_animation_active:
             self.player_attack_animation_timer += self.manager.dt
@@ -885,3 +955,80 @@ class Battle(Scenario):
 
         card = SkillCardAnimation(start_pos=start_pos, target_pos=target_pos, player= self.manager.player, manager=self.manager)
         self.reward_cards.append(card)
+
+
+    def end_game_animation(self, screen, player, title):
+        overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180)) 
+        screen.blit(overlay, (0, 0))
+
+        title_font = pygame.font.SysFont("arial", 60, bold=True)
+        stats_font = pygame.font.SysFont("arial", 30)
+        footer_font = pygame.font.SysFont("arial", 20, italic=True)
+
+        victory_text = title_font.render(title, True, (255, 255, 255))
+        congrats_text = stats_font.render("Você chegou ao fim da jornada! Veja seus atributos finais", True, (255, 255, 255))
+
+        victory_rect = victory_text.get_rect(center=(screen.get_width() // 2, 150))
+        congrats_rect = congrats_text.get_rect(center=(screen.get_width() // 2, 220))
+
+        screen.blit(victory_text, victory_rect)
+        screen.blit(congrats_text, congrats_rect)
+
+        attr_lines = [
+            f"Vida: {player.get_health()} / {player.get_max_health()}",
+            f"Força: {round(player.attributes.strength, 2)}",
+            f"Velocidade de ataque: {round(player.attributes.attack_speed, 2)}",
+            f"Esquiva: {round(player.attributes.dodge)}%",
+            f"Crítico: {round(player.attributes.critical_chance)}%",
+            f"Sorte: {round(player.attributes.lucky, 2)}",
+        ]
+
+        for i, line in enumerate(attr_lines):
+            line_surf = stats_font.render(line, True, (255, 255, 255))
+            line_rect = line_surf.get_rect(center=(screen.get_width() // 2, 280 + i * 40))
+            screen.blit(line_surf, line_rect)
+ 
+        acquired = len(player.all_acquired_skills)
+        skills_title_text = f"Habilidades adquiridas ({acquired}/?):"
+        skills_title = stats_font.render(skills_title_text, True, (255, 255, 255))
+
+        skills_title_rect = skills_title.get_rect(center=(screen.get_width() // 2, 280 + len(attr_lines) * 40 + 20))
+        screen.blit(skills_title, skills_title_rect)
+
+        padding_between_title_and_skills = 20
+        start_y = skills_title_rect.bottom + padding_between_title_and_skills
+
+        for i, skill in enumerate(player.all_acquired_skills):
+            skill_name = skill.get_name()
+            normalized = self.utils.normalize_skill_name(skill_name)
+
+            skill_img_path = skill.get_image()
+            print(skill_img_path)
+            try:
+                skill_img_surface = pygame.image.load(skill_img_path).convert_alpha()
+                skill_img_scaled = pygame.transform.scale(skill_img_surface, (40, 40))
+            except Exception as e:
+                print(f"Erro ao carregar imagem da habilidade {skill_name}: {e}")
+                continue
+
+            img_y = start_y + i * 50
+            img_x = screen.get_width() // 2 - 100
+
+            screen.blit(skill_img_scaled, (img_x, img_y))
+
+            name_surf = stats_font.render(skill_name, True, (255, 255, 255))
+            name_rect = name_surf.get_rect(midleft=(img_x + 50, img_y + 20))
+            screen.blit(name_surf, name_rect)
+
+        if player.all_acquired_skills:
+            last_skill_y = start_y + (len(player.all_acquired_skills) - 1) * 50
+            footer_y = last_skill_y + 60 
+        else:
+            footer_y = start_y + 20 
+
+        footer_text = footer_font.render("Desenvolvido por Gabriel Mazzotti", True, (220, 220, 220))
+        footer_rect = footer_text.get_rect(center=(screen.get_width() // 2, footer_y))
+        screen.blit(footer_text, footer_rect)
+
+

@@ -31,6 +31,24 @@ class ScenarioManager:
         self.in_battle = True
         self.current_scenario = self.battle_scenario
 
+    def start_boss_battle(self, scenario, boss, index):
+        scene_enemy, biome_path = self.getBossBattleScene(boss, index)
+        
+        if index == 6:
+            isLastBattle = True
+        else:
+            isLastBattle = False
+
+        self.boss_battle_scenario = Battle(self, biome_path, scene_enemy, self.player_final_x, self.player_final_y, isBossBattle=True, isLastBattle=isLastBattle)
+
+        self.player.x = -100
+        self.player.y = 750
+        self.player.rect.topleft = (self.player.x, self.player.y)
+        self.player.moving = False
+        self.player.battle_initial_movement_done = False
+        self.in_battle = True
+        self.current_scenario = self.boss_battle_scenario
+
     def end_battle(self):
         self.in_battle = False
         self.current_scenario = self.map_scenario
@@ -71,6 +89,26 @@ class ScenarioManager:
             case "mico":
                 mico = EnemyFactory.create_enemy('Mico', attributes, 1000, 300)
                 return mico, "../assets/scene/battle/mata_atlantica_scenario.png"
+            
+    def getBossBattleScene(self, enemy, index):
+        attributes = self.boss_scale_attributes(index)
+
+        match enemy:
+            case "tupinaje":
+                tupinaje = EnemyFactory.create_enemy('Tupinajé', attributes, 1200, 550)
+                return tupinaje, "../assets/scene/battle/amazonic_scenario.png"
+            case "vermaçu":
+                vermaçu = EnemyFactory.create_enemy('Vermaçu', attributes, 1200, 580)
+                return vermaçu, "../assets/scene/battle/caatinga_scenario.png"
+            case "donJacarone":
+                donJacarone = EnemyFactory.create_enemy('Don Jacarone', attributes, 1280, 520)
+                return donJacarone,  "../assets/scene/battle/pantanal_scenario.png"
+            case "drPestis":
+                drPestis = EnemyFactory.create_enemy('Dr. Pestis', attributes, 1100, 420)
+                return drPestis, "../assets/scene/battle/pampa_scenario.png"
+            case "froguelhao":
+                froguelhao = EnemyFactory.create_enemy('Froguelhão', attributes, 1100, 560)
+                return froguelhao, "../assets/scene/battle/mata_atlantica_scenario.png"
 
     def back_to_main(self):
         self.in_battle = False
@@ -90,10 +128,12 @@ class ScenarioManager:
             strength=1.0,
             health=50,
             lucky=1.0,
-            critical_chance=1.0
+            critical_chance=1.0,
+            max_health=50
         )
         self.player.set_attributes(new_attributes)
         self.player.skills = []
+        self.player.all_acquired_skills = []
         self.change_scenario(MainMenu(self, self.player))
 
     def scale_attributes(self, index: int) -> Attributes:
@@ -104,6 +144,19 @@ class ScenarioManager:
             strength=1 + idx * 2,
             health=5 + idx * 10,
             lucky=0.05 + 0.01 * idx,
-            critical_chance=min(0.05 + 0.02 * idx, 0.5)
+            critical_chance=min(0.05 + 0.02 * idx, 0.5),
+            max_health=5 + idx * 10
+        )
+
+    def boss_scale_attributes(self, index: int) -> Attributes:
+        idx = index + 1
+        return Attributes(
+            dodge=min(0.1 + 0.02 * idx, 0.5),
+            attack_speed=0.5 + 0.05 * idx,
+            strength=1 + idx * 2,
+            health=5 + idx * 10,
+            lucky=0.05 + 0.01 * idx,
+            critical_chance=min(0.05 + 0.02 * idx, 0.5),
+            max_health=5 + idx * 10
         )
 

@@ -13,7 +13,8 @@ class PlayerFactory:
                 strength=10,
                 health=50,
                 lucky=1,
-                critical_chance=1
+                critical_chance=1,
+                max_health=50
             )
 
         player = Player("Aurélio", attributes, x, y)

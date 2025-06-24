@@ -6,13 +6,21 @@ class Attributes:
                  strength: float, 
                  health: int, 
                  lucky: float, 
-                 critical_chance: float):
+                 critical_chance: float,
+                 max_health: int ):
         self.dodge = dodge
         self.attack_speed = attack_speed
         self.strength = strength
         self.health = health
         self.lucky = lucky
         self.critical_chance = critical_chance
+        self.max_health = max_health
+    
+    def set_max_health(self, max_health: int):
+        self.max_health = max_health
+
+    def get_max_health(self):
+        return self.max_health
 
     def set_dodge(self, dodge: float):
         self.dodge = dodge

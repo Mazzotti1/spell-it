@@ -135,7 +135,111 @@ class Enemy(Entity):
                 frame_height=384,
                 frame_width=384
             )
-        
+        elif self.name == "Tupinajé":
+            self.tupinaje_hited = CustomSpriteAnimation(
+                hitted_sprite, 
+                (self.x, self.y), 
+                num_frames=12, 
+                loop=False,
+                frame_duration=0.01, 
+                total_duration=0.5,
+                frame_height=384,
+                frame_width=384
+            )
+            self.tupinaje_dying = CustomSpriteAnimation(
+                dying_sprite, 
+                (self.x, self.y), 
+                num_frames=12, 
+                loop=False,
+                frame_duration=0.1, 
+                total_duration=3.5,
+                frame_height=384,
+                frame_width=384
+            )
+        elif self.name == "Don Jacarone":
+            self.don_jacarone_hited = CustomSpriteAnimation(
+                hitted_sprite, 
+                (self.x, self.y), 
+                num_frames=10, 
+                loop=False,
+                frame_duration=0.01, 
+                total_duration=0.5,
+                frame_height=384,
+                frame_width=384
+            )
+            self.don_jacarone_dying = CustomSpriteAnimation(
+                dying_sprite, 
+                (self.x, self.y), 
+                num_frames=12, 
+                loop=False,
+                frame_duration=0.1, 
+                total_duration=3.5,
+                frame_height=384,
+                frame_width=384
+            )
+        elif self.name == "Dr. Pestis":
+            self.dr_pestis_hited = CustomSpriteAnimation(
+                hitted_sprite, 
+                (self.x, self.y), 
+                num_frames=10, 
+                loop=False,
+                frame_duration=0.01, 
+                total_duration=0.5,
+                frame_height=384,
+                frame_width=384
+            )
+            self.dr_pestis_dying = CustomSpriteAnimation(
+                dying_sprite, 
+                (self.x, self.y), 
+                num_frames=11, 
+                loop=False,
+                frame_duration=0.1, 
+                total_duration=3.5,
+                frame_height=384,
+                frame_width=384
+            )
+        elif self.name == "Vermaçu":
+            self.vermaçu_hited = CustomSpriteAnimation(
+                hitted_sprite, 
+                (self.x, self.y), 
+                num_frames=10, 
+                loop=False,
+                frame_duration=0.01, 
+                total_duration=0.5,
+                frame_height=384,
+                frame_width=384
+            )
+            self.vermaçu_dying = CustomSpriteAnimation(
+                dying_sprite, 
+                (self.x, self.y), 
+                num_frames=12, 
+                loop=False,
+                frame_duration=0.1, 
+                total_duration=3.5,
+                frame_height=384,
+                frame_width=384
+            )
+        elif self.name == "Froguelhão":
+            self.froguelhao_hited = CustomSpriteAnimation(
+                hitted_sprite, 
+                (self.x, self.y), 
+                num_frames=7, 
+                loop=False,
+                frame_duration=0.01, 
+                total_duration=0.5,
+                frame_height=384,
+                frame_width=384
+            )
+            self.froguelhao_dying = CustomSpriteAnimation(
+                dying_sprite, 
+                (self.x, self.y), 
+                num_frames=10, 
+                loop=False,
+                frame_duration=0.1, 
+                total_duration=3.5,
+                frame_height=384,
+                frame_width=384
+            )
 
     def setType(self, type):
         self.type = type
@@ -187,38 +291,44 @@ class Enemy(Entity):
     def punish(self):
         self.punish_effects.clear()
 
-        if self.name == "Anaconda":
-            anvil_start_y = self.y - 400
-            anvil_anim = FallingAnvilAnimation(
-                "../assets/effects/anvil/anvil_sheet.png",
-                (self.x, anvil_start_y),
-                (self.x, self.y),
-                duration=0.2,
-                num_frames=1,
-                frame_duration=0.6,
-                frame_height= 320,
-                frame_width= 320
-            )
-            self.punish_effects.append(PunishAnimation(anvil_anim))
+        if self.name in ["Anaconda", "Tupinajé"]:
+                animation_hit = self.anaconda_hited if self.name == "Anaconda" else self.tupinaje_hited
+                animation_dying = self.anaconda_dying if self.name == "Anaconda" else self.tupinaje_dying
 
-            stars_anim = CustomSpriteAnimation(
-                "../assets/effects/anvil/shining_sheet.png",
-                (self.x, self.y),
-                frame_duration=0.2,
-                num_frames=7,
-                loop=True,
-                total_duration=2.5,
-                frame_height= 320,
-                frame_width= 320
-            )
+                anvil_start_y = self.y - 400
+                anvil_anim = FallingAnvilAnimation(
+                    "../assets/effects/anvil/anvil_sheet.png",
+                    (self.x, anvil_start_y),
+                    (self.x, self.y),
+                    duration=0.2,
+                    num_frames=1,
+                    frame_duration=0.6,
+                    frame_height=320,
+                    frame_width=320
+                )
+                self.punish_effects.append(PunishAnimation(anvil_anim))
 
-            self.punish_effects.append(PunishAnimation(stars_anim, delay = 0.6))
-            self.punish_effects.append(PunishAnimation(self.anaconda_hited, delay = 0.7))
+                stars_anim = CustomSpriteAnimation(
+                    "../assets/effects/anvil/shining_sheet.png",
+                    (self.x, self.y),
+                    frame_duration=0.2,
+                    num_frames=7,
+                    loop=True,
+                    total_duration=2.5,
+                    frame_height=320,
+                    frame_width=320
+                )
 
-            if not self.is_alive():
-                self.dying_animations.append(PunishAnimation(self.anaconda_dying, delay = 0.0))
+                self.punish_effects.append(PunishAnimation(stars_anim, delay=0.6))
+                self.punish_effects.append(PunishAnimation(animation_hit, delay=0.7))
 
-        elif self.name == "Calango":
+                if not self.is_alive():
+                    self.dying_animations.append(PunishAnimation(animation_dying, delay=0.0))
+
+        elif self.name in ["Calango", "Vermaçu"]:
+            animation_hit = self.calango_hited if self.name == "Calango" else self.vermaçu_hited
+            animation_dying = self.calango_dying if self.name == "Calango" else self.vermaçu_dying
+
             flame = CustomSpriteAnimation(
                 "../assets/effects/flame/fire_sheet.png",
                 (self.x, self.y),
@@ -226,16 +336,19 @@ class Enemy(Entity):
                 num_frames=7,
                 loop=True,
                 total_duration=3.0,
-                frame_height= 320,
-                frame_width= 320
+                frame_height=320,
+                frame_width=320
             )
             self.punish_effects.append(PunishAnimation(flame))
-            self.punish_effects.append(PunishAnimation(self.calango_hited, delay = 0.6))
+            self.punish_effects.append(PunishAnimation(animation_hit, delay=0.6))
 
             if not self.is_alive():
-                self.dying_animations.append(PunishAnimation(self.calango_dying, delay = 0.0))
+                self.dying_animations.append(PunishAnimation(animation_dying, delay=0.0))
 
-        elif self.name == "Jacare":
+        elif self.name in ["Jacare", "Don Jacarone"]:
+            animation_hit = self.jacare_hited if self.name == "Jacare" else self.don_jacarone_hited
+            animation_dying = self.jacare_dying if self.name == "Jacare" else self.don_jacarone_dying
+
             firefly = CustomSpriteAnimation(
                 "../assets/effects/tornado/big_tornado_sheet.png",
                 (self.x, self.y - 70),
@@ -243,17 +356,19 @@ class Enemy(Entity):
                 num_frames=20,
                 loop=True,
                 total_duration=2.5,
-                frame_height= 512,
-                frame_width= 512
+                frame_height=512,
+                frame_width=512
             )
             self.punish_effects.append(PunishAnimation(firefly))
-            self.punish_effects.append(PunishAnimation(self.jacare_hited, delay = 0.2))
+            self.punish_effects.append(PunishAnimation(animation_hit, delay=0.2))
 
             if not self.is_alive():
-                self.dying_animations.append(PunishAnimation(self.jacare_dying, delay = 0.5))
+                self.dying_animations.append(PunishAnimation(animation_dying, delay=0.5))
 
+        elif self.name in ["Quero-Quero", "Dr. Pestis"]:
+            animation_hit = self.quero_quero_hited if self.name == "Quero-Quero" else self.dr_pestis_hited
+            animation_dying = self.quero_quero_dying if self.name == "Quero-Quero" else self.dr_pestis_dying
 
-        elif self.name == "Quero-Quero":
             tornado = CustomSpriteAnimation(
                 "../assets/effects/tornado/tornado_sheet.png",
                 (self.x, self.y),
@@ -261,16 +376,19 @@ class Enemy(Entity):
                 num_frames=7,
                 loop=True,
                 total_duration=3.0,
-                frame_height= 320,
-                frame_width= 320
+                frame_height=320,
+                frame_width=320
             )
             self.punish_effects.append(PunishAnimation(tornado))
-            self.punish_effects.append(PunishAnimation(self.quero_quero_hited, delay = 0.2))
+            self.punish_effects.append(PunishAnimation(animation_hit, delay=0.2))
 
             if not self.is_alive():
-                self.dying_animations.append(PunishAnimation(self.quero_quero_dying, delay = 0.5))
+                self.dying_animations.append(PunishAnimation(animation_dying, delay=0.5))
 
-        elif self.name == "Mico":
+        elif self.name in ["Mico", "Froguelhão"]:
+            animation_hit = self.mico_hited if self.name == "Mico" else self.froguelhao_hited
+            animation_dying = self.mico_dying if self.name == "Mico" else self.froguelhao_dying
+
             storm = CustomSpriteAnimation(
                 "../assets/effects/storm/storm_sheet.png",
                 (self.x, self.y - 180),
@@ -278,14 +396,14 @@ class Enemy(Entity):
                 loop=True,
                 frame_duration=0.1,
                 total_duration=2.0,
-                frame_height= 320,
-                frame_width= 512
+                frame_height=320,
+                frame_width=512
             )
             self.punish_effects.append(PunishAnimation(storm))
-            self.punish_effects.append(PunishAnimation(self.mico_hited, delay = 0.2))
+            self.punish_effects.append(PunishAnimation(animation_hit, delay=0.2))
 
             if not self.is_alive():
-                self.dying_animations.append(PunishAnimation(self.mico_dying, delay = 0.5))
+                self.dying_animations.append(PunishAnimation(animation_dying, delay=0.5))
 
     def set_animation(self, name: str, play_once: bool = False):
         self.current_frames = getattr(self, f"{name}_frames")
@@ -312,7 +430,8 @@ class Enemy(Entity):
             self._play_extra_effect(enemy_key)
 
     def _play_extra_effect(self, enemy_key: str):
-        if enemy_key == "anaconda":
+        print(enemy_key)
+        if enemy_key in ["anaconda", "tupinajé"]:
             anvil_start_y = self.y - 400
             anvil = FallingAnvilAnimation(
                 "../assets/effects/anvil/anvil_sheet.png",
@@ -337,7 +456,7 @@ class Enemy(Entity):
             self.punish_effects.append(PunishAnimation(anvil))
             self.punish_effects.append(PunishAnimation(stars, delay=0.6))
             
-        elif enemy_key == "calango":
+        elif enemy_key in ["calango", "vermaçu"]:
             flame = CustomSpriteAnimation(
                 "../assets/effects/flame/fire_sheet.png",
                 (self.x, self.y),
@@ -350,7 +469,7 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(flame))
 
-        elif enemy_key == "jacare":
+        elif enemy_key in ["jacare", "don_jacarone"]:
             tornado = CustomSpriteAnimation(
                 "../assets/effects/tornado/big_tornado_sheet.png",
                 (self.x, self.y - 70),
@@ -363,7 +482,7 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(tornado))
 
-        elif enemy_key == "quero_quero":
+        elif enemy_key in ["quero_quero", "dr._pestis"]:
             tornado = CustomSpriteAnimation(
                 "../assets/effects/tornado/tornado_sheet.png",
                 (self.x, self.y),
@@ -376,7 +495,7 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(tornado))
 
-        elif enemy_key == "mico":
+        elif enemy_key in ["mico", "froguelhão"]:
             storm = CustomSpriteAnimation(
                 "../assets/effects/storm/storm_sheet.png",
                 (self.x, self.y - 180),

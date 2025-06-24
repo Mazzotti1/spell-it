@@ -15,12 +15,12 @@ class CorrenteDeCombos(Skill):
 
     def activate(self, context):
         context.interface.reset_plauer_turn_timer()
-        context.interface.show_popup("Corrente de Combos ativado!", duration=2.0)
+        context.interface.show_popup("Corrente de Combos ativado!", duration=2.0, y=880)
         context.manager.player.remove_skill(self.get_name())
         context.active_skills.append(self) 
 
     def on_3_words_success(self, context):
         if self.streak >= 3:
-            context.interface.show_popup("O ataque será crítico!", duration=2.0)
+            context.interface.show_popup("O ataque será crítico!", duration=2.0, y=880)
             context.manager.player.force_critical_hit = True
             self.streak = 0

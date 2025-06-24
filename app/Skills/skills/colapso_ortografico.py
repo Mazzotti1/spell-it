@@ -11,5 +11,5 @@ class ColapsoOrtografico(Skill):
         context.active_skills.append(self) 
 
     def on_word_error(self, context, word):
-        context.interface.show_popup(f"{word} foi desconsiderada automaticamente!", 1.5)
+        context.interface.show_popup(f"{word} foi desconsiderada automaticamente!", 1.5, y=880)
         return True

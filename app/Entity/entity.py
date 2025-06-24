@@ -45,6 +45,9 @@ class Entity:
     def set_attributes(self, attributes: Attributes):
         self.attributes = attributes
 
+    def get_max_health(self) -> int:
+        return self.attributes.get_max_health()
+
     def get_attributes(self):
         return self.attributes
 

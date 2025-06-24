@@ -17,7 +17,7 @@ class RouboDeVocabulario(Skill):
 
     def activate(self, context):
         context.interface.reset_plauer_turn_timer()
-        context.interface.show_popup("Roubo de Vocabulário ativado!", duration=2.0)
+        context.interface.show_popup("Roubo de Vocabulário ativado!", duration=2.0, y=880)
         context.manager.player.remove_skill(self.get_name())
         context.active_skills.append(self) 
 
@@ -28,6 +28,6 @@ class RouboDeVocabulario(Skill):
                 self.streak_enemy_words += 1
 
         if self.streak_enemy_words >= 2 and not self.activated_once:
-            context.interface.show_popup("Roubo de vocabulário foi atingido!", duration=2.0, priority=1)
+            context.interface.show_popup("Roubo de vocabulário foi atingido!", duration=2.0, priority=1, y=880)
             context.manager.player.set_health(context.manager.player.get_health() + 20)
             self.activated_once = True
