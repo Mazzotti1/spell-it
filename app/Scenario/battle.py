@@ -15,6 +15,7 @@ import random
 ##Arrumar a expansão de mapa
 ##Testar o end game de vitória
 ##Balancear tudo
+#Normalized crashando o jogo
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy, player_final_x, player_final_y, isBossBattle=False, isLastBattle=False):
         super().__init__(manager),
@@ -1001,7 +1002,7 @@ class Battle(Scenario):
 
         for i, skill in enumerate(player.all_acquired_skills):
             skill_name = skill.get_name()
-            normalized = self.utils.normalize_skill_name(skill_name)
+            # normalized = self.utils.normalize_skill_name(skill_name)
 
             skill_img_path = skill.get_image()
             print(skill_img_path)
