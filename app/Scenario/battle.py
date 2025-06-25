@@ -12,10 +12,8 @@ from Effects.punish_animation import PunishAnimation
 from Skills.SkillCardAnimation import SkillCardAnimation
 import random
 
-##Arrumar a expansão de mapa
-##Testar o end game de vitória
-##Balancear tudo
-#Normalized crashando o jogo
+##Balancear tudo -> não dar atributos floats
+
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy, player_final_x, player_final_y, isBossBattle=False, isLastBattle=False):
         super().__init__(manager),
@@ -127,12 +125,12 @@ class Battle(Scenario):
         self.show_enemy_words = False
 
         self.screen_flash_alpha = 0
-        self.flash_intensity = 100 
+        self.flash_intensity = 100
         self.shake_offset = (0, 0)
         self.shake_magnitude = 10
         self.player_win_game = False
         self.player_was_defeated = False
-        
+
     def draw_ui(self, screen):
         if not self.manager.player.moving:
             for btn in self.buttons:
@@ -141,7 +139,7 @@ class Battle(Scenario):
             self.interface.draw_input_box(screen)
             self.interface.draw_popup(screen)
             self.interface.draw_health_bar(screen)
-            
+
             if self.isBossBattle:
                 self.interface.draw_boss_health_bar(screen, self.enemy, self.manager.dt)
 
@@ -155,7 +153,7 @@ class Battle(Scenario):
                 if self.player_turn_started:
                     self.interface.draw_battle_timers(screen, "player_turn", self.manager.player.moving)
                     self.interface.draw_hit_bar(screen)
-                
+
                 if not self.pre_combat_ended:
                     self.interface.draw_battle_timers(screen, "pre_combat", self.manager.player.moving)
                 elif not self.punishment_ended and self.pre_combat_ended:
@@ -165,7 +163,7 @@ class Battle(Scenario):
             if self.player_win_game:
                 self.end_game_animation(screen, self.manager.player, "Parabéns pela vitória!")
                 self.draw_restart_button = True
-            
+
             if self.player_was_defeated:
                 self.end_game_animation(screen, self.manager.player, "Você foi derrotado!")
                 self.draw_restart_button = True
@@ -195,7 +193,7 @@ class Battle(Scenario):
                 for i, rect in enumerate(self.interface.skill_rects):
                     if rect.collidepoint(pygame.mouse.get_pos()):
                         skill = self.manager.player.skills[i]
-                        skill.activate(context=self) 
+                        skill.activate(context=self)
                         break
         elif not self.pre_combat_ended and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.interface.show_popup("Não é possível usar habilidades no pré-combate!", duration=2.0, y=150)
@@ -237,7 +235,7 @@ class Battle(Scenario):
 
                     self.interface.input_active = False
                     return
-                
+
 
             if word_obj and not self.pre_combat_ended and not self.player_turn_started:
                 self.pre_combat_word_count += 1
@@ -341,13 +339,13 @@ class Battle(Scenario):
         ):
             self.word_manager.generate_pre_combat_words(quantity=15)
             self.alreadyGeneratedPlayerTurnWords = True
-        
+
         if not player.moving:
             self.word_manager.draw(screen)
 
             if self.show_enemy_words:
                 self.word_manager.draw_enemy_words(screen)
-            
+
             if not self.result_finalization_animation_active and not self.pre_combat_ended:
                 self.interface.draw_battle_timers(screen, "pre_combat",  self.manager.player.moving)
 
@@ -463,7 +461,7 @@ class Battle(Scenario):
             if enemy_attack_animation.is_finished():
                 self.enemy_attacks.remove(enemy_attack_animation)
                 self.enemy.set_animation("idle")
-                self.enemy_animation_attacking_started = False 
+                self.enemy_animation_attacking_started = False
 
                 if len(self.enemy_attacks) == 0:
                     self.enemy_turn_ended = True
@@ -497,7 +495,7 @@ class Battle(Scenario):
         if self.enemy_hited_animation_active: ## aqui é pra batalha do turno do player
             self.enemy.set_animation("hited")
             self.enemy_hited_animation_active = False
-            
+
             match self.enemy.getName():
                 case "Anaconda":
                     animation = self.enemy.anaconda_hited
@@ -514,11 +512,11 @@ class Battle(Scenario):
                 case "Vermaçu":
                     animation = self.enemy.vermaçu_hited
                 case "Froguelhão":
-                    animation = self.enemy.froguelhao_hited   
+                    animation = self.enemy.froguelhao_hited
                 case "Don Jacarone":
                     animation = self.enemy.don_jacarone_hited
                 case "Dr. Pestis":
-                    animation = self.enemy.dr_pestis_hited    
+                    animation = self.enemy.dr_pestis_hited
 
             self.enemy_hited.append(PunishAnimation(animation, delay = 0))
 
@@ -549,11 +547,11 @@ class Battle(Scenario):
                 case "Vermaçu":
                     animation = self.enemy.vermaçu_dying
                 case "Froguelhão":
-                    animation = self.enemy.froguelhao_dying 
+                    animation = self.enemy.froguelhao_dying
                 case "Don Jacarone":
                     animation = self.enemy.don_jacarone_dying
                 case "Dr. Pestis":
-                    animation = self.enemy.dr_pestis_dying   
+                    animation = self.enemy.dr_pestis_dying
 
             self.enemy_dying.append(PunishAnimation(animation, delay=0))
 
@@ -587,7 +585,7 @@ class Battle(Scenario):
         if self.isBossBattle:
             if self.shake_offset != (0, 0):
                 screen.scroll(dx=self.shake_offset[0], dy=self.shake_offset[1])
-        
+
             if self.screen_flash_alpha > 0:
                 flash_surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
                 flash_surface.fill((255, 255, 255, self.screen_flash_alpha))
@@ -667,7 +665,7 @@ class Battle(Scenario):
                     (self.interface.is_punishment_over() and not self.punishment_ended)
                     or
                     (self.interface.is_pre_combat_over() and not self.pre_combat_ended)
-                )            
+                )
                 or
                     (self.enemy_turn_ended and not self.player_turn_started)
             )
@@ -721,10 +719,10 @@ class Battle(Scenario):
             self.result_finalization_animation_timer += self.manager.dt
             total_duration = 3
             self.result_finalization_animation_progress = min(self.result_finalization_animation_timer / total_duration, 1)
-            
+
             if not self.player_turn_started:
                 self.interface.input_active = False
-            else: 
+            else:
                 self.player_turn_word_count = 0
                 self.player_turn_ended = False
                 self.interface.reset_plauer_turn_timer()
@@ -830,9 +828,9 @@ class Battle(Scenario):
                 bonus = 1.5
             else:
                 bonus = 1.0
-                
+
             damage, is_critical, enemy_alive, did_hit = self.manager.player.attack(self.enemy, bonus)
-                    
+
             if not did_hit:
                 image = self.dodge_img
                 pos = (self.enemy.x, self.enemy.y - 100)
@@ -960,7 +958,7 @@ class Battle(Scenario):
 
     def end_game_animation(self, screen, player, title):
         overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 180)) 
+        overlay.fill((0, 0, 0, 180))
         screen.blit(overlay, (0, 0))
 
         title_font = pygame.font.SysFont("arial", 60, bold=True)
@@ -980,8 +978,8 @@ class Battle(Scenario):
             f"Vida: {player.get_health()} / {player.get_max_health()}",
             f"Força: {round(player.attributes.strength, 2)}",
             f"Velocidade de ataque: {round(player.attributes.attack_speed, 2)}",
-            f"Esquiva: {round(player.attributes.dodge)}%",
-            f"Crítico: {round(player.attributes.critical_chance)}%",
+            f"Chance de Esquiva: {round(player.attributes.dodge)}%",
+            f"Chance de Crítico: {round(player.attributes.critical_chance)}%",
             f"Sorte: {round(player.attributes.lucky, 2)}",
         ]
 
@@ -989,7 +987,7 @@ class Battle(Scenario):
             line_surf = stats_font.render(line, True, (255, 255, 255))
             line_rect = line_surf.get_rect(center=(screen.get_width() // 2, 280 + i * 40))
             screen.blit(line_surf, line_rect)
- 
+
         acquired = len(player.all_acquired_skills)
         skills_title_text = f"Habilidades adquiridas ({acquired}/?):"
         skills_title = stats_font.render(skills_title_text, True, (255, 255, 255))
@@ -1002,13 +1000,10 @@ class Battle(Scenario):
 
         for i, skill in enumerate(player.all_acquired_skills):
             skill_name = skill.get_name()
-            # normalized = self.utils.normalize_skill_name(skill_name)
-
             skill_img_path = skill.get_image()
-            print(skill_img_path)
+
             try:
-                skill_img_surface = pygame.image.load(skill_img_path).convert_alpha()
-                skill_img_scaled = pygame.transform.scale(skill_img_surface, (40, 40))
+                skill_img_scaled = pygame.transform.scale(skill_img_path, (40, 40))
             except Exception as e:
                 print(f"Erro ao carregar imagem da habilidade {skill_name}: {e}")
                 continue
@@ -1024,9 +1019,9 @@ class Battle(Scenario):
 
         if player.all_acquired_skills:
             last_skill_y = start_y + (len(player.all_acquired_skills) - 1) * 50
-            footer_y = last_skill_y + 60 
+            footer_y = last_skill_y + 60
         else:
-            footer_y = start_y + 20 
+            footer_y = start_y + 20
 
         footer_text = footer_font.render("Desenvolvido por Gabriel Mazzotti", True, (220, 220, 220))
         footer_rect = footer_text.get_rect(center=(screen.get_width() // 2, footer_y))

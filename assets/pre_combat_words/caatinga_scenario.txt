@@ -36,7 +36,7 @@ sabia
 carcara
 caboclo
 caçador
-sertão
+sertao
 vereda
 chapada
 espinho

@@ -37,7 +37,7 @@ chimarrao
 coxilha
 boiadeiro
 cavalo
-estância
+estancia
 poncho
 carreteiro
 milonga

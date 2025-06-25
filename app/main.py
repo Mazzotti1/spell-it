@@ -17,16 +17,15 @@ class App:
         self.running = True
 
         attributes = Attributes(
-            dodge=1.0,
-            attack_speed=1.0,
-            strength=2.0,
+            dodge=10.0,
+            attack_speed=65.0,
+            strength=5.0,
             health=50,
-            lucky=1.0,
-            critical_chance=1.0,
+            lucky=1.5,
+            critical_chance=20.0,
             max_health=50
         )
         self.player = PlayerFactory.create_player(-100, 750, attributes)
-        print(self.player.get_health())
 
         self.manager = ScenarioManager(self.player)
         self.manager.change_scenario(MainMenu(self.manager, self.player))

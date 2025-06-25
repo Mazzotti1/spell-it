@@ -29,7 +29,8 @@ class Utils:
             wrapped = textwrap.wrap(paragraph, width)
             wrapped_lines.extend(wrapped)
         return [font.render(line, True, color) for line in wrapped_lines]
-    
+
+    @staticmethod
     def normalize_skill_name(name):
         name = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
         name = re.sub(r'\s+', '_', name.lower())

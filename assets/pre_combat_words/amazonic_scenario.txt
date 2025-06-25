@@ -31,9 +31,9 @@ olhar
 vigiar
 floresta
 rio
-jacaré
+jacare
 onça
-cipó
+cipo
 tribo
 cacique
 canoa
@@ -45,6 +45,6 @@ borracha
 iguana
 cachoeira
 piranha
-açaí
+açai
 arraia
 mandioca

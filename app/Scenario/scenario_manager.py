@@ -33,8 +33,8 @@ class ScenarioManager:
 
     def start_boss_battle(self, scenario, boss, index):
         scene_enemy, biome_path = self.getBossBattleScene(boss, index)
-        
-        if index == 6:
+
+        if index in [6, 7]:
             isLastBattle = True
         else:
             isLastBattle = False
@@ -89,7 +89,7 @@ class ScenarioManager:
             case "mico":
                 mico = EnemyFactory.create_enemy('Mico', attributes, 1000, 300)
                 return mico, "../assets/scene/battle/mata_atlantica_scenario.png"
-            
+
     def getBossBattleScene(self, enemy, index):
         attributes = self.boss_scale_attributes(index)
 
@@ -123,12 +123,12 @@ class ScenarioManager:
         self.player.current_frames = self.player.idle_frames
 
         new_attributes = Attributes(
-            dodge=1.0,
-            attack_speed=1.0,
-            strength=1.0,
+            dodge=20.0,
+            attack_speed=60.0,
+            strength=5.0,
             health=50,
-            lucky=1.0,
-            critical_chance=1.0,
+            lucky=1.5,
+            critical_chance=20.0,
             max_health=50
         )
         self.player.set_attributes(new_attributes)
@@ -139,24 +139,23 @@ class ScenarioManager:
     def scale_attributes(self, index: int) -> Attributes:
         idx = index + 1
         return Attributes(
-            dodge=min(0.1 + 0.02 * idx, 0.5),
-            attack_speed=0.5 + 0.05 * idx,
-            strength=1 + idx * 2,
-            health=5 + idx * 10,
-            lucky=0.05 + 0.01 * idx,
-            critical_chance=min(0.05 + 0.02 * idx, 0.5),
-            max_health=5 + idx * 10
+            dodge=min(10 + 2 * idx, 50),
+            attack_speed=20 + idx * 2,
+            strength=2 + idx * 2,
+            health=5 + idx * 20,
+            lucky=1 + idx * 2,
+            critical_chance=min(5 + 2 * idx, 50),
+            max_health=5 + idx * 20,
         )
 
     def boss_scale_attributes(self, index: int) -> Attributes:
         idx = index + 1
         return Attributes(
-            dodge=min(0.1 + 0.02 * idx, 0.5),
-            attack_speed=0.5 + 0.05 * idx,
-            strength=1 + idx * 2,
-            health=5 + idx * 10,
-            lucky=0.05 + 0.01 * idx,
-            critical_chance=min(0.05 + 0.02 * idx, 0.5),
-            max_health=5 + idx * 10
+            dodge=min(10 + 2 * idx, 50),
+            attack_speed=20 + idx * 2,
+            strength=4 + idx * 2,
+            health=50 + idx * 10,
+            lucky=1 + idx * 2,
+            critical_chance=min(10 + 2 * idx, 50),
+            max_health=50 + idx * 10,
         )
-

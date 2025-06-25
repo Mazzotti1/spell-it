@@ -32,210 +32,210 @@ class Enemy(Entity):
 
         if self.name == "Anaconda":
             self.anaconda_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=5, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=5,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=0.5,
-                frame_height=384, 
+                frame_height=384,
                 frame_width=384
             )
             self.anaconda_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=7, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=7,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=4.0,
-                frame_height=384, 
+                frame_height=384,
                 frame_width=384
             )
         elif self.name == "Calango":
             self.calango_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=5, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=5,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=0.5,
-                frame_height=384, 
+                frame_height=384,
                 frame_width=384
             )
             self.calango_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=8, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=8,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=3.5,
-                frame_height=384, 
+                frame_height=384,
                 frame_width=384
             )
         elif self.name == "Jacare":
             self.jacare_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=6, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=6,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=0.5,
-                frame_height=384, 
+                frame_height=384,
                 frame_width=384
             )
             self.jacare_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=8, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=8,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=3.5,
-                frame_height=384, 
+                frame_height=384,
                 frame_width=384
             )
         elif self.name == "Mico":
             self.mico_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=8, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=8,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=0.5,
-                frame_height=384, 
+                frame_height=384,
                 frame_width=384
             )
             self.mico_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=12, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=12,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=4.5,
-                frame_height=384, 
+                frame_height=384,
                 frame_width=384
             )
         elif self.name == "Quero-Quero":
             self.quero_quero_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=5, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=5,
                 loop=False,
-                frame_duration=0.01, 
+                frame_duration=0.01,
                 total_duration=0.5,
                 frame_height=384,
                 frame_width=384
             )
             self.quero_quero_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=8, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=8,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=3.5,
                 frame_height=384,
                 frame_width=384
             )
         elif self.name == "Tupinajé":
             self.tupinaje_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=12, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=12,
                 loop=False,
-                frame_duration=0.01, 
+                frame_duration=0.01,
                 total_duration=0.5,
                 frame_height=384,
                 frame_width=384
             )
             self.tupinaje_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=12, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=12,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=3.5,
                 frame_height=384,
                 frame_width=384
             )
         elif self.name == "Don Jacarone":
             self.don_jacarone_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=10, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=10,
                 loop=False,
-                frame_duration=0.01, 
+                frame_duration=0.01,
                 total_duration=0.5,
                 frame_height=384,
                 frame_width=384
             )
             self.don_jacarone_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=12, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=12,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=3.5,
                 frame_height=384,
                 frame_width=384
             )
         elif self.name == "Dr. Pestis":
             self.dr_pestis_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=10, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=10,
                 loop=False,
-                frame_duration=0.01, 
+                frame_duration=0.01,
                 total_duration=0.5,
                 frame_height=384,
                 frame_width=384
             )
             self.dr_pestis_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=11, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=11,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=3.5,
                 frame_height=384,
                 frame_width=384
             )
         elif self.name == "Vermaçu":
             self.vermaçu_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=10, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=10,
                 loop=False,
-                frame_duration=0.01, 
+                frame_duration=0.01,
                 total_duration=0.5,
                 frame_height=384,
                 frame_width=384
             )
             self.vermaçu_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=12, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=12,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=3.5,
                 frame_height=384,
                 frame_width=384
             )
         elif self.name == "Froguelhão":
             self.froguelhao_hited = CustomSpriteAnimation(
-                hitted_sprite, 
-                (self.x, self.y), 
-                num_frames=7, 
+                hitted_sprite,
+                (self.x, self.y),
+                num_frames=7,
                 loop=False,
-                frame_duration=0.01, 
+                frame_duration=0.01,
                 total_duration=0.5,
                 frame_height=384,
                 frame_width=384
             )
             self.froguelhao_dying = CustomSpriteAnimation(
-                dying_sprite, 
-                (self.x, self.y), 
-                num_frames=10, 
+                dying_sprite,
+                (self.x, self.y),
+                num_frames=10,
                 loop=False,
-                frame_duration=0.1, 
+                frame_duration=0.1,
                 total_duration=3.5,
                 frame_height=384,
                 frame_width=384
@@ -254,7 +254,7 @@ class Enemy(Entity):
         return (self.x, self.y)
 
     def attack(self, target: "Entity"):
-        final_crit_chance = min(1.0, self.get_critical_chance() * self.get_lucky())
+        final_crit_chance = min(1.0, (self.get_critical_chance() / 100.0) * self.get_lucky())
         is_critical = random.random() < final_crit_chance
 
         damage = self.get_strength()
@@ -268,8 +268,8 @@ class Enemy(Entity):
         else:
             dodge = target.get_dodge()
 
-        dodge_chance = min(1.0, self.get_lucky() * dodge)
-        
+        dodge_chance = min(1.0, self.get_lucky() * (dodge / 100.0))
+        print(dodge_chance)
         if self.forced_miss_turns > 0:
             did_dodge = True
             self.forced_miss_turns -= 1
@@ -430,7 +430,6 @@ class Enemy(Entity):
             self._play_extra_effect(enemy_key)
 
     def _play_extra_effect(self, enemy_key: str):
-        print(enemy_key)
         if enemy_key in ["anaconda", "tupinajé"]:
             anvil_start_y = self.y - 400
             anvil = FallingAnvilAnimation(
@@ -455,7 +454,7 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(anvil))
             self.punish_effects.append(PunishAnimation(stars, delay=0.6))
-            
+
         elif enemy_key in ["calango", "vermaçu"]:
             flame = CustomSpriteAnimation(
                 "../assets/effects/flame/fire_sheet.png",

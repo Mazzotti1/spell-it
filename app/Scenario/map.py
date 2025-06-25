@@ -121,7 +121,7 @@ class Map(Scenario):
 
         current_x = start_x
         current_y = start_y
-        
+
         if not self.nodes:
             first = {
                 'rect': pygame.Rect(current_x, current_y, branch_width, branch_height),
@@ -140,7 +140,7 @@ class Map(Scenario):
             middle_node = self.get_last_middle_node()
 
             if not middle_node:
-                    middle_node = self.nodes[0] 
+                    middle_node = self.nodes[0]
 
             branch_x_left = current_x - offset_x
             branch_y_left = current_y - offset_y
@@ -251,7 +251,7 @@ class Map(Scenario):
                 entity = node['entity']
                 entity.update_animation(self.dt)
                 shifted_rect = node['rect'].copy()
-                shifted_rect.y += self.branch_scroll_offset_y 
+                shifted_rect.y += self.branch_scroll_offset_y
                 entity.draw_at_position(screen, shifted_rect.center)
 
     def draw_ui(self, screen):
@@ -351,10 +351,12 @@ class Map(Scenario):
                     self.manager.map_scenario = self
                     self.manager.start_boss_battle(self, chosen_boss, index=boss_index)
 
-                    if boss_index == 3:
+                    print(boss_index)
+
+                    if boss_index in [2, 3]:
                         self.expand_map()
-  
-                    if boss_index == 5 and not self.expanded_once:
+
+                    if boss_index in [4, 5] and not self.expanded_once:
                         self.expand_map()
                         self.expanded_once = True
 
@@ -531,7 +533,7 @@ class Map(Scenario):
                     self.current_perk_frame += 1
                 else:
                     self.is_animating_perk = False
-        
+
         if self.manager.need_to_expand_map:
             self.expand_map()
             self.manager.need_to_expand_map = False
@@ -558,12 +560,12 @@ class Map(Scenario):
             on_click=on_click,
             text_color=text_color
         )
-    
+
     def get_last_middle_node_y(self):
         middle_nodes = [n for n in self.nodes if n['type'] == 'middle']
         if middle_nodes:
             return middle_nodes[-1]['rect'].y
-        return 830 
+        return 830
 
     def get_last_middle_node(self):
         for node in reversed(self.nodes):
@@ -579,7 +581,7 @@ class Map(Scenario):
 
         self.nodes = self.nodes[total_to_remove:]
 
-        self.branch_scroll_offset_y += 220  
+        self.branch_scroll_offset_y += 220
 
         last_y = self.get_last_middle_node_y()
         self.generate_branches(steps=1, start_x=930, start_y=last_y)

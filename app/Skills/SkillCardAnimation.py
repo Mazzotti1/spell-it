@@ -83,7 +83,7 @@ class SkillCardAnimation:
 
         if self.reveal_time and not self.end_battle_called:
             current_time = pygame.time.get_ticks()
-            if current_time - self.reveal_time >= 2500:
+            if current_time - self.reveal_time >= 4500:
                 self.manager.end_battle()
                 self.end_battle_called = True
 

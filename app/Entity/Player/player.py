@@ -24,7 +24,7 @@ class Player(Entity):
         })
 
         self.visible = True
-        
+
         self.skills = []
         self.all_acquired_skills = []
 
@@ -80,10 +80,10 @@ class Player(Entity):
         current_value = getter()
 
         if attribute in ['health']:
-            setter(current_value + 1)
+            setter(current_value + 10)
             return
 
-        bonus = random.uniform(0, lucky * 0.5)
+        bonus = random.uniform(0, lucky * 2)
         bonus_int = max(1, int(bonus))
 
         setter(current_value + bonus_int)
@@ -92,35 +92,35 @@ class Player(Entity):
         if self.get_health() <= 1:
             return
 
-        self.set_health(self.get_health() - 1)
+        self.set_health(self.get_health() - 8)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_lucky_for_attribute(self, attribute):
-        if self.get_lucky() <= 0.5:
+        if self.get_lucky() <= 4:
             return
 
-        self.set_lucky(self.get_lucky() - 0.5)
+        self.set_lucky(self.get_lucky() - 4)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_dodge_for_attribute(self, attribute):
-        if self.get_dodge() <= 0.5:
+        if self.get_dodge() <= 4:
             return
 
-        self.set_dodge(self.get_dodge() - 0.5)
+        self.set_dodge(self.get_dodge() - 4)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_critical_chance_for_attribute(self, attribute):
-        if self.get_critical_chance() <= 0.5:
+        if self.get_critical_chance() <= 3:
             return
 
-        self.set_critical_chance(self.get_critical_chance() - 0.5)
+        self.set_critical_chance(self.get_critical_chance() - 3)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def trade_strength_for_attribute(self, attribute):
-        if self.get_strength() <= 0.5:
+        if self.get_strength() <= 3:
             return
 
-        self.set_strength(self.get_strength() - 0.5)
+        self.set_strength(self.get_strength() - 3)
         self.calculate_attributes(attribute, self.get_lucky())
 
     def get_position(self):
@@ -164,7 +164,6 @@ class Player(Entity):
             lucky = self.get_lucky()
 
         if self.buff_atack_damage > 0:
-            print("bonus")
             random_bonus = random.randint(1, 3) * lucky
             strength = self.get_strength() + random_bonus
             self.buff_atack_damage -= 1
@@ -172,24 +171,27 @@ class Player(Entity):
             strength = self.get_strength()
 
         if self.buff_atack_speed > 0:
-            print("bonus")
             random_bonus = random.randint(1, 3) * lucky
-            atack_speed = self.get_attack_speed() + random_bonus
+            attack_speed = self.get_attack_speed() + random_bonus
             self.buff_atack_speed -= 1
         else:
-            atack_speed = self.get_attack_speed()
+            attack_speed = self.get_attack_speed()
 
-        hit_chance = min(1.0, max(0.0, atack_speed))
-        did_hit = random.random() < hit_chance
+        base_hit_chance = attack_speed / 100.0
+        hit_chance = base_hit_chance * self.get_lucky()
 
+        dodge_chance = (target.get_dodge() / 100.0)
+        final_hit_chance = min(1.0, max(0.0, hit_chance - dodge_chance))
+
+        did_hit = random.random() < final_hit_chance
         if not did_hit:
             return 0, False, target.is_alive(), False
 
-        final_crit_chance = min(1.0, self.get_critical_chance() * lucky)
+        final_crit_chance = min(1.0, (self.get_critical_chance() / 100.0) * lucky)
 
         if self.force_critical_hit:
             is_critical = True
-            self.force_critical_hit = False 
+            self.force_critical_hit = False
         else:
             is_critical = random.random() < final_crit_chance
 
@@ -198,7 +200,6 @@ class Player(Entity):
             damage = double_strength * hit_bonus
             self.double_damage = False
         elif self.is_mime_hit:
-            print("mimetismo")
             damage = self.mime_damage * hit_bonus
             self.is_mime_hit = False
             self.mime_damage = None
@@ -212,18 +213,19 @@ class Player(Entity):
         target_alive = target.is_alive()
 
         return damage, is_critical, target_alive, True
-    
+
     def recieveBossReward(self):
         bonus_health = random.randint(5, 10)
-        bonus_strength = round(random.uniform(0.2, 0.5), 2)
-        bonus_attack_speed = round(random.uniform(0.05, 0.1), 2)
-        bonus_dodge = round(random.uniform(0.01, 0.03), 2)
-        bonus_critical = round(random.uniform(0.01, 0.03), 2)
-        bonus_lucky = round(random.uniform(0.01, 0.03), 2)
+        bonus_strength = random.randint(2, 6)
+        bonus_attack_speed = random.randint(2, 6)
+        bonus_dodge = random.randint(2, 6)
+        bonus_critical = random.randint(2, 6)
+        bonus_lucky = random.randint(2, 6)
 
         self.set_health(self.get_health() + bonus_health)
         self.attributes.strength += bonus_strength
         self.attributes.attack_speed += bonus_attack_speed
-        self.attributes.dodge = min(self.attributes.dodge + bonus_dodge, 0.5)
-        self.attributes.critical_chance = min(self.attributes.critical_chance + bonus_critical, 0.5)
+
+        self.attributes.dodge = min(self.attributes.dodge + bonus_dodge, 50)
+        self.attributes.critical_chance = min(self.attributes.critical_chance + bonus_critical, 50)
         self.attributes.lucky += bonus_lucky

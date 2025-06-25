@@ -34,7 +34,7 @@ jacare
 arara
 capivara
 sucuri
-piúva
+piuva
 pirarucu
 onça
 garça
