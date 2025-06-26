@@ -21,13 +21,13 @@ class Map(Scenario):
 
         self.font_title = Utils.scaled_font(
             path='../assets/fonts/CrimsonPro-VariableFont_wght.ttf',
-            base_size=24,
+            base_size=26,
             scale_y=self.manager.scale_y
         )
 
         self.font_desc = Utils.scaled_font(
             path='../assets/fonts/CrimsonPro-VariableFont_wght.ttf',
-            base_size=18,
+            base_size=22,
             scale_y=self.manager.scale_y
         )
 

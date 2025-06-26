@@ -2,7 +2,7 @@ import pygame
 from Utils.menu_button import MenuButton
 from Utils.confirm_dialog import ConfirmDialog
 from Utils.text_button import TextButton
-
+from Utils.utils import Utils
 class SettingsDialog:
     def __init__(self, color, position, size, text, text_size=36, font=None, radius=15):
         self.color = color

@@ -24,13 +24,18 @@ class Scenario:
         
         self.is_menu_open = False
 
+        self.font = Utils.scaled_font(
+            path="../assets/fonts/VT323-Regular.ttf",
+            base_size=30,
+        )
+
         self.settings_dialog = SettingsDialog(
             color='gray',
             position=(650, 120),
             size=(600, 800),
             text="Configurações",
             text_size=36,
-            font=None,
+            font=self.font,
             radius=10
         )
 
@@ -41,7 +46,7 @@ class Scenario:
             size=(400, 200),
             text="Opções",
             text_size=36,
-            font=None,
+            font=self.font,
             radius=10,
             settings_dialog=self.settings_dialog,
         )

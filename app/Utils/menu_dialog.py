@@ -1,7 +1,6 @@
 import pygame
 from Utils.menu_button import MenuButton
 from Utils.confirm_dialog import ConfirmDialog
-from Utils.settings_dialog import SettingsDialog
 
 class MenuDialog:
     def __init__(self, manager, color, position, size, text, text_size=36, font=None, radius=15, settings_dialog=None):
@@ -9,7 +8,7 @@ class MenuDialog:
         self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
         self.text = text
         self.text_color = 'white'
-        self.font = pygame.font.Font(font, text_size)
+        self.font = font
         self.radius = radius
         self.position = position
         self.size = size

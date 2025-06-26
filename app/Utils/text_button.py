@@ -25,7 +25,7 @@ class TextButton:
 
         self.font_text = Utils.scaled_font(
             path=None,
-            base_size=16,
+            base_size=24,
             scale_y=self.scale_y
         )
 

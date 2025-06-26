@@ -58,6 +58,12 @@ class App:
                             self.manager.current_scenario.settings_dialog.cancel()
                             continue
 
+                if hasattr(self.manager.current_scenario, 'how_to_play_dialog'):
+                    if self.manager.current_scenario.how_to_play_dialog.visible:
+                        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                            self.manager.current_scenario.how_to_play_dialog.visible = False
+                            continue
+
                 if getattr(self.manager.current_scenario, 'is_menu_open', False):
                         if getattr(self.manager.current_scenario, 'allow_pause_menu', True):
                             menu = self.manager.current_scenario.menu

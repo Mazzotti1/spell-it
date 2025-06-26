@@ -46,7 +46,7 @@ class ConfirmDialog:
 
         self.font_message = Utils.scaled_font(
             path=None,
-            base_size=22,
+            base_size=26,
             scale_y=self.scale_y
         )
 
