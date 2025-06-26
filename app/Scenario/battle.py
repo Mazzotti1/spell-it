@@ -12,8 +12,6 @@ from Effects.punish_animation import PunishAnimation
 from Skills.SkillCardAnimation import SkillCardAnimation
 import random
 
-##Balancear tudo -> não dar atributos floats
-
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy, player_final_x, player_final_y, isBossBattle=False, isLastBattle=False):
         super().__init__(manager),
@@ -133,8 +131,9 @@ class Battle(Scenario):
 
     def draw_ui(self, screen):
         if not self.manager.player.moving:
-            for btn in self.buttons:
-                btn.draw(screen)
+            #debugzinho
+            # for btn in self.buttons:
+            #     btn.draw(screen)
             self.draw_menu(screen)
             self.interface.draw_input_box(screen)
             self.interface.draw_popup(screen)
@@ -217,12 +216,12 @@ class Battle(Scenario):
 
                     if not did_hit:
                         image = self.dodge_img
-                        pos = (self.enemy.x, self.enemy.y - 100)
+                        pos = (self.enemy.x + 50, self.enemy.y - 100)
                         self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
                         self.turn_transition_delay = 0.8
                     else:
                         damage = damage
-                        pos = (self.enemy.x + 100, self.enemy.y - 80)
+                        pos = (self.enemy.x + 50, self.enemy.y + 100)
 
                         color = (255, 215, 0) if is_critical else (255, 0, 0)
                         self.floating_texts.append(FloatingText(str(damage), pos, color, self.font, duration=1.0))
@@ -275,12 +274,12 @@ class Battle(Scenario):
                     damage, is_critical, enemy_alive, did_hit = self.manager.player.attack(self.enemy, 3)
                     if not did_hit:
                         image = self.dodge_img
-                        pos = (self.enemy.x, self.enemy.y - 100)
+                        pos = (self.enemy.x + 50, self.enemy.y - 100)
                         self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
                         self.turn_transition_delay = 0.8
                     else:
                         damage = damage
-                        pos = (self.enemy.x + 100, self.enemy.y - 80)
+                        pos = (self.enemy.x + 50, self.enemy.y - 100)
 
                         color = (255, 215, 0) if is_critical else (255, 0, 0)
                         self.floating_texts.append(FloatingText(str(damage), pos, color, self.font, duration=1.0))
@@ -796,12 +795,12 @@ class Battle(Scenario):
 
             if result["did_dodge"]:
                 image = self.dodge_img
-                pos = (self.manager.player.x, self.manager.player.y - 100)
+                pos = (self.manager.player.x - 200, self.manager.player.y - 200)
                 self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
                 self.turn_transition_delay = 0.8
             else:
                 damage = result["damage"]
-                pos = (self.manager.player.x + 100, self.manager.player.y - 80)
+                pos = (self.manager.player.x - 200, self.manager.player.y - 200)
 
                 color = (255, 215, 0) if result["is_critical"] else (255, 0, 0)
                 self.floating_texts.append(FloatingText(str(damage), pos, color, self.font, duration=1.0))
@@ -833,12 +832,12 @@ class Battle(Scenario):
 
             if not did_hit:
                 image = self.dodge_img
-                pos = (self.enemy.x, self.enemy.y - 100)
+                pos = (self.enemy.x + 50, self.enemy.y - 100)
                 self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
                 self.turn_transition_delay = 0.8
             else:
                 damage = damage
-                pos = (self.enemy.x + 100, self.enemy.y - 80)
+                pos = (self.enemy.x + 50, self.enemy.y - 100)
 
                 color = (255, 215, 0) if is_critical else (255, 0, 0)
                 self.floating_texts.append(FloatingText(str(damage), pos, color, self.font, duration=1.0))

@@ -266,27 +266,36 @@ class Enemy(Entity):
             dodge = target.get_dodge() * 4
             self.player_recieve_lucky -= 1
         else:
-            dodge = target.get_dodge()
+            dodge = (target.get_dodge() / 100.0)
 
-        dodge_chance = min(1.0, self.get_lucky() * (dodge / 100.0))
-        print(dodge_chance)
+        base_hit_chance = self.get_attack_speed() / 100.0
+        hit_chance = base_hit_chance * self.get_lucky()
+
+        final_hit_chance = min(1.0, max(0.0, hit_chance - dodge))
+
         if self.forced_miss_turns > 0:
-            did_dodge = True
+            did_hit = False
             self.forced_miss_turns -= 1
         else:
-            did_dodge = random.random() < dodge_chance
+            did_hit = random.random() < final_hit_chance
 
-        if not did_dodge:
-            target.set_health(max(0, target.get_health() - damage))
-
-        target_alive = target.is_alive()
-
+        if not did_hit:
+            return {
+                "damage": 0,
+                "is_critical": is_critical,
+                "did_dodge": True,
+                "target_alive": target.is_alive()
+            }
+          
+        target.set_health(max(0, target.get_health() - damage))
+        
         return {
-            "damage": 0 if did_dodge else damage,
+            "damage": damage,
             "is_critical": is_critical,
-            "did_dodge": did_dodge,
-            "target_alive": target_alive
+            "did_dodge": False,
+            "target_alive": target.is_alive()
         }
+
 
     def punish(self):
         self.punish_effects.clear()

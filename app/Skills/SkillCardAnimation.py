@@ -107,7 +107,7 @@ class SkillCardAnimation:
             self.dice_animation.draw(surface)
 
     def get_unique_skill(self):
-        owned_names = {skill.get_name() for skill in self.player.skills}
+        owned_names = {skill.get_name() for skill in self.player.all_acquired_skills}
         available = [name for name in self.skill_names if name not in owned_names]
 
         if not available:

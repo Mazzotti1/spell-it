@@ -123,11 +123,11 @@ class ScenarioManager:
         self.player.current_frames = self.player.idle_frames
 
         new_attributes = Attributes(
-            dodge=20.0,
-            attack_speed=60.0,
+            dodge=10.0,
+            attack_speed=71.0,
             strength=5.0,
-            health=50,
-            lucky=1.5,
+            health=70,
+            lucky=1.2,
             critical_chance=20.0,
             max_health=50
         )
@@ -140,10 +140,10 @@ class ScenarioManager:
         idx = index + 1
         return Attributes(
             dodge=min(10 + 2 * idx, 50),
-            attack_speed=20 + idx * 2,
+            attack_speed=65 + idx * 2,
             strength=2 + idx * 2,
             health=5 + idx * 20,
-            lucky=1 + idx * 2,
+            lucky=1.2,
             critical_chance=min(5 + 2 * idx, 50),
             max_health=5 + idx * 20,
         )
@@ -152,10 +152,10 @@ class ScenarioManager:
         idx = index + 1
         return Attributes(
             dodge=min(10 + 2 * idx, 50),
-            attack_speed=20 + idx * 2,
+            attack_speed=65 + idx * 2,
             strength=4 + idx * 2,
-            health=50 + idx * 10,
-            lucky=1 + idx * 2,
+            health=65 + idx * 10,
+            lucky=1.2,
             critical_chance=min(10 + 2 * idx, 50),
-            max_health=50 + idx * 10,
+            max_health=65 + idx * 10,
         )

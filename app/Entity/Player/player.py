@@ -80,7 +80,7 @@ class Player(Entity):
         current_value = getter()
 
         if attribute in ['health']:
-            setter(current_value + 10)
+            setter(current_value + 20)
             return
 
         bonus = random.uniform(0, lucky * 2)
@@ -215,17 +215,15 @@ class Player(Entity):
         return damage, is_critical, target_alive, True
 
     def recieveBossReward(self):
-        bonus_health = random.randint(5, 10)
-        bonus_strength = random.randint(2, 6)
-        bonus_attack_speed = random.randint(2, 6)
-        bonus_dodge = random.randint(2, 6)
-        bonus_critical = random.randint(2, 6)
-        bonus_lucky = random.randint(2, 6)
+        bonus_health = random.randint(5, 20)
+        bonus_strength = random.randint(1, 3)
+        bonus_attack_speed = random.randint(1, 3)
+        bonus_dodge = random.randint(1,3)
+        bonus_critical = random.randint(1, 5)
 
         self.set_health(self.get_health() + bonus_health)
-        self.attributes.strength += bonus_strength
-        self.attributes.attack_speed += bonus_attack_speed
+        self.attributes.strength = min(self.attributes.strength + bonus_strength, 15)
+        self.attributes.attack_speed = min(self.attributes.attack_speed + bonus_attack_speed, 82)
 
         self.attributes.dodge = min(self.attributes.dodge + bonus_dodge, 50)
         self.attributes.critical_chance = min(self.attributes.critical_chance + bonus_critical, 50)
-        self.attributes.lucky += bonus_lucky
