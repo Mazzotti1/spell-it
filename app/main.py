@@ -12,7 +12,8 @@ class App:
         pygame.init()
         pygame.display.set_caption("Menu")
 
-        self.screen = pygame.display.set_mode((1920, 1080))
+        self.screen = pygame.display.set_mode((1920, 1080), pygame.SCALED)
+
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -27,7 +28,10 @@ class App:
         )
         self.player = PlayerFactory.create_player(-100, 750, attributes)
 
-        self.manager = ScenarioManager(self.player)
+        scale_x = self.screen.get_width() / 1920
+        scale_y = self.screen.get_height() / 1080
+
+        self.manager = ScenarioManager(self.player, scale_x, scale_y)
         self.manager.change_scenario(MainMenu(self.manager, self.player))
 
     def run(self):
@@ -91,6 +95,12 @@ class App:
                             settings_dialog.unsaved_changes_dialog.handle_event(event)
                         elif settings_dialog.save_confirm_dialog.visible:
                             settings_dialog.save_confirm_dialog.handle_event(event)
+                        continue
+
+                if hasattr(self.manager.current_scenario, 'how_to_play_dialog'):
+                    how_to_play_dialog = self.manager.current_scenario.how_to_play_dialog
+                    if how_to_play_dialog.visible:
+                        how_to_play_dialog.handle_event(event)
                         continue
 
             self.manager.update()

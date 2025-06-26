@@ -5,7 +5,10 @@ class Button:
                  text_color="black", text_size=36, font=None, radius=15, hover_color=None):
         self.color = color
         self.base_color = color
-        self.hover_color = (min(color[0] + 40, 255), min(color[1] + 40, 255), min(color[2] + 40, 255)) if color else hover_color 
+        if isinstance(color, tuple) and len(color) == 3:
+            self.hover_color = tuple(min(c + 40, 255) for c in color)
+        else:
+            self.hover_color = hover_color
         self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
         self.text = text
         self.text_color = text_color

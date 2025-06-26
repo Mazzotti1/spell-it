@@ -5,7 +5,7 @@ from Factory.enemyFactory import EnemyFactory
 from Factory.playerFactory import PlayerFactory
 from Scenario.main_menu import MainMenu
 class ScenarioManager:
-    def __init__(self, player):
+    def __init__(self, player, scale_x, scale_y):
         self.current_scenario = None
         self.battle_scenario = None
         self.in_battle = False
@@ -15,6 +15,9 @@ class ScenarioManager:
         self.player_final_x = 420
         self.player_final_y = 750
         self.need_to_expand_map = False
+
+        self.scale_x = scale_x
+        self.scale_y = scale_y
 
     def change_scenario(self, new_scenario):
         self.current_scenario = new_scenario

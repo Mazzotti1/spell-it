@@ -5,6 +5,7 @@ from Utils.button import Button
 from Scenario.map import Map
 from Utils.confirm_dialog import ConfirmDialog
 from Utils.settings_dialog import SettingsDialog
+from Utils.how_to_play_dialog import HowToPlayDialog
 
 class MainMenu(Scenario):
     def __init__(self, manager, player):
@@ -17,8 +18,16 @@ class MainMenu(Scenario):
         self.font = pygame.font.SysFont(None, 64)
 
         self.buttons_font = pygame.font.Font("../assets/fonts/VT323-Regular.ttf", 64)
+        self.how_to_play_font = pygame.font.Font("../assets/fonts/VT323-Regular.ttf", 30)
 
         self.background_image = pygame.image.load('../assets/scene/menu/main_menu.png').convert_alpha()
+        self.background_image = pygame.transform.scale(
+            self.background_image,
+            (int(self.background_image.get_width() * self.manager.scale_x),
+            int(self.background_image.get_height() * self.manager.scale_y))
+        )
+
+        
         self.player_back_idle_sheet = pygame.image.load('../assets/scene/menu/player_back_idle.png').convert_alpha() #3 frames
 
         self.player_frame_width = self.player_back_idle_sheet.get_width() // 3
@@ -50,7 +59,17 @@ class MainMenu(Scenario):
             size=(600, 800),
             text="Configurações",
             text_size=36,
-            font=None,
+            font=self.how_to_play_font,
+            radius=10
+        )
+
+        self.how_to_play_dialog = HowToPlayDialog(
+            color='gray',
+            position=(650, 120),
+            size=(900, 800),
+            text="Como jogar?",
+            text_size=36,
+            font=self.how_to_play_font,
             radius=10
         )
 
@@ -89,10 +108,12 @@ class MainMenu(Scenario):
             btn.draw(screen)
         self.confirm_dialog.draw(screen)
         self.settings_dialog.draw(screen)
+        self.how_to_play_dialog.draw(screen)
 
     def handle_buttons_event(self, event):
         for btn in self.menu_buttons:
-            btn.handle_event(event)
+            if not self.how_to_play_dialog.visible:
+                btn.handle_event(event)
 
     def exit_game(self):
         if not self.confirm_dialog.visible and not self.settings_dialog.visible:
@@ -110,7 +131,7 @@ class MainMenu(Scenario):
             self.manager.change_scenario(Map(self.manager, "../assets/scene/map/hd_m/map_1.png", self.player))
          
     def open_settings(self):
-        if not self.confirm_dialog.visible and not self.settings_dialog.visible:
+        if not self.confirm_dialog.visible and not self.settings_dialog.visible and not self.how_to_play_dialog.visible:
             self.settings_dialog.visible = True
 
     def update(self):
@@ -120,4 +141,5 @@ class MainMenu(Scenario):
             self.idle_frame_timer = 0
 
     def how_to_play(self):
-        pass
+        if not self.how_to_play_dialog.visible:
+            self.how_to_play_dialog.visible = True

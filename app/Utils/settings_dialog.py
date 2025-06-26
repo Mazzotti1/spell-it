@@ -9,7 +9,7 @@ class SettingsDialog:
         self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
         self.text = text
         self.text_color = 'white'
-        self.font = pygame.font.Font(font, text_size)
+        self.font = font
         self.radius = radius
         self.position = position
         self.size = size
@@ -51,7 +51,10 @@ class SettingsDialog:
         )
 
         self.CONTROL_COMMANDS = {
-            'Menu em jogo': 'ESC'
+            'Menu em jogo': 'ESC',
+            'Enviar palavras': 'ENTER',
+            'Ativar habilidade': 'MOUSE 1',
+            'Ler Habilidade': 'HOVER na habilidade',
         }
 
         save_pos = (
