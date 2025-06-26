@@ -12,7 +12,7 @@ class App:
         pygame.init()
         pygame.display.set_caption("Menu")
 
-        self.screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN | pygame.SCALED)
 
         self.clock = pygame.time.Clock()
         self.running = True

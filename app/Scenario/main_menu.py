@@ -20,7 +20,7 @@ class MainMenu(Scenario):
 
         self.buttons_font = Utils.scaled_font(
             path="../assets/fonts/VT323-Regular.ttf",
-            base_size=124,
+            base_size=60,
             scale_y=self.manager.scale_y
         )
 
@@ -31,11 +31,7 @@ class MainMenu(Scenario):
         )
 
         self.background_image = pygame.image.load('../assets/scene/menu/main_menu.png').convert_alpha()
-        # self.background_image = Utils.scaled_image(
-        #     self.background_image,
-        #     self.manager.scale_x,
-        #     self.manager.scale_y
-        # )
+
         self.player_back_idle_sheet = pygame.image.load('../assets/scene/menu/player_back_idle.png').convert_alpha() #3 frames
 
         self.player_frame_width = self.player_back_idle_sheet.get_width() // 3
