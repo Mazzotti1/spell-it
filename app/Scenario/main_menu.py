@@ -16,10 +16,23 @@ class MainMenu(Scenario):
         self.enable_solids = False
         self.font = pygame.font.SysFont(None, 64)
 
+        self.buttons_font = pygame.font.Font("../assets/fonts/VT323-Regular.ttf", 64)
+
+        self.background_image = pygame.image.load('../assets/scene/menu/main_menu.png').convert_alpha()
+        self.player_back_idle_sheet = pygame.image.load('../assets/scene/menu/player_back_idle.png').convert_alpha() #3 frames
+
+        self.player_frame_width = self.player_back_idle_sheet.get_width() // 3
+        self.player_frame_height = self.player_back_idle_sheet.get_height()
+
+        self.idle_frame_index = 0
+        self.idle_frame_timer = 0
+        self.idle_frame_delay = 200 
+        
         self.menu_buttons = [
-            self.create_button("Iniciar", "green", (900, 410), (130, 50), self.start_game),
-            self.create_button("Opções", "orange", (900, 510), (130, 50), self.open_settings),
-            self.create_button("Sair", "red", (900, 610), (130, 50), self.exit_game, text_color="white"),
+            self.create_button("Iniciar", None, (1250, 260), (150, 50), self.start_game),
+            self.create_button("Como jogar", None, (1250, 360), (150, 50), self.how_to_play),
+            self.create_button("Opções", None, (1250, 460), (150, 50), self.open_settings),
+            self.create_button("Sair", None, (1250, 560), (150, 50), self.exit_game),
         ]
 
         self.confirm_dialog = ConfirmDialog(
@@ -48,11 +61,27 @@ class MainMenu(Scenario):
             size=size,
             text=text,
             on_click=on_click,
-            text_color=text_color
+            text_color=text_color,
+            font=self.buttons_font
         )
 
     def draw_background(self, screen):
-        screen.fill((15, 15, 15))
+        screen.blit(self.background_image, (0, 0))
+
+        frame_rect = pygame.Rect(
+            self.idle_frame_index * self.player_frame_width,
+            0,
+            self.player_frame_width,
+            self.player_frame_height
+        )
+        frame = self.player_back_idle_sheet.subsurface(frame_rect)
+
+        scaled_frame = pygame.transform.scale(
+            frame,
+            (self.player_frame_width // 2, self.player_frame_height // 2)
+        )
+
+        screen.blit(scaled_frame, (100, screen.get_height() - scaled_frame.get_height() - 50))
 
     def draw_ui(self, screen):
         for btn in self.menu_buttons:
@@ -82,3 +111,12 @@ class MainMenu(Scenario):
     def open_settings(self):
         if not self.confirm_dialog.visible and not self.settings_dialog.visible:
             self.settings_dialog.visible = True
+
+    def update(self):
+        self.idle_frame_timer += self.manager.dt
+        if self.idle_frame_timer >= self.idle_frame_delay:
+            self.idle_frame_index = (self.idle_frame_index + 1) % 3
+            self.idle_frame_timer = 0
+
+    def how_to_play(self):
+        pass

@@ -7,14 +7,16 @@ class Button:
         self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
         self.text = text
         self.text_color = text_color
-        self.font = pygame.font.Font(font, text_size)
+        self.font = font
         self.radius = radius
         self.on_click = on_click
         self.position = position
         self.size = size
 
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect, border_radius=self.radius)
+        if self.color is not None:
+            pygame.draw.rect(screen, self.color, self.rect, border_radius=self.radius)
+
         surface_text = self.font.render(self.text, True, self.text_color)
         rect_text = surface_text.get_rect(center=(self.position[0] + self.size[0] // 2, self.position[1] + self.size[1] // 2))
         screen.blit(surface_text, rect_text)
