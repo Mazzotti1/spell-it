@@ -12,7 +12,7 @@ class App:
         pygame.init()
         pygame.display.set_caption("Menu")
 
-        self.screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN | pygame.SCALED)
+        self.screen = pygame.display.set_mode((1920, 1080), pygame.SCALED)
 
         self.clock = pygame.time.Clock()
         self.running = True
@@ -33,6 +33,7 @@ class App:
         real_height = display_info.current_h
 
         print(f"Real Width: {real_width}, Real Height: {real_height}")
+
         scale_x = real_height / 1920
         scale_y = real_height / 1080
 

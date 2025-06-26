@@ -957,7 +957,7 @@ class Battle(Scenario):
 
     def end_game_animation(self, screen, player, title):
         overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 180))
+        overlay.fill((0, 0, 0, 210))
         screen.blit(overlay, (0, 0))
 
         title_font = pygame.font.SysFont("arial", 60, bold=True)

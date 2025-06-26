@@ -97,11 +97,11 @@ class Map(Scenario):
 
         self.is_start_map_animating = True
         self.map_animation_sheet = pygame.image.load('../assets/scene/map/animation/open_map_animation.png').convert_alpha()
-        self.map_animation_sheet = pygame.transform.scale(
-            self.map_animation_sheet,
-            (int(self.map_animation_sheet.get_width() * self.manager.scale_x),
-            int(self.map_animation_sheet.get_height() * self.manager.scale_y))
-        )
+        # self.map_animation_sheet = pygame.transform.scale(
+        #     self.map_animation_sheet,
+        #     (int(self.map_animation_sheet.get_width() * self.manager.scale_x),
+        #     int(self.map_animation_sheet.get_height() * self.manager.scale_y))
+        # )
 
 
         self.frame_book_map_width = 744

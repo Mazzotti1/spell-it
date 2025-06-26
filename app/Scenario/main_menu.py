@@ -1,7 +1,7 @@
 import pygame
 from Scenario.scenario import Scenario
 from Scenario.battle import Battle
-from Utils.button import Button
+from Utils.menu_button_hover import MenuButtonHover
 from Scenario.map import Map
 from Utils.confirm_dialog import ConfirmDialog
 from Utils.settings_dialog import SettingsDialog
@@ -74,7 +74,7 @@ class MainMenu(Scenario):
         )
 
     def create_button(self, text, color, position, size, on_click, text_color="black"):
-        return Button(
+        return MenuButtonHover(
             color=color,
             position=position,
             size=size,

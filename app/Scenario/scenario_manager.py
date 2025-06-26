@@ -144,7 +144,7 @@ class ScenarioManager:
         return Attributes(
             dodge=min(10 + 2 * idx, 50),
             attack_speed=65 + idx * 2,
-            strength=2 + idx * 2,
+            strength=200 + idx * 2,
             health=5 + idx * 20,
             lucky=1.2,
             critical_chance=min(5 + 2 * idx, 50),
