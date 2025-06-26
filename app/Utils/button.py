@@ -1,5 +1,5 @@
 import pygame
-
+from Utils.utils import Utils
 class Button:
     def __init__(self, color, position, size, text, on_click=None,
                  text_color="black", text_size=36, font=None, radius=15):
@@ -7,8 +7,20 @@ class Button:
         self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
         self.text = text
         self.text_color = text_color
+
+        display_info = pygame.display.Info()
+        real_width = display_info.current_w
+        real_height = display_info.current_h
+
+        self.scale_x = real_width / 1920
+        self.scale_y = real_height / 1080
+
         if font is None:
-            self.font = pygame.font.SysFont(None, text_size) 
+            self.font = Utils.scaled_font(
+                path=None,
+                base_size=text_size,
+                scale_y=self.scale_y
+            )
         else:
             self.font = font
         self.radius = radius

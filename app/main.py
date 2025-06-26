@@ -32,7 +32,7 @@ class App:
         real_width = display_info.current_w
         real_height = display_info.current_h
 
-        scale_x = real_height / 1920
+        scale_x = real_width / 1920
         scale_y = real_height / 1080
 
         self.manager = ScenarioManager(self.player, scale_x, scale_y)

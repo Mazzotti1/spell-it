@@ -15,8 +15,12 @@ class MainMenu(Scenario):
         self.player = player
         self.enable_ground = False
         self.enable_solids = False
-        self.font = pygame.font.SysFont(None, 64)
-        
+
+        self.font = Utils.scaled_font(
+            path=None,
+            base_size=64,
+            scale_y=self.manager.scale_y
+        )
 
         self.buttons_font = Utils.scaled_font(
             path="../assets/fonts/VT323-Regular.ttf",

@@ -11,7 +11,7 @@ from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
 from Skills.SkillCardAnimation import SkillCardAnimation
 import random
-
+from Utils.utils import Utils
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy, player_final_x, player_final_y, isBossBattle=False, isLastBattle=False):
         super().__init__(manager),
@@ -35,7 +35,12 @@ class Battle(Scenario):
         self.player_turn_ended = False
         self.enemy_turn_ended = False
 
-        self.font = pygame.font.SysFont(None, 64)
+        self.font = Utils.scaled_font(
+            path=None,
+            base_size=64,
+            scale_y=self.manager.scale_y
+        )
+
         self.critical_img = pygame.image.load("../assets/effects/hits/critical.png").convert_alpha()
         self.dodge_img = pygame.image.load("../assets/effects/hits/dodge.png").convert_alpha()
 
@@ -960,9 +965,24 @@ class Battle(Scenario):
         overlay.fill((0, 0, 0, 210))
         screen.blit(overlay, (0, 0))
 
-        title_font = pygame.font.SysFont("arial", 60, bold=True)
-        stats_font = pygame.font.SysFont("arial", 30)
-        footer_font = pygame.font.SysFont("arial", 20, italic=True)
+        title_font = Utils.scaled_font(
+            path=None,
+            base_size=60,
+            scale_y=self.manager.scale_y,
+            bold=True
+        )
+
+        stats_font = Utils.scaled_font(
+            path=None,
+            base_size=30,
+            scale_y=self.manager.scale_y,
+        )
+       
+        footer_font = Utils.scaled_font(
+            path=None,
+            base_size=20,
+            scale_y=self.manager.scale_y,
+        )
 
         victory_text = title_font.render(title, True, (255, 255, 255))
         congrats_text = stats_font.render("Você chegou ao fim da jornada! Veja seus atributos finais", True, (255, 255, 255))

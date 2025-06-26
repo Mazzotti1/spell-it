@@ -17,8 +17,19 @@ class Map(Scenario):
         self.enable_ui = True
         self.in_battle = False
         self.is_choosing_perk = False
-        self.font_title = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 24)
-        self.font_desc = pygame.font.Font('../assets/fonts/CrimsonPro-VariableFont_wght.ttf', 18)
+
+
+        self.font_title = Utils.scaled_font(
+            path='../assets/fonts/CrimsonPro-VariableFont_wght.ttf',
+            base_size=24,
+            scale_y=self.manager.scale_y
+        )
+
+        self.font_desc = Utils.scaled_font(
+            path='../assets/fonts/CrimsonPro-VariableFont_wght.ttf',
+            base_size=18,
+            scale_y=self.manager.scale_y
+        )
 
         self.load_background(background)
 

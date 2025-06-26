@@ -37,7 +37,11 @@ class Utils:
         return name
     
     @staticmethod
-    def scaled_font(path: str, base_size: int, scale_y: float, min_size: int = 16) -> pygame.font.Font:
+    def scaled_font(path: str, base_size: int, scale_y: float = 0, min_size: int = 16, bold: bool = False) -> pygame.font.Font:
+        display_info = pygame.display.Info()
+        real_height = display_info.current_h
+        scale_y = real_height / 1080
+
         final_size = int(max(min_size, base_size * scale_y))
         return pygame.font.Font(path, final_size)
 

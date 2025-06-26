@@ -4,7 +4,7 @@ from Utils.time_bar import TimerBar
 import math
 from Utils.hit_bar import HitBar
 import time
-
+from Utils.utils import Utils
 class Interface:
     def __init__(self, player, pre_combat_time = 30, turn_time=15, punishment_time=5):
         self.player = player
@@ -22,11 +22,31 @@ class Interface:
 
         self.input_active = True
         self.input_text = ""
-        self.input_font = pygame.font.SysFont(None, 48)
+
+        display_info = pygame.display.Info()
+        real_width = display_info.current_w
+        real_height = display_info.current_h
+
+        scale_x = real_width / 1920
+        scale_y = real_height / 1080
+
+        self.scale_y = scale_y
+
+        self.input_font = Utils.scaled_font(
+            path=None,
+            base_size=48,
+            scale_y=scale_y
+        )
 
         self.popup_error_message = None
         self.popup_time_remaining = 0
-        self.popup_font = pygame.font.SysFont(None, 36)
+
+        self.popup_font = Utils.scaled_font(
+            path=None,
+            base_size=36,
+            scale_y=scale_y
+        )
+
         self.popup_priority = 0
 
         self.skill_rects = []
@@ -38,7 +58,14 @@ class Interface:
         self.boss_bar_y_start = 170
         self.boss_bar_current_width = 0
         self.boss_bar_full_width = 600
-        self.boss_bar_font = pygame.font.SysFont("arial", 26, bold=True)
+
+        self.boss_bar_font = Utils.scaled_font(
+            path=None,
+            base_size=26,
+            scale_y=scale_y,
+            bold=True
+        )
+
         self.boss_displayed_health = None
 
     def draw_health_bar(self, screen):
@@ -58,7 +85,12 @@ class Interface:
         pygame.draw.rect(screen, (212, 213, 214), container_rect, border_radius=5)
         pygame.draw.rect(screen, (255, 255, 255), container_rect, 2, border_radius=5)
 
-        font = pygame.font.SysFont(None, 24)
+        font = Utils.scaled_font(
+            path=None,
+            base_size=24,
+            scale_y=self.scale_y
+        )
+
         text_surface = font.render("Vidas", True, (255, 255, 255))
         text_x = 40
         text_y = container_y - 20
@@ -96,7 +128,12 @@ class Interface:
         pygame.draw.rect(screen, (212, 213, 214), container_rect, border_radius=5)
         pygame.draw.rect(screen, (255, 255, 255), container_rect, 2, border_radius=5)
 
-        font = pygame.font.SysFont(None, 24)
+        font = Utils.scaled_font(
+            path=None,
+            base_size=24,
+            scale_y=self.scale_y
+        )
+
         text_surface = font.render("Habilidades", True, (255, 255, 255))
         text_x = container_x
         text_y = container_y - 20

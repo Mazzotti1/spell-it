@@ -1,6 +1,6 @@
 
 import pygame
-
+from Utils.utils import Utils
 
 class HitBar:
     def __init__(self, total_hits, title="Acertos"):
@@ -40,6 +40,11 @@ class HitBar:
 
         pygame.draw.rect(screen, (255, 255, 255), (x, y, width, height), 2, border_radius=5)
 
+        title_font = Utils.scaled_font(
+            path=None,
+            base_size=24,
+        )
+        
         title_font = pygame.font.SysFont(None, 24)
         title_surface = title_font.render(self.title, True, (255, 255, 255))
         title_rect = title_surface.get_rect(center=(x + width // 2, y - 20))

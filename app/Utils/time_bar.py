@@ -1,6 +1,6 @@
 import time
 import pygame
-
+from Utils.utils import Utils
 class TimerBar:
     def __init__(self, total_time, title, color=(200, 50, 50)):
         self.total_time = total_time
@@ -9,6 +9,12 @@ class TimerBar:
         self.title = title
         self.color = color
         self.is_visible = True
+        display_info = pygame.display.Info()
+        real_width = display_info.current_w
+        real_height = display_info.current_h
+
+        self.scale_x = real_width / 1920
+        self.scale_y = real_height / 1080
 
     def update(self, playerIsMoving=True):
         if not playerIsMoving:
@@ -38,12 +44,20 @@ class TimerBar:
 
         pygame.draw.rect(screen, (255, 255, 255), (x, y, width, height), 2, border_radius=5)
 
-        font = pygame.font.SysFont(None, 22)
+        font = Utils.scaled_font(
+            path=None,
+            base_size=22,
+            scale_y=self.scale_y
+        )
         if show_time:
             time_surface = font.render(f"{int(self.current_time)} Segundos", True, (255, 255, 255))
             screen.blit(time_surface, (x + width + 10, y + 3))
 
-        title_font = pygame.font.SysFont(None, 24)
+        title_font = Utils.scaled_font(
+            path=None,
+            base_size=24,
+            scale_y=self.scale_y
+        )
         title_surface = title_font.render(self.title, True, (255, 255, 255))
         title_rect = title_surface.get_rect(center=(x + width // 2, y - 20))
         screen.blit(title_surface, title_rect)

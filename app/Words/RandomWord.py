@@ -2,6 +2,7 @@ import pygame
 import random
 import string
 import time
+from Utils.utils import Utils
 
 class RandomWord:
     def __init__(self, screen_size, text=None, x=None, y=None, lifetime=5, style=None):
@@ -13,24 +14,47 @@ class RandomWord:
 
         self.style = style if style is not None else random.choice([0, 1, 2])
 
+        display_info = pygame.display.Info()
+        real_width = display_info.current_w
+        real_height = display_info.current_h
+
+        self.scale_x = real_width / 1920
+        self.scale_y = real_height / 1080
+
         if self.style == 0:
             self.color = (255, 255, 255)
-            self.font = pygame.font.SysFont(None, 40)
+            self.font = Utils.scaled_font(
+                path=None,
+                base_size=40,
+                scale_y=self.scale_y
+            )
             self.use_outline = True
             self.use_shadow = True
         elif self.style == 1: 
             self.color = (200, 200, 200)
-            self.font = pygame.font.SysFont(None, 32)
+            self.font = Utils.scaled_font(
+                path=None,
+                base_size=32,
+                scale_y=self.scale_y
+            )
             self.use_outline = True
             self.use_shadow = False
         elif self.style == 'PUNIR':
             self.color = (255, 0, 0)
-            self.font = pygame.font.SysFont(None, 48)
+            self.font = Utils.scaled_font(
+                path=None,
+                base_size=48,
+                scale_y=self.scale_y
+            )
             self.use_outline = True
             self.use_shadow = True
         else:  
             self.color = (180, 180, 180)
-            self.font = pygame.font.SysFont(None, 24)
+            self.font = Utils.scaled_font(
+                path=None,
+                base_size=24,
+                scale_y=self.scale_y
+            )
             self.use_outline = False
             self.use_shadow = False
 

@@ -15,7 +15,20 @@ class TextButton:
         self.radius = radius
         self.hovered = False
         self.multiLineWidth = multiLineWidth
-        self.font_text = pygame.font.SysFont('Arial', 16)
+
+        display_info = pygame.display.Info()
+        real_width = display_info.current_w
+        real_height = display_info.current_h
+
+        self.scale_x = real_width / 1920
+        self.scale_y = real_height / 1080
+
+        self.font_text = Utils.scaled_font(
+            path=None,
+            base_size=16,
+            scale_y=self.scale_y
+        )
+
         self.utils = Utils()
 
     def draw(self, screen):

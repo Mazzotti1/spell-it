@@ -36,7 +36,20 @@ class ConfirmDialog:
         self.border_color = border_color
         self.text_color = text_color
         self.utils = Utils()
-        self.font_message = pygame.font.SysFont('Arial', 16)
+
+        display_info = pygame.display.Info()
+        real_width = display_info.current_w
+        real_height = display_info.current_h
+
+        self.scale_x = real_width / 1920
+        self.scale_y = real_height / 1080
+
+        self.font_message = Utils.scaled_font(
+            path=None,
+            base_size=22,
+            scale_y=self.scale_y
+        )
+
         self.multiLineWidth = multiLineWidth
         self.multi_line_width_cancel_button = multi_line_width_cancel_button  
 
