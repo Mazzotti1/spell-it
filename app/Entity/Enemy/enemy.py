@@ -272,7 +272,6 @@ class Enemy(Entity):
         hit_chance = base_hit_chance * self.get_lucky()
 
         final_hit_chance = min(1.0, max(0.0, hit_chance - dodge))
-        print(final_hit_chance)
         if self.forced_miss_turns > 0:
             did_hit = False
             self.forced_miss_turns -= 1

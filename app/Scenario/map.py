@@ -357,8 +357,6 @@ class Map(Scenario):
                     self.manager.map_scenario = self
                     self.manager.start_boss_battle(self, chosen_boss, index=boss_index)
 
-                    print(boss_index)
-
                     if boss_index in [2, 3]:
                         self.expand_map()
 
