@@ -35,3 +35,15 @@ class Utils:
         name = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
         name = re.sub(r'\s+', '_', name.lower())
         return name
+    
+    @staticmethod
+    def scaled_font(path: str, base_size: int, scale_y: float, min_size: int = 16) -> pygame.font.Font:
+        final_size = int(max(min_size, base_size * scale_y))
+        return pygame.font.Font(path, final_size)
+
+    @staticmethod
+    def scaled_image(image: pygame.Surface, scale_x: float, scale_y: float) -> pygame.Surface:
+
+        width = int(image.get_width() * scale_x)
+        height = int(image.get_height() * scale_y)
+        return pygame.transform.scale(image, (width, height))

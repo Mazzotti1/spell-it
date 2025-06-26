@@ -6,7 +6,7 @@ from Scenario.map import Map
 from Utils.confirm_dialog import ConfirmDialog
 from Utils.settings_dialog import SettingsDialog
 from Utils.how_to_play_dialog import HowToPlayDialog
-
+from Utils.utils import Utils
 class MainMenu(Scenario):
     def __init__(self, manager, player):
         super().__init__()
@@ -15,21 +15,27 @@ class MainMenu(Scenario):
         self.player = player
         self.enable_ground = False
         self.enable_solids = False
-        self.font = pygame.font.SysFont(None, int(64 * self.manager.scale))
+        self.font = pygame.font.SysFont(None, 64)
         
 
-        self.buttons_font = pygame.font.Font(
-            "../assets/fonts/VT323-Regular.ttf", 
-            int(124 * self.manager.scale)
+        self.buttons_font = Utils.scaled_font(
+            path="../assets/fonts/VT323-Regular.ttf",
+            base_size=124,
+            scale_y=self.manager.scale_y
         )
 
-        self.how_to_play_font = pygame.font.Font(
-            "../assets/fonts/VT323-Regular.ttf", 
-            int(45 * self.manager.scale)
+        self.how_to_play_font = Utils.scaled_font(
+            path="../assets/fonts/VT323-Regular.ttf",
+            base_size=30,
+            scale_y=self.manager.scale_y
         )
 
         self.background_image = pygame.image.load('../assets/scene/menu/main_menu.png').convert_alpha()
-        
+        self.background_image = Utils.scaled_image(
+            self.background_image,
+            self.manager.scale_x,
+            self.manager.scale_y
+        )
         self.player_back_idle_sheet = pygame.image.load('../assets/scene/menu/player_back_idle.png').convert_alpha() #3 frames
 
         self.player_frame_width = self.player_back_idle_sheet.get_width() // 3
