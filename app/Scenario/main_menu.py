@@ -29,10 +29,10 @@ class MainMenu(Scenario):
         self.idle_frame_delay = 200 
         
         self.menu_buttons = [
-            self.create_button("Iniciar", None, (1250, 260), (150, 50), self.start_game),
-            self.create_button("Como jogar", None, (1250, 360), (150, 50), self.how_to_play),
-            self.create_button("Opções", None, (1250, 460), (150, 50), self.open_settings),
-            self.create_button("Sair", None, (1250, 560), (150, 50), self.exit_game),
+            self.create_button("Iniciar", None, (1250, 260), (300, 60), self.start_game),
+            self.create_button("Como jogar", None, (1250, 360), (300, 60), self.how_to_play),
+            self.create_button("Opções", None, (1250, 460), (300, 60), self.open_settings),
+            self.create_button("Sair", None, (1250, 560), (300, 60), self.exit_game),
         ]
 
         self.confirm_dialog = ConfirmDialog(
@@ -62,7 +62,8 @@ class MainMenu(Scenario):
             text=text,
             on_click=on_click,
             text_color=text_color,
-            font=self.buttons_font
+            font=self.buttons_font,
+            hover_color=(200, 200, 200), 
         )
 
     def draw_background(self, screen):
@@ -113,7 +114,7 @@ class MainMenu(Scenario):
             self.settings_dialog.visible = True
 
     def update(self):
-        self.idle_frame_timer += self.manager.dt
+        self.idle_frame_timer += self.manager.dt * 700
         if self.idle_frame_timer >= self.idle_frame_delay:
             self.idle_frame_index = (self.idle_frame_index + 1) % 3
             self.idle_frame_timer = 0
