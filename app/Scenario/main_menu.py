@@ -21,11 +21,11 @@ class MainMenu(Scenario):
         self.how_to_play_font = pygame.font.Font("../assets/fonts/VT323-Regular.ttf", 30)
 
         self.background_image = pygame.image.load('../assets/scene/menu/main_menu.png').convert_alpha()
-        self.background_image = pygame.transform.scale(
-            self.background_image,
-            (int(self.background_image.get_width() * self.manager.scale_x),
-            int(self.background_image.get_height() * self.manager.scale_y))
-        )
+        # self.background_image = pygame.transform.scale(
+        #     self.background_image,
+        #     (int(self.background_image.get_width() * self.manager.scale_x),
+        #     int(self.background_image.get_height() * self.manager.scale_y))
+        # )
 
         
         self.player_back_idle_sheet = pygame.image.load('../assets/scene/menu/player_back_idle.png').convert_alpha() #3 frames
