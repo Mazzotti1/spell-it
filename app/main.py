@@ -34,8 +34,9 @@ class App:
 
         scale_x = real_height / 1920
         scale_y = real_height / 1080
+        scale = min(scale_x, scale_y)
 
-        self.manager = ScenarioManager(self.player, scale_x, scale_y)
+        self.manager = ScenarioManager(self.player, scale)
         self.manager.change_scenario(MainMenu(self.manager, self.player))
 
     def run(self):

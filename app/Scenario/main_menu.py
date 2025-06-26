@@ -15,18 +15,20 @@ class MainMenu(Scenario):
         self.player = player
         self.enable_ground = False
         self.enable_solids = False
-        self.font = pygame.font.SysFont(None, 64)
+        self.font = pygame.font.SysFont(None, int(64 * self.manager.scale))
+        
 
-        self.buttons_font = pygame.font.Font("../assets/fonts/VT323-Regular.ttf", 64)
-        self.how_to_play_font = pygame.font.Font("../assets/fonts/VT323-Regular.ttf", 30)
+        self.buttons_font = pygame.font.Font(
+            "../assets/fonts/VT323-Regular.ttf", 
+            int(124 * self.manager.scale)
+        )
+
+        self.how_to_play_font = pygame.font.Font(
+            "../assets/fonts/VT323-Regular.ttf", 
+            int(45 * self.manager.scale)
+        )
 
         self.background_image = pygame.image.load('../assets/scene/menu/main_menu.png').convert_alpha()
-        # self.background_image = pygame.transform.scale(
-        #     self.background_image,
-        #     (int(self.background_image.get_width() * self.manager.scale_x),
-        #     int(self.background_image.get_height() * self.manager.scale_y))
-        # )
-
         
         self.player_back_idle_sheet = pygame.image.load('../assets/scene/menu/player_back_idle.png').convert_alpha() #3 frames
 
