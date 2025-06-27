@@ -36,4 +36,7 @@ class MenuButtonHover:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
                 if self.on_click:
-                    return self.on_click()
+                    self.on_click()
+                return True
+            
+        return False

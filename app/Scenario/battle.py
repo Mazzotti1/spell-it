@@ -12,6 +12,7 @@ from Effects.punish_animation import PunishAnimation
 from Skills.SkillCardAnimation import SkillCardAnimation
 import random
 from Utils.utils import Utils
+from Scenario.audio_manager import AudioManager
 class Battle(Scenario):
     def __init__(self, manager, biome, enemy, player_final_x, player_final_y, isBossBattle=False, isLastBattle=False):
         super().__init__(manager),
@@ -134,6 +135,33 @@ class Battle(Scenario):
         self.player_win_game = False
         self.player_was_defeated = False
 
+        self.audio_manager = AudioManager.instance()
+
+        self.basic_hit_sound = [
+            "../assets/soundfx/basic_hit_1.ogg",
+            "../assets/soundfx/basic_hit_2.ogg",
+            "../assets/soundfx/basic_hit_3.ogg"
+        ]
+
+        self.dodge_sound = [
+            "../assets/soundfx/dodge_1.ogg",
+            "../assets/soundfx/dodge_2.ogg",
+            "../assets/soundfx/dodge_3.ogg",
+            "../assets/soundfx/dodge_4.ogg",
+            "../assets/soundfx/dodge_5.ogg",
+            "../assets/soundfx/dodge_6.ogg",
+            "../assets/soundfx/dodge_7.ogg",
+        ]
+
+        self.critical_hit_sound = "../assets/soundfx/critical_hit.ogg"
+
+        if isBossBattle:
+            self.audio_manager.play_battle_music("../assets/music/boss_battle.ogg")
+        else:
+            self.audio_manager.play_battle_music("../assets/music/enemy_battle.ogg")
+
+        self.audio_manager.play_sound_effect("../assets/soundfx/map_footsteps.ogg", self.audio_manager.master_volume)
+
     def draw_ui(self, screen):
         if not self.manager.player.moving:
             #debugzinho
@@ -198,6 +226,7 @@ class Battle(Scenario):
                     if rect.collidepoint(pygame.mouse.get_pos()):
                         skill = self.manager.player.skills[i]
                         skill.activate(context=self)
+                        self.audio_manager.play_sound_effect("../assets/soundfx/skill_activate.ogg", self.audio_manager.master_volume)
                         break
         elif not self.pre_combat_ended and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.interface.show_popup("Não é possível usar habilidades no pré-combate!", duration=2.0, y=150)
@@ -223,6 +252,8 @@ class Battle(Scenario):
                         image = self.dodge_img
                         pos = (self.enemy.x + 50, self.enemy.y - 100)
                         self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                        sound_path = random.choice(self.dodge_sound)
+                        self.audio_manager.play_sound_effect(sound_path, self.audio_manager.master_volume)
                         self.turn_transition_delay = 0.8
                     else:
                         damage = damage
@@ -234,6 +265,10 @@ class Battle(Scenario):
                         if is_critical:
                             image = self.critical_img
                             self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                            self.audio_manager.play_sound_effect(self.critical_hit_sound, self.audio_manager.master_volume)
+                        else:
+                            sound_path = random.choice(self.basic_hit_sound)
+                            self.audio_manager.play_sound_effect(sound_path, self.audio_manager.master_volume)
 
                         self.turn_transition_delay = 0.8
 
@@ -243,6 +278,9 @@ class Battle(Scenario):
 
             if word_obj and not self.pre_combat_ended and not self.player_turn_started:
                 self.pre_combat_word_count += 1
+
+                if self.pre_combat_word_count % 5 == 0:
+                    self.audio_manager.play_sound_effect("../assets/soundfx/after_five_words.ogg", self.audio_manager.master_volume)
 
                 word_x, word_y = word_obj.x, word_obj.y
                 player_x, player_y = self.manager.player.get_position()
@@ -260,6 +298,10 @@ class Battle(Scenario):
 
             if word_obj and self.player_turn_started:
                 self.player_turn_word_count += 1
+
+                if self.player_turn_word_count % 5 == 0:
+                    self.audio_manager.play_sound_effect("../assets/soundfx/after_five_words.ogg", self.audio_manager.master_volume)
+
                 self.interface.hit_bar.add_hit()
 
                 for skill in self.active_skills:
@@ -281,6 +323,8 @@ class Battle(Scenario):
                         image = self.dodge_img
                         pos = (self.enemy.x + 50, self.enemy.y - 100)
                         self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                        sound_path = random.choice(self.dodge_sound)
+                        self.audio_manager.play_sound_effect(sound_path, self.audio_manager.master_volume)
                         self.turn_transition_delay = 0.8
                     else:
                         damage = damage
@@ -292,6 +336,10 @@ class Battle(Scenario):
                         if is_critical:
                             image = self.critical_img
                             self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                            self.audio_manager.play_sound_effect(self.critical_hit_sound, self.audio_manager.master_volume)
+                        else:
+                            sound_path = random.choice(self.basic_hit_sound)
+                            self.audio_manager.play_sound_effect(sound_path, self.audio_manager.master_volume)
 
                         self.turn_transition_delay = 0.8
 
@@ -412,6 +460,8 @@ class Battle(Scenario):
                         frame_height= 320,
                         frame_width= 320
                     )
+                    sound = "../assets/soundfx/snake_thunder.ogg"
+                    self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
                 case "Calango" | "Vermaçu":
                     animation = CustomSpriteAnimation(
                         "../assets/effects/enemys/mordida_sheet.png",
@@ -423,6 +473,8 @@ class Battle(Scenario):
                         frame_height= 320,
                         frame_width= 320
                     )
+                    sound = "../assets/soundfx/bite.ogg"
+                    self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
                 case "Jacare" | "Don Jacarone":
                     animation = CustomSpriteAnimation(
                         "../assets/effects/enemys/garra_diagonal_sheet.png",
@@ -434,7 +486,8 @@ class Battle(Scenario):
                         frame_height= 320,
                         frame_width= 320
                     )
-
+                    sound = "../assets/soundfx/patada.ogg"
+                    self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
                 case "Quero-Quero" | "Dr. Pestis":
                     animation= CustomSpriteAnimation(
                         "../assets/effects/enemys/furacao_sheet.png",
@@ -446,7 +499,8 @@ class Battle(Scenario):
                         frame_height= 320,
                         frame_width= 320
                     )
-
+                    sound = "../assets/soundfx/patada.ogg"
+                    self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
                 case "Mico" | "Froguelhão":
                     animation = CustomSpriteAnimation(
                         "../assets/effects/enemys/leao_sheet.png",
@@ -458,7 +512,9 @@ class Battle(Scenario):
                         frame_height= 320,
                         frame_width= 320
                     )
-
+                    sound = "../assets/soundfx/meteor.ogg"
+                    self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
+                    
             self.enemy_attacks.append(PunishAnimation(animation, delay=0.0))
 
         for enemy_attack_animation in self.enemy_attacks[:]:
@@ -710,6 +766,8 @@ class Battle(Scenario):
             self.start_result_animation("victory")
             self.enemy.visible = False
             self.victory_animation_started = True
+            self.audio_manager.restore_previous_music()
+            self.audio_manager.play_sound_effect("../assets/soundfx/victory.ogg", self.audio_manager.master_volume)
             if self.isBossBattle:
                 self.manager.player.recieveBossReward()
 
@@ -802,6 +860,8 @@ class Battle(Scenario):
                 image = self.dodge_img
                 pos = (self.manager.player.x - 200, self.manager.player.y - 200)
                 self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                sound_path = random.choice(self.dodge_sound)
+                self.audio_manager.play_sound_effect(sound_path, self.audio_manager.master_volume)
                 self.turn_transition_delay = 0.8
             else:
                 damage = result["damage"]
@@ -813,6 +873,13 @@ class Battle(Scenario):
                 if result["is_critical"]:
                     image = self.critical_img
                     self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                    self.audio_manager.play_sound_effect(self.critical_hit_sound, self.audio_manager.master_volume)
+                else:
+                    if self.isBossBattle:
+                        self.audio_manager.play_sound_effect(self.critical_hit_sound, self.audio_manager.master_volume)
+                    
+                    sound_path = random.choice(self.basic_hit_sound)
+                    self.audio_manager.play_sound_effect(sound_path, self.audio_manager.master_volume)
 
                 self.turn_transition_delay = 0.8
 
@@ -839,6 +906,8 @@ class Battle(Scenario):
                 image = self.dodge_img
                 pos = (self.enemy.x + 50, self.enemy.y - 100)
                 self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                sound_path = random.choice(self.dodge_sound)
+                self.audio_manager.play_sound_effect(sound_path, self.audio_manager.master_volume)
                 self.turn_transition_delay = 0.8
             else:
                 damage = damage
@@ -850,6 +919,10 @@ class Battle(Scenario):
                 if is_critical:
                     image = self.critical_img
                     self.temporary_effects.append(TemporaryEffect(image, pos, duration=0.5))
+                    self.audio_manager.play_sound_effect(self.critical_hit_sound, self.audio_manager.master_volume)
+                else:
+                    sound_path = random.choice(self.basic_hit_sound)
+                    self.audio_manager.play_sound_effect(sound_path, self.audio_manager.master_volume)
 
                 self.turn_transition_delay = 0.8
 
@@ -961,6 +1034,8 @@ class Battle(Scenario):
 
 
     def end_game_animation(self, screen, player, title):
+        self.audio_manager.restore_previous_music()
+        
         overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 210))
         screen.blit(overlay, (0, 0))

@@ -5,6 +5,7 @@ from Scenario.scenario import Scenario
 from Factory.playerFactory import PlayerFactory
 from Interface.interace import Interface
 from Utils.utils import Utils
+from Scenario.audio_manager import AudioManager
 
 class Map(Scenario):
     def __init__(self, manager, background, player):
@@ -18,6 +19,7 @@ class Map(Scenario):
         self.in_battle = False
         self.is_choosing_perk = False
 
+        self.audio_manager = AudioManager.instance()
 
         self.font_title = Utils.scaled_font(
             path='../assets/fonts/CrimsonPro-VariableFont_wght.ttf',
@@ -123,6 +125,9 @@ class Map(Scenario):
 
         self.available_bosses = ["tupinaje", "vermaçu", "donJacarone", "drPestis", "froguelhao"]
         self.expanded_once = False
+        self.book_flip_sound_played = False
+
+        self.perk_sound_played = False
 
     def generate_branches(self, steps=3, start_x=930, start_y=830):
         branch_width = 90
@@ -279,6 +284,15 @@ class Map(Scenario):
             if self.is_node_perk or self.is_first_node:
                 self.draw_perks(screen)
 
+                if not self.perk_sound_played:
+                    self.audio_manager.play_sound_effect(
+                        "../assets/soundfx/scroll_opening.ogg",
+                        self.audio_manager.master_volume
+                    )
+                    self.perk_sound_played = True
+            else:
+                self.perk_sound_played = False
+
         self.draw_menu(screen)
 
     def handle_node_click(self, clicked_node):
@@ -325,6 +339,7 @@ class Map(Scenario):
         self.moving_entity.animation_timer = 0
         self.moving_entity.current_frame = self.moving_entity.current_frames[0]
 
+        self.audio_manager.play_sound_effect("../assets/soundfx/map_footsteps.ogg", self.audio_manager.master_volume)
         for n in self.nodes:
             if 'entity' in n and n['entity'] == self.player:
                 del n['entity']
@@ -476,6 +491,10 @@ class Map(Scenario):
     def draw_background(self, screen):
         screen.fill((0, 0, 0))
 
+        if self.is_start_map_animating and not self.book_flip_sound_played:
+            self.audio_manager.play_sound_effect("../assets/soundfx/book_fliping.ogg", self.audio_manager.master_volume)
+            self.book_flip_sound_played = True
+
         if self.is_start_map_animating or self.current_book_map_frame == self.num_book_map_frames - 1:
             col = self.current_book_map_frame % self.frame_book_map_cols
             row = self.current_book_map_frame // self.frame_book_map_cols
@@ -503,7 +522,7 @@ class Map(Scenario):
 
             x = (screen.get_width() - scaled_width) // 2
             y = (screen.get_height() - scaled_height) // 2 - lift
-
+            
             screen.blit(frame_image, (x, y))
 
         if self.background_image and not self.is_start_map_animating:

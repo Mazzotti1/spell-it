@@ -1,8 +1,10 @@
 import pygame
 from Utils.utils import Utils
+from Scenario.audio_manager import AudioManager
 
 class TextButton:
-    def __init__(self, text, position, size, on_click=None, font=None, font_size=24, text_color=(255,255,255), bg_color=(100,100,100), hover_color=(150,150,150), radius=10, multiLineWidth=50):
+    def __init__(self, text, position, size, on_click=None, font=None, font_size=24, text_color=(255,255,255), bg_color=(100,100,100), hover_color=(150,150,150), radius=10, multiLineWidth=50
+                 ):
         self.text = text
         self.position = position
         self.size = size
@@ -22,13 +24,13 @@ class TextButton:
 
         self.scale_x = real_width / 1920
         self.scale_y = real_height / 1080
-
         self.font_text = Utils.scaled_font(
             path=None,
             base_size=24,
             scale_y=self.scale_y
         )
-
+        
+        self.audio_manager = AudioManager.instance()
         self.utils = Utils()
 
     def draw(self, screen):
@@ -52,3 +54,6 @@ class TextButton:
             if self.rect.collidepoint(event.pos):
                 if self.on_click:
                     self.on_click()
+                    if not self.audio_manager.audio_muted:
+                        self.audio_manager.play_sound_effect("../assets/soundfx/button_click.ogg", self.audio_manager.master_volume)
+

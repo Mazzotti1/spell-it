@@ -7,6 +7,7 @@ from Utils.confirm_dialog import ConfirmDialog
 from Utils.settings_dialog import SettingsDialog
 from Utils.how_to_play_dialog import HowToPlayDialog
 from Utils.utils import Utils
+from Scenario.audio_manager import AudioManager
 class MainMenu(Scenario):
     def __init__(self, manager, player):
         super().__init__()
@@ -68,7 +69,8 @@ class MainMenu(Scenario):
             text="Configurações",
             text_size=36,
             font=self.how_to_play_font,
-            radius=10
+            radius=10,
+            manager=self.manager,
         )
 
         self.how_to_play_dialog = HowToPlayDialog(
@@ -80,6 +82,9 @@ class MainMenu(Scenario):
             font=self.how_to_play_font,
             radius=10
         )
+
+        self.audio_manager = AudioManager.instance()
+        self.audio_manager.play_music("../assets/music/main_menu.ogg")
 
     def create_button(self, text, color, position, size, on_click, text_color="black"):
         return MenuButtonHover(
@@ -121,7 +126,9 @@ class MainMenu(Scenario):
     def handle_buttons_event(self, event):
         for btn in self.menu_buttons:
             if not self.how_to_play_dialog.visible:
-                btn.handle_event(event)
+                clicked = btn.handle_event(event)
+                if clicked and not self.audio_manager.audio_muted:
+                    self.audio_manager.play_sound_effect("../assets/soundfx/button_click.ogg", self.audio_manager.master_volume)
 
     def exit_game(self):
         if not self.confirm_dialog.visible and not self.settings_dialog.visible:

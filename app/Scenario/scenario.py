@@ -36,7 +36,8 @@ class Scenario:
             text="Configurações",
             text_size=36,
             font=self.font,
-            radius=10
+            radius=10,
+            manager=self.manager,
         )
 
         self.menu = MenuDialog(

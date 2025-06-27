@@ -3,6 +3,8 @@ import pygame
 
 from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Skills.skill import Skill
+from Scenario.audio_manager import AudioManager
+from Utils.utils import Utils
 
 class SkillCardAnimation:
     def __init__(self, start_pos, target_pos=None, player=None, manager=None):
@@ -57,7 +59,8 @@ class SkillCardAnimation:
 
         self.reveal_time = None
         self.end_battle_called = False
-
+        self.audio_manager = AudioManager.instance()
+        self.dice_sounding = False
     def update(self, mouse_pos, dt):
         target_scale = self.hover_scale if self.rect.collidepoint(mouse_pos) else 1.0
         self.scale += (target_scale - self.scale) * 0.1
@@ -69,6 +72,11 @@ class SkillCardAnimation:
         self.hovered = self.rect.collidepoint(mouse_pos)
 
         if self.dice_playing:
+            if not self.dice_sounding:
+                sound = "../assets/soundfx/dice_skill.ogg"
+                self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
+                self.dice_sounding = True
+
             self.dice_animation.update(dt)
             if self.dice_animation.is_finished():
                 self.dice_playing = False
@@ -107,7 +115,11 @@ class SkillCardAnimation:
             self.dice_animation.draw(surface)
 
     def get_unique_skill(self):
-        owned_names = {skill.get_name() for skill in self.player.all_acquired_skills}
+        owned_names = {
+            Utils.normalize_skill_name(skill.get_name())
+            for skill in self.player.all_acquired_skills
+        }
+
         available = [name for name in self.skill_names if name not in owned_names]
 
         if not available:

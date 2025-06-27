@@ -4,6 +4,7 @@ from Attributes.attributes import Attributes
 from Factory.enemyFactory import EnemyFactory
 from Factory.playerFactory import PlayerFactory
 from Scenario.main_menu import MainMenu
+from Scenario.audio_manager import AudioManager
 class ScenarioManager:
     def __init__(self, player, scale_x, scale_y):
         self.current_scenario = None
@@ -19,6 +20,9 @@ class ScenarioManager:
         self.scale_x = scale_x
         self.scale_y = scale_y
 
+
+        self.audio_manager = AudioManager.instance()
+        
     def change_scenario(self, new_scenario):
         self.current_scenario = new_scenario
 
@@ -128,11 +132,11 @@ class ScenarioManager:
         new_attributes = Attributes(
             dodge=10.0,
             attack_speed=71.0,
-            strength=5.0,
+            strength=7.0,
             health=70,
             lucky=1.2,
             critical_chance=20.0,
-            max_health=50
+            max_health=70
         )
         self.player.set_attributes(new_attributes)
         self.player.skills = []

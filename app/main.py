@@ -6,25 +6,29 @@ from Scenario.battle import Battle
 from Factory.playerFactory import PlayerFactory
 from Scenario.map import Map
 from Attributes.attributes import Attributes
+from Scenario.audio_manager import AudioManager
 class App:
     def __init__(self):
 
         pygame.init()
+        pygame.mixer.init()
+
         pygame.display.set_caption("Menu")
 
         self.screen = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN | pygame.SCALED)
 
         self.clock = pygame.time.Clock()
         self.running = True
-
+        self.audio_manager = AudioManager.instance()
+        
         attributes = Attributes(
             dodge=10.0,
             attack_speed=71.0,
-            strength=5.0,
+            strength=700.0,
             health=70,
             lucky=1.2,
             critical_chance=20.0,
-            max_health=50
+            max_health=70
         )
         self.player = PlayerFactory.create_player(-100, 750, attributes)
 
@@ -115,6 +119,7 @@ class App:
 
             self.manager.update()
             self.manager.draw(self.screen)
+            self.audio_manager.update()
 
             if isinstance(self.manager.current_scenario, Battle):
                 battle = self.manager.current_scenario

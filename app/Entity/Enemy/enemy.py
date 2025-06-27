@@ -3,6 +3,7 @@ from Entity.entity import Entity
 from Effects.custom_sprite_animation import CustomSpriteAnimation
 from Effects.punish_animation import PunishAnimation
 from Effects.falling_anvil_animation import FallingAnvilAnimation
+from Scenario.audio_manager import AudioManager
 class Enemy(Entity):
     def __init__(self, type, attributes, x=0, y=0):
         super().__init__(x, y, type, attributes, width=384, height=384)
@@ -29,6 +30,7 @@ class Enemy(Entity):
             "hited": (hitted_sprite, 0.1),
             "dying": (dying_sprite, 0.1),
         })
+        self.audio_manager = AudioManager.instance()
 
         if self.name == "Anaconda":
             self.anaconda_hited = CustomSpriteAnimation(
@@ -328,7 +330,12 @@ class Enemy(Entity):
                 )
 
                 self.punish_effects.append(PunishAnimation(stars_anim, delay=0.6))
+                
+                sound = "../assets/soundfx/anvil.ogg"
+                self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
+
                 self.punish_effects.append(PunishAnimation(animation_hit, delay=0.7))
+
 
                 if not self.is_alive():
                     self.dying_animations.append(PunishAnimation(animation_dying, delay=0.0))
@@ -350,6 +357,9 @@ class Enemy(Entity):
             self.punish_effects.append(PunishAnimation(flame))
             self.punish_effects.append(PunishAnimation(animation_hit, delay=0.6))
 
+            sound = "../assets/soundfx/burning.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
+
             if not self.is_alive():
                 self.dying_animations.append(PunishAnimation(animation_dying, delay=0.0))
 
@@ -369,6 +379,9 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(firefly))
             self.punish_effects.append(PunishAnimation(animation_hit, delay=0.2))
+
+            sound = "../assets/soundfx/water_cyclone.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
 
             if not self.is_alive():
                 self.dying_animations.append(PunishAnimation(animation_dying, delay=0.5))
@@ -390,6 +403,9 @@ class Enemy(Entity):
             self.punish_effects.append(PunishAnimation(tornado))
             self.punish_effects.append(PunishAnimation(animation_hit, delay=0.2))
 
+            sound = "../assets/soundfx/wind_cyclone.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
+
             if not self.is_alive():
                 self.dying_animations.append(PunishAnimation(animation_dying, delay=0.5))
 
@@ -409,6 +425,9 @@ class Enemy(Entity):
             )
             self.punish_effects.append(PunishAnimation(storm))
             self.punish_effects.append(PunishAnimation(animation_hit, delay=0.2))
+
+            sound = "../assets/soundfx/player_thunder.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
 
             if not self.is_alive():
                 self.dying_animations.append(PunishAnimation(animation_dying, delay=0.5))
@@ -461,6 +480,8 @@ class Enemy(Entity):
                 frame_width=320
             )
             self.punish_effects.append(PunishAnimation(anvil))
+            sound = "../assets/soundfx/anvil.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
             self.punish_effects.append(PunishAnimation(stars, delay=0.6))
 
         elif enemy_key in ["calango", "vermaçu"]:
@@ -474,6 +495,8 @@ class Enemy(Entity):
                 frame_height=320,
                 frame_width=320
             )
+            sound = "../assets/soundfx/burning.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
             self.punish_effects.append(PunishAnimation(flame))
 
         elif enemy_key in ["jacare", "don_jacarone"]:
@@ -487,6 +510,8 @@ class Enemy(Entity):
                 frame_height=512,
                 frame_width=512
             )
+            sound = "../assets/soundfx/water_cyclone.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
             self.punish_effects.append(PunishAnimation(tornado))
 
         elif enemy_key in ["quero_quero", "dr._pestis"]:
@@ -500,6 +525,8 @@ class Enemy(Entity):
                 frame_height=320,
                 frame_width=320
             )
+            sound = "../assets/soundfx/wind_cyclone.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
             self.punish_effects.append(PunishAnimation(tornado))
 
         elif enemy_key in ["mico", "froguelhão"]:
@@ -513,4 +540,6 @@ class Enemy(Entity):
                 frame_height=320,
                 frame_width=512
             )
+            sound = "../assets/soundfx/player_thunder.ogg"
+            self.audio_manager.play_sound_effect(sound, self.audio_manager.master_volume)
             self.punish_effects.append(PunishAnimation(storm))

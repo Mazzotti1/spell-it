@@ -33,8 +33,13 @@ class Utils:
     @staticmethod
     def normalize_skill_name(name):
         name = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
-        name = re.sub(r'\s+', '_', name.lower())
-        return name
+        name = name.lower()
+
+        words = re.split(r'\s+', name.strip())
+        stopwords = {"de", "do", "da", "dos", "das", "e"}
+        filtered_words = [w for w in words if w not in stopwords]
+        normalized = "_".join(filtered_words)
+        return normalized
     
     @staticmethod
     def scaled_font(path: str, base_size: int, scale_y: float = 0, min_size: int = 16, bold: bool = False) -> pygame.font.Font:

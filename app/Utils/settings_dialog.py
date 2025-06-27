@@ -3,8 +3,9 @@ from Utils.menu_button import MenuButton
 from Utils.confirm_dialog import ConfirmDialog
 from Utils.text_button import TextButton
 from Utils.utils import Utils
+from Scenario.audio_manager import AudioManager
 class SettingsDialog:
-    def __init__(self, color, position, size, text, text_size=36, font=None, radius=15):
+    def __init__(self, color, position, size, text, text_size=36, font=None, radius=15, manager=None):
         self.color = color
         self.rect = pygame.Rect(position[0], position[1], size[0], size[1])
         self.text = text
@@ -23,7 +24,8 @@ class SettingsDialog:
 
         self.current_tab = 'audio'
         self.is_dirty = False
-
+        self.manager = manager
+        
         self.topbar_setting_buttons = [
             self.create_topbar_button('Áudio',  (780, 150), (120, 50), on_click= self.change_to_audio_settings),
             self.create_topbar_button('Controles',  (1000, 150), (120, 50), on_click=self.change_to_controls_settings),
@@ -70,14 +72,24 @@ class SettingsDialog:
             text='Salvar',
             position=save_pos,
             size=self.button_size,
-            on_click=self.confirm
+            on_click=self.confirm,
         )
         self.cancel_button = TextButton(
             text='Fechar',
             position=cancel_pos,
             size=self.button_size,
-            on_click=self.cancel
+            on_click=self.cancel,
         )
+
+        self.audio_manager = AudioManager.instance()
+
+        self.volume = self.audio_manager.master_volume if self.audio_manager else 0.5
+        self.is_muted = self.audio_manager.audio_muted if self.audio_manager else False
+
+        self.checkbox_rect = pygame.Rect(position[0] + 100, position[1] + 190, 20, 20)
+        self.checkbox_label = "Mutar som"
+
+        self.volume_slider_rect = pygame.Rect(position[0] + 100, position[1] + 280, 300, 20)
 
     def confirm(self):
         if self.is_dirty:
@@ -138,7 +150,7 @@ class SettingsDialog:
             text=text,
             position=position,
             size=size,
-            on_click=on_click
+            on_click=on_click,
         )
     
     def handle_topbar_buttons_event(self, event):
@@ -184,6 +196,28 @@ class SettingsDialog:
                 1  
             )
 
+        if self.current_tab == 'audio':
+            pygame.draw.rect(screen, (255, 255, 255), self.checkbox_rect, 2)
+            if self.is_muted:
+                pygame.draw.line(screen, (255, 255, 255), self.checkbox_rect.topleft, self.checkbox_rect.bottomright, 2)
+                pygame.draw.line(screen, (255, 255, 255), self.checkbox_rect.topright, self.checkbox_rect.bottomleft, 2)
+
+            label_surface = self.font.render(self.checkbox_label, True, self.text_color)
+            screen.blit(label_surface, (self.checkbox_rect.right + 10, self.checkbox_rect.top - 4))
+
+            pygame.draw.rect(screen, (180, 180, 180), self.volume_slider_rect)
+
+            filled_width = int(self.volume_slider_rect.width * self.volume)
+            filled_rect = pygame.Rect(
+                self.volume_slider_rect.x, self.volume_slider_rect.y,
+                filled_width, self.volume_slider_rect.height
+            )
+            pygame.draw.rect(screen, (100, 200, 100), filled_rect)
+
+            volume_text = f"Volume: {int(self.volume * 100)}%"
+            surface = self.font.render(volume_text, True, self.text_color)
+            screen.blit(surface, (self.volume_slider_rect.x, self.volume_slider_rect.y - 30))
+
         if self.current_tab == 'controls':
             start_y = content_text_rect.bottom + 40 
             spacing = 10 
@@ -194,8 +228,17 @@ class SettingsDialog:
                 screen.blit(line_surface, line_rect)
                 start_y += line_surface.get_height() + spacing
 
-
     def confirm_settings(self):
+        if self.is_muted:
+            if not self.audio_manager.audio_muted:
+                self.audio_manager.audio_muted = True
+                pygame.mixer.music.pause()
+        else:
+            if self.audio_manager.audio_muted:
+                self.audio_manager.audio_muted = False
+                pygame.mixer.music.unpause()
+            self.audio_manager.set_volume(self.volume)
+        
         self.is_dirty = False
         self.visible = False
 
@@ -210,6 +253,18 @@ class SettingsDialog:
         if not self.visible:
             return
 
+        if self.current_tab == 'audio':
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.checkbox_rect.collidepoint(event.pos):
+                    self.is_muted = not self.is_muted
+                    self.is_dirty = True
+                elif self.volume_slider_rect.collidepoint(event.pos):
+                    self.set_volume_from_mouse(event.pos[0])
+
+            elif event.type == pygame.MOUSEMOTION:
+                if pygame.mouse.get_pressed()[0] and self.volume_slider_rect.collidepoint(event.pos):
+                    self.set_volume_from_mouse(event.pos[0])
+
         if self.unsaved_changes_dialog.visible:
             self.unsaved_changes_dialog.handle_event(event)
             return
@@ -223,3 +278,9 @@ class SettingsDialog:
 
         self.save_button.handle_event(event)
         self.cancel_button.handle_event(event)
+
+    def set_volume_from_mouse(self, mouse_x):
+        relative_x = mouse_x - self.volume_slider_rect.x
+        self.volume = max(0.0, min(1.0, relative_x / self.volume_slider_rect.width))
+        self.is_dirty = True
+
