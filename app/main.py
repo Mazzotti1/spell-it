@@ -24,7 +24,7 @@ class App:
         attributes = Attributes(
             dodge=10.0,
             attack_speed=71.0,
-            strength=700.0,
+            strength=7.0,
             health=70,
             lucky=1.2,
             critical_chance=20.0,
