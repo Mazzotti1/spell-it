@@ -83,6 +83,10 @@ class Player(Entity):
             setter(current_value + 20)
             return
 
+        if attribute in ['lucky']:
+            setter(current_value + 0.1)
+            return
+
         bonus = random.uniform(0, lucky * 2)
         bonus_int = max(1, int(bonus))
 
