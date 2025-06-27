@@ -63,6 +63,9 @@ Jogo do gênero Rogue Like desenvolvido completamente em python com uma mecânic
 - Trilha sonora batalha - Bell Gargoyles - Dark Souls Soundtrack 05
 - Trilha sonora de chefes - Taurus Demon - Dark Souls Soundtrack 04
 
+- Efeitos sonoros : João Vitor Nunes
+- Artes : João Pedro Carneiro
+
 ---
 
 ## 📄 Licença
